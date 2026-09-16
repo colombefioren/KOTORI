@@ -116,3 +116,61 @@ and unit-tested.
 Everything is expressed as CSS custom properties in `assets/styles/tokens.css`, and
 the Gradio theme in `theme.py` mirrors the same palette so components that ship their
 own styles still match.
+
+---
+
+## Run it locally
+
+```bash
+# 1. install (uv installs the project itself, editable)
+uv sync
+
+# 2. credentials — any OpenAI-compatible endpoint works
+cp .env.example .env
+$EDITOR .env
+
+# 3. launch
+uv run ai-storyteller          # or: uv run python app.py / uv run python -m ai_storyteller
+# → http://127.0.0.1:7860
+```
+
+Only three variables are required: `MODEL_NAME`, `API_KEY`, `BASE_URL`.
+
+| variable | default | purpose |
+|---|---|---|
+| `MODEL_NAME` | `gpt-4o-mini` | any chat model your endpoint serves |
+| `API_KEY` | — | required; `OPENAI_API_KEY` also accepted |
+| `BASE_URL` | OpenAI | Groq, OpenRouter, Together, Ollama, vLLM, LM Studio… |
+| `TEMPERATURE` | `0.9` | writer's temperature |
+| `MAX_TOKENS` | `900` | hard ceiling per story |
+| `REQUEST_TIMEOUT` | `60` | seconds before a write is abandoned |
+| `AI_STORYTELLER_DATA_DIR` | `./data` | archive + rendered mp3s |
+| `FORCE_DARK` | `1` | the studio ships dark-first |
+| `PORT` / `GRADIO_SERVER_PORT` | `7860` | server port (`PORT` wins) |
+| `GRADIO_SERVER_NAME` | `0.0.0.0` | bind address |
+
+### Keyboard
+
+| key | action |
+|---|---|
+| `⌘/Ctrl + K` | command palette |
+| `/` | focus the seed field |
+| `⌘/Ctrl + Enter` | ignite a story |
+| `space` | play / pause the voice |
+| `←` `→` | scrub five seconds |
+| `A` | jump to the archive |
+| `P` | open a shared story |
+| `T` | toggle the cursor trail |
+| `?` | shortcut sheet |
+| `Esc` | close overlays |
+
+### Tests and lint
+
+```bash
+uv run pytest          # 70+ unit tests, fully offline
+uv run ruff check src tests
+uv run ruff format --check src tests
+```
+
+The network is never touched in tests: the writer is faked, speech synthesis is
+monkeypatched, and the app is assembled without launching.
