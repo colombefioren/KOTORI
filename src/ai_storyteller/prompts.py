@@ -105,7 +105,7 @@ TOPIC_SEEDS: tuple[str, ...] = (
 
 _FENCE_RE = re.compile(r"^\s*```[a-zA-Z]*\s*|\s*```\s*$")
 _HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+.*\n+")
-_LABEL_RE = re.compile(r"^\s*(title|story)\s*:\s*", re.IGNORECASE)
+_LABEL_RE = re.compile(r"^\s*(?:title|story)\s*[:\-—]\s*.*(?:\n+|$)", re.IGNORECASE)
 _SPACE_RE = re.compile(r"[ \t]{2,}")
 _MULTI_NEWLINE_RE = re.compile(r"\n{3,}")
 _SPACE_BEFORE_PUNCT_RE = re.compile(r"\s+([,.;:!?…])")
@@ -155,7 +155,7 @@ def clean_story(raw: str) -> str:
     """Strip model chatter so the teleprompter only ever sees prose."""
     text = _FENCE_RE.sub("", (raw or "").strip())
     text = _HEADING_RE.sub("", text)
-    text = _LABEL_RE.sub("", text)
+    text = _LABEL_RE.sub("", text).lstrip()
     text = _SPACE_BEFORE_PUNCT_RE.sub(r"\1", text)
     text = _MISSING_SPACE_RE.sub(" ", text)
     text = _SPACE_RE.sub(" ", text)
