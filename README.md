@@ -52,3 +52,67 @@ Built with **Gradio 6**, **LangChain** and **gTTS** — no database, no accounts
 6. **the deck** — custom player, karaoke rail, exports and share link
 7. **the shelf** — the JSONL archive with preview, re-voice, delete, burn
 8. **the shell** — command palette, shortcuts, toasts, restored share links
+
+---
+
+## Architecture
+
+One package, small modules, no framework of its own:
+
+```
+src/ai_storyteller/
+├── config.py       env → Settings (aliases, coercion, writable-dir fallback)
+├── llm.py          ChatOpenAI factory for any OpenAI-compatible endpoint
+├── prompts.py      genres, moods, brief, prose cleanup
+├── story.py        streaming writer with paced frames
+├── speech.py       voice presets, gTTS synthesis, data-URI delivery
+├── timing.py       word weights → the karaoke timeline
+├── library.py      append-only JSONL archive + stats
+├── models.py       StoryRequest / StoryDraft + reading-time maths
+├── markup.py       HTML for hero, stage, deck, archive, footer
+├── studio.py       controller: write → voice → archive (Gradio-free)
+├── theme.py        Gradio theme mirroring the CSS tokens
+├── frontend.py     css/js/head bundle loader
+├── ui.py           Blocks layout + event wiring
+├── app.py          launch(): theme, css, js, favicon, port
+└── assets/
+    ├── styles/     tokens · layout · components · animations
+    ├── scripts/    trail · teleprompter · deck · shell
+    └── favicon.svg
+```
+
+**Why the split?** `studio.py` returns plain HTML strings and dataclasses, so the
+whole product can be driven from tests, a notebook or a CLI without Gradio in the
+loop. The Gradio layer stays a thin skin over it.
+
+### How the karaoke actually works
+
+1. The server tokenises the finished prose and gives each word a **weight**
+   (base + length + a pause for its trailing punctuation) — see `timing.py`.
+2. Each word is rendered as `<span class="tp-word" data-w="1.72">debt.</span>`.
+3. In the browser, weights become cumulative fractions; the audio's real
+   `duration` scales them into a timeline.
+4. A `requestAnimationFrame` loop maps `currentTime → word index` and paints
+   three states (`is-spoken`, `is-current`, `is-pending`), moves the halo and
+   scrolls the paper.
+
+No forced-alignment model, no second API call — the timing engine is ~60 lines
+and unit-tested.
+
+### The design system
+
+| token | value | used for |
+|---|---|---|
+| `--ast-void` | `#07070c` | page canvas |
+| `--ast-panel` | `#101021` | panels, cards |
+| `--ast-mint` | `#96f7d2` | primary action, current word |
+| `--ast-lilac` | `#cbb8ff` | secondary accent, focus |
+| `--ast-blush` | `#ffb2cb` | destructive, warnings |
+| `--ast-butter` | `#ffe8a3` | playful highlights |
+| `--ast-sky` | `#a6d8ff` | engine + model chips |
+| type | Space Grotesk · JetBrains Mono · Instrument Serif | UI · labels · prose |
+| geometry | 2px radius · 2px borders · 6px hard shadows | brutalism |
+
+Everything is expressed as CSS custom properties in `assets/styles/tokens.css`, and
+the Gradio theme in `theme.py` mirrors the same palette so components that ship their
+own styles still match.
