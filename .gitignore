@@ -9,4 +9,16 @@ wheels/
 # Virtual environments
 .venv
 
+# Secrets
 .env
+.env.local
+
+# Local story archive + rendered audio
+data/
+*.mp3
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
