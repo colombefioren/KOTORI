@@ -7,36 +7,17 @@ from ai_storyteller.config import Settings
 from ai_storyteller.models import StoryRequest
 from ai_storyteller.story import StoryError, StoryService
 
-PROSE = (
-    "The lamp turned twice and the sea leaned closer, patient as debt. "
-    "She read the letter again and understood the ship had never sunk."
-)
-
-
-class FakeChunk:
-    def __init__(self, content: str) -> None:
-        self.content = content
-
-
-class FakeModel:
-    def __init__(self, pieces: list[str]) -> None:
-        self.pieces = pieces
-
-    async def astream(self, messages):
-        for piece in self.pieces:
-            yield FakeChunk(piece)
-
-    def invoke(self, messages):
-        return FakeChunk("".join(self.pieces))
-
 
 @pytest.fixture
-def service(monkeypatch: pytest.MonkeyPatch) -> StoryService:
-    settings = Settings(model_name="test-model", api_key="test-key")
-    service = StoryService(settings)
-    pieces = [PROSE[:40], PROSE[40:120], PROSE[120:]]
-    monkeypatch.setattr(story_module, "build_chat_model", lambda *a, **k: FakeModel(pieces))
-    return service
+def service(story_service: StoryService) -> StoryService:
+    return story_service
+
+
+def collect_chunks(service: StoryService, request: StoryRequest):
+    async def run():
+        return [chunk async for chunk in service.stream(request)]
+
+    return asyncio.run(run())
 
 
 def test_prepare_fills_empty_topic_and_clamps_length():
@@ -51,21 +32,25 @@ def test_prepare_keeps_a_real_topic():
     assert prepared.topic == "a quiet town"
 
 
-def test_stream_yields_growing_text_then_finishes(service: StoryService):
-    async def collect():
-        return [chunk async for chunk in service.stream(StoryRequest(topic="the lamp"))]
-
-    chunks = asyncio.run(collect())
+def test_stream_yields_growing_text_then_finishes(service: StoryService, story_text: str):
+    chunks = collect_chunks(service, StoryRequest(topic="the lamp"))
     assert chunks[0].note.startswith("warming")
     assert chunks[-1].finished is True
-    assert chunks[-1].text == PROSE
+    assert chunks[-1].text == story_text
     lengths = [len(chunk.text) for chunk in chunks]
     assert lengths == sorted(lengths)
 
 
-def test_compose_returns_a_populated_draft(service: StoryService):
+def test_stream_paces_itself_to_one_frame_per_burst(service: StoryService, story_text: str):
+    chunks = collect_chunks(service, StoryRequest(topic="the lamp"))
+    # warm-up frame, one frame per burst, then the closing frame
+    assert len(chunks) <= 4
+    assert any(chunk.text == story_text for chunk in chunks)
+
+
+def test_compose_returns_a_populated_draft(service: StoryService, story_text: str):
     draft = service.compose(StoryRequest(topic="the lamp", genre="Noir", mood="Tense"))
-    assert draft.story == PROSE
+    assert draft.story == story_text
     assert draft.genre == "Noir"
     assert draft.mood == "Tense"
     assert draft.words > 20
@@ -74,12 +59,15 @@ def test_compose_returns_a_populated_draft(service: StoryService):
     assert draft.elapsed_ms >= 0
 
 
-def test_stream_rejects_a_stub_answer(monkeypatch: pytest.MonkeyPatch):
-    service = StoryService(Settings(api_key="x"))
-    monkeypatch.setattr(story_module, "build_chat_model", lambda *a, **k: FakeModel(["ok."]))
-
-    async def collect():
-        return [chunk async for chunk in service.stream(StoryRequest(topic="x"))]
+def test_stream_rejects_a_stub_answer(settings: Settings, monkeypatch, fake_model):
+    service = StoryService(settings)
+    monkeypatch.setattr(story_module, "build_chat_model", lambda *a, **k: fake_model(["ok."]))
 
     with pytest.raises(StoryError):
-        asyncio.run(collect())
+        collect_chunks(service, StoryRequest(topic="x"))
+
+
+def test_messages_start_with_the_brief(service: StoryService):
+    messages = service.messages(StoryRequest(topic="a lighthouse", genre="Noir", mood="Tense"))
+    assert messages[0].type == "system"
+    assert "a lighthouse" in messages[1].content

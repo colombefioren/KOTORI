@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import gradio as gr
-import pytest
 
 from ai_storyteller.app import build_demo, launch_options
 from ai_storyteller.config import Settings
@@ -33,11 +32,6 @@ EXPECTED_IDS = {
     "ast-adopt",
     "ast-footer",
 }
-
-
-@pytest.fixture
-def settings(tmp_path: Path) -> Settings:
-    return Settings(model_name="test-model", api_key="test-key", data_dir=tmp_path)
 
 
 def test_asset_bundle_is_complete():
