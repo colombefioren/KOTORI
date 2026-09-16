@@ -62,7 +62,7 @@ def test_random_topic_is_seeded_and_known():
 
 
 def test_clean_story_strips_model_chatter():
-    raw = '```\nTitle: The Lamp\n\nShe waited,  and the sea ,  answered.\n```'
+    raw = "```\nTitle: The Lamp\n\nShe waited,  and the sea ,  answered.\n```"
     assert clean_story(raw) == "She waited, and the sea, answered."
 
 

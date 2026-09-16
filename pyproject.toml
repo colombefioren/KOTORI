@@ -45,10 +45,13 @@ extend-exclude = [".venv", "data"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "C4", "RUF"]
-ignore = ["E501"]
+# typographic apostrophes and dashes are deliberate in the prose handling
+ignore = ["E501", "RUF001"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+# gradio layouts are nested contexts by design: merging `with` blocks hurts
+"src/ai_storyteller/ui.py" = ["SIM117"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

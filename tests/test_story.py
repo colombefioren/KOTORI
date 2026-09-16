@@ -35,9 +35,7 @@ def service(monkeypatch: pytest.MonkeyPatch) -> StoryService:
     settings = Settings(model_name="test-model", api_key="test-key")
     service = StoryService(settings)
     pieces = [PROSE[:40], PROSE[40:120], PROSE[120:]]
-    monkeypatch.setattr(
-        story_module, "build_chat_model", lambda *a, **k: FakeModel(pieces)
-    )
+    monkeypatch.setattr(story_module, "build_chat_model", lambda *a, **k: FakeModel(pieces))
     return service
 
 
@@ -78,9 +76,7 @@ def test_compose_returns_a_populated_draft(service: StoryService):
 
 def test_stream_rejects_a_stub_answer(monkeypatch: pytest.MonkeyPatch):
     service = StoryService(Settings(api_key="x"))
-    monkeypatch.setattr(
-        story_module, "build_chat_model", lambda *a, **k: FakeModel(["ok."])
-    )
+    monkeypatch.setattr(story_module, "build_chat_model", lambda *a, **k: FakeModel(["ok."]))
 
     async def collect():
         return [chunk async for chunk in service.stream(StoryRequest(topic="x"))]
