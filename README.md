@@ -174,3 +174,80 @@ uv run ruff format --check src tests
 
 The network is never touched in tests: the writer is faked, speech synthesis is
 monkeypatched, and the app is assembled without launching.
+
+---
+
+## Deploy it
+
+Anywhere that runs a container and gives you a public port will host this untouched.
+The image is a single Python 3.12 stage, runs as an unprivileged user, exposes a
+`HEALTHCHECK`, and writes its archive to `AI_STORYTELLER_DATA_DIR` (default `/data`).
+
+### Docker (any host)
+
+```bash
+docker build -t ai-storyteller .
+docker run -p 7860:7860 \
+  -e MODEL_NAME=gpt-4o-mini \
+  -e API_KEY=sk-… \
+  -e BASE_URL=https://api.openai.com/v1 \
+  -v storyteller-data:/data \
+  ai-storyteller
+```
+
+Or `docker compose up --build` with a filled-in `.env`.
+
+### Hugging Face Spaces
+
+The front matter at the top of this file already declares `sdk: docker` and
+`app_port: 7860`, so a Space created from this repo needs only three repository
+secrets — add them under **Settings → Variables and secrets**:
+
+| secret | example |
+|---|---|
+| `MODEL_NAME` | `gpt-4o-mini` |
+| `API_KEY` | `sk-…` |
+| `BASE_URL` | `https://api.openai.com/v1` |
+
+Spaces' filesystem is ephemeral unless you attach persistent storage: set
+`AI_STORYTELLER_DATA_DIR=/data` and mount a bucket there to keep the archive.
+Without it the studio falls back to a temp directory instead of crashing.
+
+### Render (blueprint included)
+
+`render.yaml` describes a Docker web service with a 1 GB disk mounted at
+`/var/data`. Point Render at this repository, choose *New → Blueprint*, then fill in
+`MODEL_NAME`, `API_KEY` and `BASE_URL`. Setup and docs: <https://render.com/docs>.
+
+Other paths that work the same way: **Fly.io** (`fly launch` picks up the Dockerfile,
+then `fly volumes create` for `/data`), **Google Cloud Run**, **Koyeb**, or any VPS.
+Serverless/edge platforms are a poor fit: this app is a long-running server with
+WebSocket streaming and a writable disk, not a request/response function.
+
+### Health and hardening notes
+
+- The archive is append-only JSONL, pruned to the newest 120 drafts.
+- The API key is read from the environment and never rendered — `Settings.public()`
+  is what the UI sees.
+- `render_footer`, `markup.py` and the client scripts escape every user/model string
+  with `html.escape`; prose can never inject markup into the stage.
+- `prefers-reduced-motion` disables the trail, the halo animation and the reveals.
+
+---
+
+## Where to take it next
+
+- Real forced alignment (Whisper timestamps) for per-word accuracy.
+- A `ChatInterface`-style continuation loop: “keep going” without losing the thread.
+- Optional Redis/SQLite store so several replicas can share one shelf.
+- Export a story as a small audio + text bundle, or a printable broadsheet PDF.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## Credits
+
+Written by [colombefioren](https://github.com/colombefioren). Voices come from
+Google Translate's TTS endpoint by way of [gTTS](https://github.com/pndurette/gTTS);
+the UI is [Gradio 6](https://www.gradio.app) wearing a hand-cut stylesheet.
