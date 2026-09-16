@@ -7,7 +7,11 @@ authors = [
     { name = "colombefioren", email = "colomberakotonjanahary@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "gtts>=2.5.4",
+    "python-dotenv>=1.2.3",
+    "requests>=2.34.2",
+]
 
 [project.scripts]
 ai-storyteller = "ai_storyteller:main"
