@@ -68,9 +68,19 @@ def test_idle_view_reports_a_ready_engine(studio: Studio):
     assert "waiting for a topic" in studio.idle_view().status
 
 
-def test_idle_view_warns_without_credentials(tmp_path: Path):
+def test_idle_view_offers_the_demo_without_credentials(tmp_path: Path):
     offline = Studio(Settings(api_key=None, data_dir=tmp_path), service=FakeService())
-    assert "engine offline" in offline.idle_view().status
+    assert "demo mode" in offline.idle_view().status
+    assert "credentials" in offline.idle_view().status
+
+
+def test_ignite_without_credentials_streams_a_demo_reel(tmp_path: Path):
+    offline = Studio(Settings(api_key=None, data_dir=tmp_path), service=FakeService())
+    views = ignite(offline)
+    assert views[-1].draft is not None
+    assert views[-1].draft.model == "demo reel"
+    assert "data:audio/mpeg;base64," in views[-1].deck
+    assert "follow the light" in views[-1].status
 
 
 def test_ignite_streams_then_voices_and_archives(studio: Studio):
