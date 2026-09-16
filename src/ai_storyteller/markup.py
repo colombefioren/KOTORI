@@ -98,10 +98,17 @@ def render_hero(settings: Settings, stats: ArchiveStats) -> str:
 """
 
 
+STATUS_DOTS: dict[str, str] = {
+    "idle": "ast-dot",
+    "busy": "ast-dot",
+    "demo": "ast-dot ast-dot--demo",
+    "error": "ast-dot ast-dot--off",
+}
+
+
 def render_status(note: str = "idle · waiting for a topic", tone: str = "idle") -> str:
-    dot = (
-        "ast-dot" if tone == "busy" else ("ast-dot ast-dot--off" if tone == "error" else "ast-dot")
-    )
+    """Status ticker line; ``tone`` picks the lamp colour."""
+    dot = STATUS_DOTS.get(tone, STATUS_DOTS["idle"])
     return f'<div class="ast-status"><i class="{dot}"></i><b>{escape(note)}</b></div>'
 
 

@@ -84,6 +84,11 @@
   animation: ast-pulse 2.4s ease-in-out infinite;
 }
 
+.ast-dot--demo {
+  background: var(--ast-butter);
+  box-shadow: 0 0 12px var(--ast-butter);
+}
+
 .ast-dot--off {
   background: var(--ast-blush);
   box-shadow: 0 0 12px var(--ast-blush);

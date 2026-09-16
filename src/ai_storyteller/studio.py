@@ -11,6 +11,7 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 
 from .config import Settings, ensure_writable_dir, get_settings
+from .demo import DEMO_GENRE, DEMO_MODEL, DEMO_MOOD, demo_stream
 from .library import StoryLibrary
 from .markup import (
     archive_choices,
@@ -32,6 +33,7 @@ from .timing import estimate_duration
 
 VOICE_WAIT_NOTE = "synthesising the voice…"
 SAVED_NOTE = "archived"
+DEMO_STATUS = "demo mode · add credentials for your own stories"
 
 
 @dataclass(slots=True)
@@ -72,14 +74,9 @@ class Studio:
         return render_footer(self.settings, data_dir=self.data_dir)
 
     def idle_view(self) -> View:
-        note = (
-            "idle · waiting for a topic"
-            if self.settings.is_configured
-            else "engine offline · add API_KEY, BASE_URL and MODEL_NAME to .env"
-        )
-        return View(
-            status=render_status(note, tone="idle" if self.settings.is_configured else "error")
-        )
+        if self.settings.is_configured:
+            return View(status=render_status("idle · waiting for a topic"))
+        return View(status=render_status(DEMO_STATUS, tone="demo"))
 
     def roll_topic(self) -> str:
         return random_topic()
@@ -106,18 +103,20 @@ class Studio:
         prepared = self.service.prepare(request)
         voice_option = resolve_voice(prepared.voice)
 
+        configured = self.settings.is_configured
         draft = StoryDraft(
             topic=prepared.topic,
-            genre=get_genre(prepared.genre).label,
-            mood=get_mood(prepared.mood).label,
+            genre=get_genre(prepared.genre).label if configured else DEMO_GENRE,
+            mood=get_mood(prepared.mood).label if configured else DEMO_MOOD,
             target_words=prepared.target_words,
             voice=voice_option.key,
             voice_label=voice_option.choice,
-            model=self.settings.model_name,
+            model=self.settings.model_name if configured else DEMO_MODEL,
         )
+        frames = self.service.stream(prepared) if configured else demo_stream(prepared)
 
         started = time.perf_counter()
-        async for chunk in self.service.stream(prepared):
+        async for chunk in frames:
             draft.story = chunk.text
             yield View(
                 stage=render_stage(draft, live=not chunk.finished, note=chunk.note),
