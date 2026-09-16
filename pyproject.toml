@@ -1,14 +1,23 @@
 [project]
 name = "ai-storyteller"
 version = "0.1.0"
-description = "Add your description here"
+description = "A dark, editorial-grade Gradio studio that writes stories and reads them aloud."
 readme = "README.md"
 authors = [
     { name = "colombefioren", email = "colomberakotonjanahary@gmail.com" }
 ]
 requires-python = ">=3.12"
+keywords = ["gradio", "langchain", "storytelling", "tts", "generative-ai"]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Artistic Software",
+]
 dependencies = [
+    "gradio>=6.27.0",
     "gtts>=2.5.4",
+    "langchain>=1.4.0",
+    "langchain-openai>=1.6.2",
     "python-dotenv>=1.2.3",
     "requests>=2.34.2",
 ]
@@ -16,6 +25,32 @@ dependencies = [
 [project.scripts]
 ai-storyteller = "ai_storyteller:main"
 
+[project.urls]
+Homepage = "https://github.com/colombefioren/ai-storyteller"
+
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.7",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".venv", "data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
