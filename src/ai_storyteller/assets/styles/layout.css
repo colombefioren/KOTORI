@@ -192,10 +192,11 @@
 /* ── working grid ──────────────────────────────────────────────────────────── */
 
 .ast-grid {
-  display: grid;
-  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
-  gap: var(--ast-gap);
-  align-items: start;
+  display: grid !important;
+  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr) !important;
+  gap: var(--ast-gap) !important;
+  align-items: start !important;
+  flex-wrap: nowrap !important;
 }
 
 .ast-section {
@@ -270,7 +271,7 @@
 
 @media (max-width: 1080px) {
   .ast-hero { grid-template-columns: 1fr; align-items: start; }
-  .ast-grid { grid-template-columns: 1fr; }
+  .ast-grid { grid-template-columns: minmax(0, 1fr) !important; }
   .ast-rail { position: static; }
 }
 

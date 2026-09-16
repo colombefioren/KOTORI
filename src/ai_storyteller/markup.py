@@ -40,6 +40,12 @@ def _chips(items: Sequence[tuple[str, str]]) -> str:
     return f'<div class="tp-meta">{spans}</div>'
 
 
+def render_section(index: str, title: str, meta: str = "") -> str:
+    """Editorial section rule: ``01 — composer``."""
+    tail = f" · {escape(meta)}" if meta else ""
+    return f'<p class="ast-section"><b>{escape(index)}</b>{escape(title)}{tail}</p>'
+
+
 def render_ticker() -> str:
     body = "".join(f"<span>{item}</span><i>✦</i>" for item in TICKER_ITEMS)
     return (
