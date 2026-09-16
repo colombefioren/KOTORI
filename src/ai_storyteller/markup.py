@@ -74,7 +74,8 @@ def render_hero(settings: Settings, stats: ArchiveStats) -> str:
     return f"""
 {render_ticker()}
 <div class="ast-shell">
-  <header class="ast-hero">
+  <a class="ast-skip" href="#ast-composer">skip to the composer</a>
+  <header class="ast-hero" role="banner">
     <div>
       <span class="ast-eyebrow"><i class="{dot}"></i>{escape(APP_NAME)} · v{escape(settings.version)}</span>
       <h1 class="ast-headline">Stories<br /><em>that speak</em><br /><span>for themselves</span></h1>
@@ -171,9 +172,10 @@ def render_stage(
         chips.append((note, "sky"))
 
     live_cls = " tp-paper--live" if live else ""
-    aria = ' aria-live="polite"' if live else ""
+    aria = ' aria-live="polite" aria-busy="true"' if live else ""
     return f"""
-<div class="tp-stage" data-story-id="{escape(draft.story_id)}">
+<div class="tp-stage" data-story-id="{escape(draft.story_id)}" role="region"
+     aria-label="story stage for {escape(draft.title)}">
   {_chips(chips)}
   <div class="tp-paper{live_cls}" id="ast-paper"{aria}>
     <div class="tp-halo" aria-hidden="true"></div>
@@ -189,17 +191,20 @@ def render_deck(draft: StoryDraft, audio_uri: str, *, duration_hint: float = 0.0
     voice: Voice = resolve_voice(draft.voice)
     return f"""
 <div class="deck" data-story-id="{escape(draft.story_id)}"
-     data-slug="{escape(draft.slug)}" data-duration-hint="{duration_hint:.2f}">
+     data-slug="{escape(draft.slug)}" data-duration-hint="{duration_hint:.2f}"
+     role="group" aria-label="story player and exports">
   <audio id="ast-audio" preload="metadata" src="{escape(audio_uri, quote=True)}"></audio>
   <textarea hidden class="deck__payload" data-kind="text">{escape(draft.story)}</textarea>
   <textarea hidden class="deck__payload" data-kind="markdown">{escape(markdown)}</textarea>
 
   <div class="deck__top">
-    <button type="button" class="deck__play" data-role="toggle" aria-label="Play or pause">
+    <button type="button" class="deck__play" data-role="toggle"
+            aria-label="Play or pause the spoken story">
       <span data-role="glyph">▶</span>
     </button>
     <span class="deck__label">{escape("now speaking")} · {escape(voice.choice)}</span>
-    <div class="deck__rail" data-role="rail" role="slider" aria-label="Seek" tabindex="0">
+    <div class="deck__rail" data-role="rail" role="slider" aria-label="Seek in the narration"
+         aria-valuemin="0" aria-valuemax="100" tabindex="0">
       <div class="deck__fill" data-role="fill"></div>
     </div>
     <span class="deck__time" data-role="time">0:00 / 0:00</span>

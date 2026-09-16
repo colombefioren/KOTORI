@@ -19,6 +19,29 @@
 
 /* ── ticker ────────────────────────────────────────────────────────────────── */
 
+/* keyboard users land here first */
+.ast-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 90;
+  font-family: var(--ast-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: var(--ast-mint);
+  color: var(--ast-void);
+  border: 2px solid #000;
+  padding: 10px 14px;
+  box-shadow: var(--ast-hard-sm);
+  text-decoration: none;
+}
+
+.ast-skip:focus {
+  left: 14px;
+  top: 14px;
+}
+
 .ast-ticker {
   position: relative;
   overflow: hidden;
