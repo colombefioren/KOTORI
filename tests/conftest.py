@@ -74,3 +74,50 @@ def story_service(settings: Settings, fake_model_factory):
     from ai_storyteller.story import StoryService
 
     return StoryService(settings)
+
+
+class FakeStoryService:
+    """A writer that never calls an API: enough for studio-level tests."""
+
+    def prepare(self, request):
+        return request.normalised("a quiet town")
+
+    async def stream(self, request):
+        from ai_storyteller.story import StoryChunk
+
+        yield StoryChunk(text=STORY[:40], delta=STORY[:40], note="writing…")
+        yield StoryChunk(text=STORY, delta=STORY[40:], note="writing…")
+        yield StoryChunk(text=STORY, delta="", finished=True, note="closing the loop…")
+
+
+@pytest.fixture
+def fake_speech(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Write a stand-in mp3 instead of talking to Google."""
+    from pathlib import Path
+
+    from ai_storyteller import studio as studio_module
+
+    def fake_synthesize(text, *, voice_key, out_dir, stem, slow=False):
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        target = out_dir / f"{stem}-{voice_key}.mp3"
+        target.write_bytes(b"\xff\xfb\x90\x00")
+        return target
+
+    monkeypatch.setattr(studio_module, "synthesize", fake_synthesize)
+
+
+@pytest.fixture
+def studio(settings: Settings, fake_speech: None):
+    """A studio with a fake writer and fake speech, on a throwaway archive."""
+    from ai_storyteller.studio import Studio
+
+    return Studio(settings, service=FakeStoryService())
+
+
+@pytest.fixture
+def offline_studio(offline_settings: Settings, fake_speech: None):
+    """No credentials: the studio must reach for the demo reels."""
+    from ai_storyteller.studio import Studio
+
+    return Studio(offline_settings, service=FakeStoryService())
