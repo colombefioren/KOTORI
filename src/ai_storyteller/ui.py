@@ -136,15 +136,14 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
                                 )
                                 with gr.Row(elem_classes=["ast-actions"]):
                                     archive_open = gr.Button("open in stage")
-                                    archive_speak = gr.Button(
-                                        "speak it again", variant="primary"
-                                    )
+                                    archive_speak = gr.Button("speak it again", variant="primary")
                                     archive_refresh = gr.Button("refresh")
                                 with gr.Row(elem_classes=["ast-actions"]):
                                     archive_delete = gr.Button("delete draft")
-                                    archive_clear = gr.Button(
-                                        "burn the archive", variant="stop"
-                                    )
+                                    archive_clear = gr.Button("burn the archive", variant="stop")
+                                archive_status = gr.HTML(
+                                    render_status("archive ready"), elem_id="ast-archive-status"
+                                )
                         with gr.Column(scale=12):
                             gr.HTML(render_section("04", "reading", "the selected draft"))
                             archive_preview = gr.HTML(
@@ -183,9 +182,11 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
             except (StoryError, SpeechError, EngineNotConfiguredError) as error:
                 raise gr.Error(str(error)) from error
 
-        def refresh_archive() -> tuple[object, str, str]:
+        def refresh_archive() -> tuple[object, str, str, str]:
             choices, preview, _listing = studio.archive_state()
-            return gr.update(choices=choices, value=choices[0][1] if choices else None), preview, studio.hero()
+            update = gr.update(choices=choices, value=choices[0][1] if choices else None)
+            note = f"{len(choices)} draft{'s' if len(choices) != 1 else ''} on the shelf"
+            return update, preview, studio.hero(), render_status(note)
 
         def open_selected(story_id: str | None) -> tuple[str, str, str]:
             view = studio.open_draft(story_id)
@@ -195,13 +196,14 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
             view = studio.respeak(story_id)
             return view.stage, view.deck, view.status
 
-        def delete_selected(story_id: str | None) -> tuple[object, str, str]:
-            choices, preview, _listing, hero = studio.delete(story_id)
-            return gr.update(choices=choices, value=choices[0][1] if choices else None), preview, hero
+        def delete_selected(story_id: str | None) -> tuple[object, str, str, str]:
+            choices, preview, hero, status = studio.delete(story_id)
+            update = gr.update(choices=choices, value=choices[0][1] if choices else None)
+            return update, preview, hero, status
 
-        def clear_archive() -> tuple[object, str, str]:
-            choices, preview, _listing, hero = studio.clear()
-            return gr.update(choices=choices, value=None), preview, hero
+        def clear_archive() -> tuple[object, str, str, str]:
+            choices, preview, hero, status = studio.clear()
+            return gr.update(choices=choices, value=None), preview, hero, status
 
         def preview_selected(story_id: str | None) -> str:
             return studio.preview(story_id)
@@ -232,20 +234,24 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
         )
         stop.click(fn=None, cancels=[ignition, submission])
 
+        archive_targets = [archive_pick, archive_preview, header, archive_status]
+
         for event in (ignition, submission):
-            event.then(
-                fn=refresh_archive,
-                outputs=[archive_pick, archive_preview, header],
-                show_progress="hidden",
-            )
+            event.then(fn=refresh_archive, outputs=archive_targets, show_progress="hidden")
 
         seed.click(fn=studio.roll_topic, outputs=topic, show_progress="hidden")
 
         archive_pick.change(
-            fn=preview_selected, inputs=archive_pick, outputs=archive_preview, show_progress="hidden"
+            fn=preview_selected,
+            inputs=archive_pick,
+            outputs=archive_preview,
+            show_progress="hidden",
         )
         archive_open.click(
-            fn=open_selected, inputs=archive_pick, outputs=[stage, deck, status], show_progress="hidden"
+            fn=open_selected,
+            inputs=archive_pick,
+            outputs=[stage, deck, status],
+            show_progress="hidden",
         )
         archive_speak.click(
             fn=speak_selected,
@@ -253,18 +259,14 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
             outputs=[stage, deck, status],
             show_progress="hidden",
         )
-        archive_refresh.click(
-            fn=refresh_archive, outputs=[archive_pick, archive_preview, header], show_progress="hidden"
-        )
+        archive_refresh.click(fn=refresh_archive, outputs=archive_targets, show_progress="hidden")
         archive_delete.click(
             fn=delete_selected,
             inputs=archive_pick,
-            outputs=[archive_pick, archive_preview, header],
+            outputs=archive_targets,
             show_progress="hidden",
         )
-        archive_clear.click(
-            fn=clear_archive, outputs=[archive_pick, archive_preview, header], show_progress="hidden"
-        )
+        archive_clear.click(fn=clear_archive, outputs=archive_targets, show_progress="hidden")
         adopt.click(
             fn=adopt_shared,
             inputs=incoming,

@@ -6,7 +6,6 @@ free of Gradio and can be driven from a notebook or the CLI just as easily.
 
 from __future__ import annotations
 
-import asyncio
 import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
@@ -72,7 +71,9 @@ class Studio:
             if self.settings.is_configured
             else "engine offline · add API_KEY, BASE_URL and MODEL_NAME to .env"
         )
-        return View(status=render_status(note, tone="idle" if self.settings.is_configured else "error"))
+        return View(
+            status=render_status(note, tone="idle" if self.settings.is_configured else "error")
+        )
 
     def roll_topic(self) -> str:
         return random_topic()
@@ -149,9 +150,7 @@ class Studio:
                 self.library.save(draft)
                 return View(
                     stage=render_stage(draft, note="voiced"),
-                    deck=render_deck(
-                        draft, uri, duration_hint=estimate_duration(draft.story)
-                    ),
+                    deck=render_deck(draft, uri, duration_hint=estimate_duration(draft.story)),
                     status=render_status("ready · press play and follow the light", tone="idle"),
                     draft=draft,
                     audio=str(path),
@@ -203,15 +202,23 @@ class Studio:
         )
 
     def delete(self, story_id: str | None) -> tuple[list[tuple[str, str]], str, str, str]:
+        """Drop one draft; returns choices, preview, hero and a status line."""
         removed = self.library.delete(story_id)
-        choices, preview, listing = self.archive_state()
-        note = "deleted" if removed else "nothing selected"
-        return (choices, preview, listing, self.hero())
+        choices, preview, _listing = self.archive_state()
+        note = "draft deleted" if removed else "nothing selected"
+        return (
+            choices,
+            preview,
+            self.hero(),
+            render_status(note, tone="idle" if removed else "error"),
+        )
 
     def clear(self) -> tuple[list[tuple[str, str]], str, str, str]:
+        """Burn the archive; returns choices, preview, hero and a status line."""
         count = self.library.clear()
-        choices, preview, listing = self.archive_state()
-        return (choices, preview, listing, self.hero())
+        choices, preview, _listing = self.archive_state()
+        note = f"burned {count} draft{'s' if count != 1 else ''}" if count else "archive was empty"
+        return (choices, preview, self.hero(), render_status(note, tone="idle"))
 
     # ── restore ──────────────────────────────────────────────────────────────
     def adopt(self, text: str | None) -> View:

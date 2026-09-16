@@ -49,7 +49,7 @@ def derive_title(topic: str, limit: int = 68) -> str:
 
 def format_duration(seconds: float) -> str:
     """``95`` -> ``1:35``, ``9`` -> ``0:09``."""
-    total = max(0, int(round(seconds)))
+    total = max(0, round(seconds))
     return f"{total // 60}:{total % 60:02d}"
 
 
@@ -146,5 +146,5 @@ class StoryDraft:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> StoryDraft:
-        allowed = {f for f in cls.__dataclass_fields__}
+        allowed = set(cls.__dataclass_fields__)
         return cls(**{k: v for k, v in data.items() if k in allowed})

@@ -109,7 +109,5 @@ def word_timings(text: str, duration: float | None = None) -> list[WordTiming]:
         start = running / total * span
         running += weight
         end = running / total * span
-        timings.append(
-            WordTiming(index=index, text=word, weight=weight, start=start, end=end)
-        )
+        timings.append(WordTiming(index=index, text=word, weight=weight, start=start, end=end))
     return timings

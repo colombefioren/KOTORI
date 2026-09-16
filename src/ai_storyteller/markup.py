@@ -99,7 +99,9 @@ def render_hero(settings: Settings, stats: ArchiveStats) -> str:
 
 
 def render_status(note: str = "idle · waiting for a topic", tone: str = "idle") -> str:
-    dot = "ast-dot" if tone == "busy" else ("ast-dot ast-dot--off" if tone == "error" else "ast-dot")
+    dot = (
+        "ast-dot" if tone == "busy" else ("ast-dot ast-dot--off" if tone == "error" else "ast-dot")
+    )
     return f'<div class="ast-status"><i class="{dot}"></i><b>{escape(note)}</b></div>'
 
 
