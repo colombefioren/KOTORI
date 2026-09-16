@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 880" width="1200" height="880" role="img" aria-label="AI Storyteller studio interface: streaming prose with the spoken word highlighted in mint">
+  <defs>
+    <linearGradient id="canvas" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0b13"/>
+      <stop offset="1" stop-color="#07070c"/>
+    </linearGradient>
+    <radialGradient id="auroraLilac" cx="0.15" cy="0.05" r="0.6">
+      <stop offset="0" stop-color="#cbb8ff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#cbb8ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="auroraMint" cx="0.85" cy="0" r="0.55">
+      <stop offset="0" stop-color="#96f7d2" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#96f7d2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="auroraBlush" cx="0.5" cy="1.05" r="0.6">
+      <stop offset="0" stop-color="#ffb2cb" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ffb2cb" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#96f7d2" stop-opacity="0.5"/>
+      <stop offset="0.55" stop-color="#96f7d2" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#96f7d2" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#96f7d2"/>
+      <stop offset="0.55" stop-color="#cbb8ff"/>
+      <stop offset="1" stop-color="#ffb2cb"/>
+    </linearGradient>
+    <pattern id="grid" width="96" height="96" patternUnits="userSpaceOnUse">
+      <path d="M96 0H0V96" fill="none" stroke="#a0a0dc" stroke-opacity="0.09" stroke-width="1"/>
+    </pattern>
+    <style>
+      .mono { font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace; }
+      .sans { font-family: "Space Grotesk", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+      .serif { font-family: "Instrument Serif", "Iowan Old Style", "Times New Roman", serif; }
+      .label { font-size: 11px; letter-spacing: 3.4px; fill: #7c7aa0; }
+      .chip { font-size: 10px; letter-spacing: 1.8px; }
+      .body { font-size: 20px; }
+    </style>
+  </defs>
+
+  <!-- canvas -->
+  <rect width="1200" height="880" fill="url(#canvas)"/>
+  <rect width="1200" height="880" fill="url(#grid)"/>
+  <rect width="1200" height="880" fill="url(#auroraLilac)"/>
+  <rect width="1200" height="880" fill="url(#auroraMint)"/>
+  <rect width="1200" height="880" fill="url(#auroraBlush)"/>
+
+  <!-- ticker -->
+  <rect x="0" y="0" width="1200" height="38" fill="#101021"/>
+  <line x1="0" y1="38" x2="1200" y2="38" stroke="#2a2a48" stroke-width="2"/>
+  <text class="mono label" x="30" y="24" fill="#b6b3d8">STREAMED PROSE</text>
+  <text x="164" y="24" fill="#96f7d2" font-size="11">✦</text>
+  <text class="mono label" x="186" y="24" fill="#b6b3d8">SYNTHESISED VOICE</text>
+  <text x="352" y="24" fill="#cbb8ff" font-size="11">✦</text>
+  <text class="mono label" x="374" y="24" fill="#b6b3d8">KARAOKE TELEPROMPTER</text>
+  <text x="576" y="24" fill="#96f7d2" font-size="11">✦</text>
+  <text class="mono label" x="598" y="24" fill="#b6b3d8">LOCAL ARCHIVE</text>
+  <text x="742" y="24" fill="#cbb8ff" font-size="11">✦</text>
+  <text class="mono label" x="764" y="24" fill="#b6b3d8">NO ACCOUNTS, NO TRACKING</text>
+  <text x="994" y="24" fill="#96f7d2" font-size="11">✦</text>
+  <text class="mono label" x="1016" y="24" fill="#b6b3d8">PRESS ? FOR SHORTCUTS</text>
+
+  <!-- hero -->
+  <g transform="translate(56, 92)">
+    <rect x="0" y="0" width="218" height="30" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
+    <circle cx="18" cy="15" r="4" fill="#96f7d2"/>
+    <text class="mono label" x="32" y="19" fill="#7c7aa0">AI STORYTELLER · V0.2.0</text>
+  </g>
+
+  <text class="sans" x="56" y="188" font-size="74" font-weight="700" fill="#f5f4ff" letter-spacing="-3">STORIES</text>
+  <text class="serif" x="56" y="252" font-size="76" font-style="italic" fill="#96f7d2" letter-spacing="-1">that speak</text>
+  <text class="sans" x="56" y="316" font-size="74" font-weight="700" fill="none" stroke="#cbb8ff" stroke-width="1.4" letter-spacing="-3">FOR THEMSELVES</text>
+
+  <g class="serif" font-size="19" fill="#b6b3d8">
+    <text x="600" y="150">A writer and a voice in one dark room. Type a</text>
+    <text x="600" y="178">topic, watch the prose arrive word by word, then</text>
+    <text x="600" y="206">let <tspan fill="#f5f4ff">deepseek-v4-pro</tspan> read it back while every</text>
+    <text x="600" y="234">word lights up in time with the audio.</text>
+  </g>
+  <g class="mono label" font-size="10">
+    <text x="1050" y="150" fill="#f5f4ff">STORIES THAT SPEAK</text>
+    <text x="1050" y="172">STREAMED PROSE</text>
+    <text x="1050" y="192">KARAOKE PLAYBACK</text>
+    <text x="1050" y="212">MP3 · MARKDOWN</text>
+    <text x="1050" y="232">JSONL ARCHIVE</text>
+  </g>
+  <line x1="1034" y1="136" x2="1034" y2="240" stroke="#cbb8ff" stroke-width="3"/>
+
+  <!-- stat strip -->
+  <g transform="translate(56, 352)">
+    <rect x="0" y="0" width="1088" height="66" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
+    <g class="mono label" font-size="10">
+      <text x="22" y="24">DRAFTS ARCHIVED</text>
+      <text x="240" y="24">WORDS WRITTEN</text>
+      <text x="458" y="24">MINUTES VOICED</text>
+      <text x="676" y="24">DOMINANT GENRE</text>
+      <text x="894" y="24">ENGINE</text>
+    </g>
+    <g class="sans" font-size="26" font-weight="700">
+      <text x="22" y="54" fill="#96f7d2">38</text>
+      <text x="240" y="54" fill="#cbb8ff">9,412</text>
+      <text x="458" y="54" fill="#ffb2cb">61</text>
+      <text x="676" y="54" fill="#ffe8a3">Noir</text>
+      <text x="894" y="54" fill="#a6d8ff" font-size="19">deepseek-v4-pro</text>
+    </g>
+    <line x1="218" y1="10" x2="218" y2="56" stroke="#2a2a48" stroke-width="2"/>
+    <line x1="436" y1="10" x2="436" y2="56" stroke="#2a2a48" stroke-width="2"/>
+    <line x1="654" y1="10" x2="654" y2="56" stroke="#2a2a48" stroke-width="2"/>
+    <line x1="872" y1="10" x2="872" y2="56" stroke="#2a2a48" stroke-width="2"/>
+  </g>
+
+  <!-- section labels -->
+  <g class="mono label" font-size="10">
+    <text x="56" y="462" letter-spacing="3.4">01 / COMPOSER</text>
+    <text x="512" y="462" letter-spacing="3.4">02 / STAGE</text>
+  </g>
+  <line x1="190" y1="458" x2="470" y2="458" stroke="#2a2a48" stroke-width="2" stroke-dasharray="8 6"/>
+  <line x1="640" y1="458" x2="1144" y2="458" stroke="#2a2a48" stroke-width="2" stroke-dasharray="8 6"/>
+
+  <!-- composer -->
+  <g transform="translate(56, 474)">
+    <rect x="0" y="0" width="414" height="350" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
+    <rect x="6" y="6" width="414" height="350" fill="none" stroke="#000" stroke-opacity="0.85" stroke-width="6" stroke-dasharray="0"/>
+
+    <text class="mono label" x="24" y="32">THE SEED</text>
+    <rect x="24" y="44" width="366" height="74" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
+    <g class="sans" font-size="15" fill="#7c7aa0" font-style="italic">
+      <text x="38" y="74">a lighthouse keeper who receives</text>
+      <text x="38" y="98">letters from a ship that sank in 1912</text>
+    </g>
+
+    <g>
+      <rect x="24" y="134" width="146" height="36" fill="#96f7d2" stroke="#000" stroke-width="2"/>
+      <text class="mono chip" x="52" y="157" fill="#07070c" letter-spacing="2.4">IGNITE STORY</text>
+      <rect x="182" y="134" width="122" height="36" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
+      <text class="mono chip" x="200" y="157" fill="#f5f4ff">SURPRISE ME</text>
+      <rect x="316" y="134" width="74" height="36" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
+      <text class="mono chip" x="334" y="157" fill="#f5f4ff">STOP</text>
+    </g>
+
+    <text class="mono label" x="24" y="200">GENRE</text>
+    <g class="mono chip" font-size="10">
+      <rect x="24" y="210" width="70" height="26" rx="13" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
+      <text x="40" y="227" fill="#b6b3d8">FOLK</text>
+      <rect x="102" y="210" width="128" height="26" rx="13" fill="#cbb8ff" stroke="#000" stroke-width="2"/>
+      <text x="118" y="227" fill="#07070c">SCIENCE FICTION</text>
+      <rect x="238" y="210" width="72" height="26" rx="13" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
+      <text x="254" y="227" fill="#b6b3d8">NOIR</text>
+      <rect x="318" y="210" width="72" height="26" rx="13" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
+      <text x="334" y="227" fill="#b6b3d8">FABLE</text>
+    </g>
+
+    <text class="mono label" x="24" y="264">MOOD</text>
+    <text class="mono label" x="200" y="264">VOICE</text>
+    <rect x="24" y="274" width="164" height="34" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
+    <text class="sans" x="38" y="296" font-size="15" fill="#f5f4ff">Eerie</text>
+    <rect x="200" y="274" width="190" height="34" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
+    <text class="sans" x="214" y="296" font-size="15" fill="#f5f4ff">Camber — English · UK</text>
+
+    <text class="mono label" x="24" y="330">LENGTH · WORDS</text>
+    <text class="mono label" x="360" y="330" fill="#96f7d2">260</text>
+    <rect x="24" y="338" width="366" height="6" fill="#1d1d38"/>
+    <rect x="24" y="338" width="200" height="6" fill="#96f7d2"/>
+    <circle cx="224" cy="341" r="9" fill="#96f7d2" stroke="#000" stroke-width="2"/>
+  </g>
+
+  <!-- meta chips -->
+  <g class="mono chip" font-size="10">
+    <rect x="512" y="472" width="96" height="24" fill="#07070c" stroke="#96f7d2" stroke-width="2"/>
+    <text x="524" y="488" fill="#96f7d2">152 WORDS</text>
+    <rect x="616" y="472" width="96" height="24" fill="#07070c" stroke="#cbb8ff" stroke-width="2"/>
+    <text x="628" y="488" fill="#cbb8ff">1:02 READ</text>
+    <rect x="720" y="472" width="70" height="24" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
+    <text x="732" y="488" fill="#b6b3d8">NOIR</text>
+    <rect x="798" y="472" width="86" height="24" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
+    <text x="810" y="488" fill="#b6b3d8">TENSE</text>
+    <rect x="892" y="472" width="150" height="24" fill="#07070c" stroke="#ffb2cb" stroke-width="2"/>
+    <text x="904" y="488" fill="#ffb2cb">CAMBER — ENGLISH · UK</text>
+  </g>
+
+  <!-- paper -->
+  <g>
+    <rect x="512" y="506" width="632" height="176" fill="#07070c" stroke="#96f7d2" stroke-width="2"/>
+    <circle cx="876" cy="586" r="86" fill="url(#halo)"/>
+    <g class="serif" font-size="19" fill="#6f6f92">
+      <text x="536" y="546" fill="#f5f4ff">The lighthouse keeper had <tspan fill="#f5f4ff">letters</tspan> again. They arrived with the</text>
+      <text x="536" y="574" fill="#f5f4ff">tide, sealed in wax the colour of old blood, addressed in her</text>
+      <text x="536" y="602" fill="#f5f4ff">own hand. The first one asked her to keep</text>
+      <text x="866" y="602" fill="#07070c"> </text>
+      <text x="536" y="630" fill="#f5f4ff">the lamp lit on the sixteenth of March. The</text>
+      <text x="536" y="658">second apologised for something she had not done yet.</text>
+    </g>
+    <rect x="846" y="586" width="62" height="24" fill="#96f7d2"/>
+    <text class="serif" x="852" y="604" font-size="19" fill="#07070c">lamp</text>
+    <rect x="914" y="588" width="10" height="20" fill="#96f7d2"/>
+  </g>
+
+  <!-- deck -->
+  <g transform="translate(512, 694)">
+    <rect x="0" y="0" width="632" height="140" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
+    <circle cx="42" cy="40" r="26" fill="#96f7d2" stroke="#000" stroke-width="2"/>
+    <path d="M36 30 L54 40 L36 50 Z" fill="#07070c"/>
+    <text class="mono label" x="82" y="36" font-size="10">NOW SPEAKING · CAMBER</text>
+    <text class="serif" x="82" y="58" font-size="16" fill="#f5f4ff" font-style="italic">now speaking: “lamp”</text>
+    <rect x="82" y="72" width="420" height="14" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
+    <rect x="82" y="72" width="196" height="14" fill="url(#rail)"/>
+    <text class="mono" x="516" y="84" font-size="11" fill="#b6b3d8">0:38 / 1:02</text>
+
+    <g class="mono chip" font-size="9">
+      <rect x="82" y="100" width="126" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
+      <text x="94" y="117" fill="#f5f4ff">↺ FROM THE TOP</text>
+      <rect x="216" y="100" width="112" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
+      <text x="228" y="117" fill="#f5f4ff">⧉ COPY PROSE</text>
+      <rect x="336" y="100" width="118" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
+      <text x="348" y="117" fill="#f5f4ff">↓ MARKDOWN</text>
+      <rect x="462" y="100" width="122" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
+      <text x="474" y="117" fill="#f5f4ff">↓ MP3 · LINK</text>
+    </g>
+  </g>
+
+  <!-- footer -->
+  <line x1="56" y1="852" x2="1144" y2="852" stroke="#2a2a48" stroke-width="2"/>
+  <g class="mono label" font-size="10">
+    <text x="56" y="872">AI STORYTELLER · STORIES THAT SPEAK · BUILT WITH GRADIO 6</text>
+    <text x="1000" y="872">SPACE = PLAY · → = SCRUB 5S</text>
+  </g>
+</svg>
