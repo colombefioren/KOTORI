@@ -36,7 +36,11 @@ jobs:
         run: uv run ruff format --check src tests
 
       - name: test
-        run: uv run pytest -q
+        run: |
+          uv run pytest -q \
+            --cov=ai_storyteller \
+            --cov-report=term-missing:skip-covered \
+            --cov-fail-under=90
 
   docker:
     runs-on: ubuntu-latest
