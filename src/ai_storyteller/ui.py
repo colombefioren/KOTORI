@@ -6,12 +6,12 @@ stage that streams prose word by word and then plays it back in karaoke.
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from functools import partial
 
 import gradio as gr
 
+from . import callbacks
 from .config import APP_NAME, Settings, get_settings
-from .llm import EngineNotConfiguredError
 from .markup import (
     archive_choices,
     render_archive_preview,
@@ -20,11 +20,9 @@ from .markup import (
     render_section,
     render_status,
 )
-from .speech import SpeechError, voice_choices
-from .story import StoryError
+from .speech import voice_choices
 from .studio import Studio
 
-STAGE_OUTPUTS = 3
 DEFAULT_GENRE = "Contemporary"
 DEFAULT_MOOD = "Melancholic"
 DEFAULT_VOICE = "aurora"
@@ -160,117 +158,92 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
         gr.HTML(studio.footer(), elem_id="ast-footer")
 
         composer_inputs = [topic, genre, mood, words, voice, slow]
+        stage_targets = [stage, deck, status]
+        archive_targets = [archive_pick, archive_preview, header, archive_status]
 
-        async def stream_story(
-            topic_value: str,
-            genre_value: str,
-            mood_value: str,
-            words_value: float,
-            voice_value: str,
-            slow_value: bool,
-        ) -> AsyncIterator[tuple[str, str, str]]:
-            try:
-                async for view in studio.ignite(
-                    topic=topic_value,
-                    genre=genre_value,
-                    mood=mood_value,
-                    target_words=int(words_value or 260),
-                    voice=voice_value,
-                    slow=bool(slow_value),
-                ):
-                    yield view.stage, view.deck, view.status
-            except (StoryError, SpeechError, EngineNotConfiguredError) as error:
-                raise gr.Error(str(error)) from error
-
-        def refresh_archive() -> tuple[object, str, str, str]:
-            choices, preview, _listing = studio.archive_state()
-            update = gr.update(choices=choices, value=choices[0][1] if choices else None)
-            note = f"{len(choices)} draft{'s' if len(choices) != 1 else ''} on the shelf"
-            return update, preview, studio.hero(), render_status(note)
-
-        def open_selected(story_id: str | None) -> tuple[str, str, str]:
-            view = studio.open_draft(story_id)
-            return view.stage, view.deck, view.status
-
-        def speak_selected(story_id: str | None) -> tuple[str, str, str]:
-            view = studio.respeak(story_id)
-            return view.stage, view.deck, view.status
-
-        def delete_selected(story_id: str | None) -> tuple[object, str, str, str]:
-            choices, preview, hero, status = studio.delete(story_id)
-            update = gr.update(choices=choices, value=choices[0][1] if choices else None)
-            return update, preview, hero, status
-
-        def clear_archive() -> tuple[object, str, str, str]:
-            choices, preview, hero, status = studio.clear()
-            return gr.update(choices=choices, value=None), preview, hero, status
-
-        def preview_selected(story_id: str | None) -> str:
-            return studio.preview(story_id)
-
-        def adopt_shared(text: str | None) -> tuple[str, str, str, object, str, str]:
-            view = studio.adopt(text)
-            choices, preview, _listing = studio.archive_state()
-            return (
-                view.stage,
-                view.deck,
-                view.status,
-                gr.update(choices=choices, value=choices[0][1] if choices else None),
-                preview,
-                studio.hero(),
-            )
+        # callbacks live in callbacks.py so they can be tested without a server
+        def bind(fn):
+            return partial(fn, studio)
 
         ignition = ignite.click(
-            fn=stream_story,
+            fn=bind(callbacks.stream_story),
             inputs=composer_inputs,
-            outputs=[stage, deck, status],
+            outputs=stage_targets,
+            api_name="ignite",
             show_progress="hidden",
         )
         submission = topic.submit(
-            fn=stream_story,
+            fn=bind(callbacks.stream_story),
             inputs=composer_inputs,
-            outputs=[stage, deck, status],
+            outputs=stage_targets,
+            api_name="ignite_from_field",
             show_progress="hidden",
         )
         stop.click(fn=None, cancels=[ignition, submission])
 
-        archive_targets = [archive_pick, archive_preview, header, archive_status]
+        for event, name in (
+            (ignition, "refresh_after_ignite"),
+            (submission, "refresh_after_submit"),
+        ):
+            event.then(
+                fn=bind(callbacks.refresh_archive),
+                outputs=archive_targets,
+                api_name=name,
+                show_progress="hidden",
+            )
 
-        for event in (ignition, submission):
-            event.then(fn=refresh_archive, outputs=archive_targets, show_progress="hidden")
-
-        seed.click(fn=studio.roll_topic, outputs=topic, show_progress="hidden")
+        seed.click(
+            fn=bind(callbacks.roll_topic),
+            outputs=topic,
+            api_name="surprise_me",
+            show_progress="hidden",
+        )
 
         archive_pick.change(
-            fn=preview_selected,
+            fn=bind(callbacks.preview_selected),
             inputs=archive_pick,
             outputs=archive_preview,
+            api_name="preview_selected",
             show_progress="hidden",
         )
         archive_open.click(
-            fn=open_selected,
+            fn=bind(callbacks.open_selected),
             inputs=archive_pick,
-            outputs=[stage, deck, status],
+            outputs=stage_targets,
+            api_name="open_selected",
             show_progress="hidden",
         )
         archive_speak.click(
-            fn=speak_selected,
+            fn=bind(callbacks.speak_selected),
             inputs=archive_pick,
-            outputs=[stage, deck, status],
+            outputs=stage_targets,
+            api_name="speak_selected",
             show_progress="hidden",
         )
-        archive_refresh.click(fn=refresh_archive, outputs=archive_targets, show_progress="hidden")
+        archive_refresh.click(
+            fn=bind(callbacks.refresh_archive),
+            outputs=archive_targets,
+            api_name="refresh_archive",
+            show_progress="hidden",
+        )
         archive_delete.click(
-            fn=delete_selected,
+            fn=bind(callbacks.delete_selected),
             inputs=archive_pick,
             outputs=archive_targets,
+            api_name="delete_selected",
             show_progress="hidden",
         )
-        archive_clear.click(fn=clear_archive, outputs=archive_targets, show_progress="hidden")
+        archive_clear.click(
+            fn=bind(callbacks.clear_archive),
+            outputs=archive_targets,
+            api_name="clear_archive",
+            show_progress="hidden",
+        )
         adopt.click(
-            fn=adopt_shared,
+            fn=bind(callbacks.adopt_shared),
             inputs=incoming,
             outputs=[stage, deck, status, archive_pick, archive_preview, header],
+            api_name="adopt_shared",
             show_progress="hidden",
         )
 
