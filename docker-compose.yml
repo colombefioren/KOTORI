@@ -1,0 +1,13 @@
+services:
+  studio:
+    build: .
+    image: ai-storyteller
+    ports:
+      - "7860:7860"
+    env_file:
+      - .env
+    environment:
+      AI_STORYTELLER_DATA_DIR: /data
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
