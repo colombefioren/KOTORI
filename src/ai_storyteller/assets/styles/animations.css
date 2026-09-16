@@ -118,6 +118,18 @@
   to { transform: translate3d(4%, -4%, 0) scale(1.08); }
 }
 
+/* ── play affordance when autoplay was blocked ─────────────────────────────── */
+
+@keyframes ast-ready {
+  0%, 100% { box-shadow: var(--ast-hard-sm), 0 0 0 0 rgba(150, 247, 210, 0.55); }
+  50% { box-shadow: var(--ast-hard-sm), 0 0 0 14px rgba(150, 247, 210, 0); }
+}
+
+.deck__play--ready {
+  background: var(--ast-butter) !important;
+  animation: ast-ready 1.7s ease-out infinite;
+}
+
 /* ── skeleton shimmer used while the model warms up ────────────────────────── */
 
 .ast-loading {

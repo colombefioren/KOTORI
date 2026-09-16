@@ -643,6 +643,17 @@
 .ast-toast--error { background: var(--ast-blush); }
 .ast-toast--ok { background: var(--ast-mint); }
 
+/* machinery that must exist in the DOM without being seen */
+.ast-ghost {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* the stage column never inherits ghost spacing */
+.ast-ghost + * { margin-top: 0 !important; }
+
 /* cursor trail canvas sits above the canvas, below the overlays */
 #ast-trail {
   position: fixed;
