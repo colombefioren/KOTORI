@@ -1,0 +1,282 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Shell, hero, editorial grid, footer
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.gradio-container > .main,
+.gradio-container > .wrap {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.ast-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--ast-max);
+  margin: 0 auto;
+  padding: 0 clamp(14px, 3vw, 42px) 60px;
+}
+
+/* ── ticker ────────────────────────────────────────────────────────────────── */
+
+.ast-ticker {
+  position: relative;
+  overflow: hidden;
+  border-bottom: var(--ast-border);
+  background: linear-gradient(90deg, var(--ast-panel), var(--ast-void));
+  padding: 9px 0;
+}
+
+.ast-ticker__track {
+  display: inline-flex;
+  gap: 34px;
+  white-space: nowrap;
+  animation: ast-marquee 34s linear infinite;
+  font-family: var(--ast-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ast-mist);
+}
+
+.ast-ticker__track b {
+  color: var(--ast-mint);
+  font-weight: 600;
+}
+
+.ast-ticker__track i {
+  color: var(--ast-lilac);
+  font-style: normal;
+}
+
+/* ── hero ──────────────────────────────────────────────────────────────────── */
+
+.ast-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+  gap: var(--ast-gap);
+  align-items: end;
+  padding: clamp(26px, 5vw, 58px) 0 clamp(20px, 3vw, 32px);
+  border-bottom: var(--ast-border);
+}
+
+.ast-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--ast-mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ast-dust);
+  border: var(--ast-border);
+  background: var(--ast-panel);
+  padding: 6px 11px;
+  box-shadow: var(--ast-hard-sm);
+}
+
+.ast-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ast-mint);
+  box-shadow: 0 0 12px var(--ast-mint);
+  animation: ast-pulse 2.4s ease-in-out infinite;
+}
+
+.ast-dot--off {
+  background: var(--ast-blush);
+  box-shadow: 0 0 12px var(--ast-blush);
+}
+
+.ast-headline {
+  font-family: var(--ast-display);
+  font-weight: 700;
+  font-size: clamp(38px, 8.4vw, 106px);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  margin: 18px 0 0;
+  text-transform: uppercase;
+}
+
+.ast-headline em {
+  font-family: var(--ast-serif);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: var(--ast-mint);
+  text-shadow: var(--ast-glow-mint);
+}
+
+.ast-headline span {
+  -webkit-text-stroke: 1.5px var(--ast-lilac);
+  color: transparent;
+}
+
+.ast-lede {
+  font-family: var(--ast-serif);
+  font-size: clamp(16px, 1.5vw, 21px);
+  line-height: 1.5;
+  color: var(--ast-mist);
+  max-width: 62ch;
+  margin: 20px 0 0;
+}
+
+.ast-lede b {
+  color: var(--ast-chalk);
+  font-weight: 400;
+  border-bottom: 2px solid var(--ast-butter);
+}
+
+.ast-heroblurb {
+  font-family: var(--ast-mono);
+  font-size: 11px;
+  line-height: 1.8;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ast-dust);
+  border-left: 3px solid var(--ast-lilac);
+  padding-left: 14px;
+  margin: 0;
+}
+
+.ast-heroblurb strong {
+  display: block;
+  color: var(--ast-chalk);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+/* ── stat strip ────────────────────────────────────────────────────────────── */
+
+.ast-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--ast-line);
+  border: var(--ast-border);
+  margin: 0 0 var(--ast-gap);
+}
+
+.ast-stat {
+  background: var(--ast-panel);
+  padding: 14px 16px;
+}
+
+.ast-stat dt {
+  font-family: var(--ast-mono);
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ast-dust);
+  margin: 0 0 8px;
+}
+
+.ast-stat dd {
+  margin: 0;
+  font-family: var(--ast-display);
+  font-size: clamp(20px, 2.4vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ast-chalk);
+  overflow-wrap: anywhere;
+}
+
+.ast-stat--mint dd { color: var(--ast-mint); }
+.ast-stat--lilac dd { color: var(--ast-lilac); }
+.ast-stat--blush dd { color: var(--ast-blush); }
+.ast-stat--butter dd { color: var(--ast-butter); }
+.ast-stat--sky dd { color: var(--ast-sky); }
+
+/* ── working grid ──────────────────────────────────────────────────────────── */
+
+.ast-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
+  gap: var(--ast-gap);
+  align-items: start;
+}
+
+.ast-section {
+  font-family: var(--ast-mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ast-dust);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.ast-section::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--ast-line) 0 8px, transparent 8px 14px);
+}
+
+.ast-section b {
+  color: var(--ast-mint);
+  font-weight: 600;
+}
+
+/* sticky rail so the composer never leaves the viewport */
+.ast-rail {
+  position: sticky;
+  top: 12px;
+}
+
+/* ── footer ────────────────────────────────────────────────────────────────── */
+
+.ast-footer {
+  margin-top: 42px;
+  border-top: var(--ast-border);
+  padding: 18px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  justify-content: space-between;
+  font-family: var(--ast-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ast-dust);
+}
+
+.ast-footer a {
+  color: var(--ast-mist);
+  text-decoration: none;
+  border-bottom: 2px solid var(--ast-line);
+  padding-bottom: 2px;
+}
+
+.ast-footer a:hover {
+  color: var(--ast-void);
+  background: var(--ast-mint);
+  border-color: var(--ast-mint);
+}
+
+.ast-footer kbd {
+  font-family: var(--ast-mono);
+  border: 1px solid var(--ast-line);
+  background: var(--ast-panel-2);
+  color: var(--ast-chalk);
+  padding: 1px 6px;
+}
+
+/* ── responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1080px) {
+  .ast-hero { grid-template-columns: 1fr; align-items: start; }
+  .ast-grid { grid-template-columns: 1fr; }
+  .ast-rail { position: static; }
+}
+
+@media (max-width: 640px) {
+  .ast-shell { padding: 0 12px 40px; }
+  .ast-headline { letter-spacing: -0.02em; }
+  .ast-stat { padding: 12px; }
+  .ast-footer { font-size: 10px; }
+}
