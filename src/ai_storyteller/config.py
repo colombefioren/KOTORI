@@ -6,6 +6,7 @@ Every tunable lives here so the rest of the codebase stays free of ``os.getenv``
 from __future__ import annotations
 
 import os
+import tempfile
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -51,6 +52,20 @@ def _env_int(name: str, default: int) -> int:
         return int(raw)
     except ValueError:
         return default
+
+
+def ensure_writable_dir(path: Path) -> Path:
+    """Create ``path``, falling back to a temp dir on read-only hosts."""
+    for candidate in (path, Path(tempfile.gettempdir()) / "ai-storyteller"):
+        try:
+            candidate.mkdir(parents=True, exist_ok=True)
+            probe = candidate / ".write-probe"
+            probe.touch()
+            probe.unlink()
+            return candidate
+        except OSError:
+            continue
+    raise RuntimeError(f"no writable directory among {[str(path)]}") from None
 
 
 def _env_bool(name: str, default: bool = False) -> bool:

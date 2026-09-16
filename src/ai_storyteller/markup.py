@@ -288,8 +288,9 @@ def render_archive_list(drafts: Sequence[StoryDraft]) -> str:
     return f'<div class="ar-list">{items}</div>'
 
 
-def render_footer(settings: Settings) -> str:
-    """Credits, licence note and the palette swatch row."""
+def render_footer(settings: Settings, data_dir: object | None = None) -> str:
+    """Credits, licence note and the storage location."""
+    location = data_dir or settings.data_dir
     return f"""
 <div class="ast-shell">
   <footer class="ast-footer">
@@ -299,7 +300,7 @@ def render_footer(settings: Settings) -> str:
       <a href="/gradio_api/info" target="_blank" rel="noreferrer">api</a> ·
       <a href="?__theme=dark">dark</a>
     </span>
-    <span>drafts: {escape(str(settings.data_dir))}</span>
+    <span>drafts: {escape(str(location))}</span>
   </footer>
 </div>
 """

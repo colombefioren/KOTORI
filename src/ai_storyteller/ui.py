@@ -157,7 +157,7 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
             incoming = gr.Textbox(elem_id="ast-incoming", container=False)
             adopt = gr.Button("adopt", elem_id="ast-adopt")
 
-        gr.HTML(_footer(settings), elem_id="ast-footer")
+        gr.HTML(studio.footer(), elem_id="ast-footer")
 
         composer_inputs = [topic, genre, mood, words, voice, slow]
 
@@ -275,12 +275,6 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
         )
 
     return demo
-
-
-def _footer(settings: Settings) -> str:
-    from .markup import render_footer
-
-    return render_footer(settings)
 
 
 def configure_queue(demo: gr.Blocks) -> gr.Blocks:

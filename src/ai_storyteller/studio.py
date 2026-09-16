@@ -10,7 +10,7 @@ import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 
-from .config import Settings, get_settings
+from .config import Settings, ensure_writable_dir, get_settings
 from .library import StoryLibrary
 from .markup import (
     archive_choices,
@@ -18,6 +18,7 @@ from .markup import (
     render_archive_preview,
     render_deck,
     render_deck_idle,
+    render_footer,
     render_hero,
     render_idle_stage,
     render_stage,
@@ -57,13 +58,18 @@ class Studio:
         service: StoryService | None = None,
     ) -> None:
         self.settings = settings or get_settings()
-        self.settings.ensure_dirs()
-        self.library = library or StoryLibrary(self.settings.archive_path)
+        self.data_dir = ensure_writable_dir(self.settings.data_dir)
+        self.audio_dir = self.data_dir / "audio"
+        self.audio_dir.mkdir(parents=True, exist_ok=True)
+        self.library = library or StoryLibrary(self.data_dir / "library.jsonl")
         self.service = service or StoryService(self.settings)
 
     # ── chrome ───────────────────────────────────────────────────────────────
     def hero(self) -> str:
         return render_hero(self.settings, self.library.stats())
+
+    def footer(self) -> str:
+        return render_footer(self.settings, data_dir=self.data_dir)
 
     def idle_view(self) -> View:
         note = (
@@ -141,7 +147,7 @@ class Studio:
                 path = synthesize(
                     draft.story,
                     voice_key=draft.voice,
-                    out_dir=self.settings.audio_dir,
+                    out_dir=self.audio_dir,
                     stem=draft.slug,
                     slow=False,
                 )
