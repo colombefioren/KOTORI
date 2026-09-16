@@ -18,10 +18,10 @@ PROSE = (
 class FakeService:
     """Stands in for StoryService so the pipeline runs offline."""
 
-    def prepare(self, request):  # noqa: ANN001, ANN201
+    def prepare(self, request):
         return request.normalised("a quiet town")
 
-    async def stream(self, request):  # noqa: ANN001, ANN201
+    async def stream(self, request):
         yield StoryChunk(text=PROSE[:40], delta=PROSE[:40], note="writing…")
         yield StoryChunk(text=PROSE, delta=PROSE[40:], note="writing…")
         yield StoryChunk(text=PROSE, delta="", finished=True, note="closing the loop…")
@@ -31,7 +31,7 @@ class FakeService:
 def fake_speech(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Never touch the network: write a tiny stand-in mp3 instead."""
 
-    def fake_synthesize(text, *, voice_key, out_dir, stem, slow=False):  # noqa: ANN001, ANN202
+    def fake_synthesize(text, *, voice_key, out_dir, stem, slow=False):
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
         target = out_dir / f"{stem}-{voice_key}.mp3"
@@ -101,7 +101,7 @@ def test_ignite_streams_then_voices_and_archives(studio: Studio):
 def test_ignite_reports_speech_failure_without_losing_the_story(
     studio: Studio, monkeypatch: pytest.MonkeyPatch
 ):
-    def broken(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+    def broken(*args, **kwargs):
         raise studio_module.SpeechError("voices are down")
 
     monkeypatch.setattr(studio_module, "synthesize", broken)
@@ -127,7 +127,7 @@ def test_archive_round_trip_and_preview(studio: Studio):
     assert "data:audio/mpeg;base64," in re_voiced.deck
 
 
-def openable_deck_is_idle(view) -> bool:  # noqa: ANN001
+def openable_deck_is_idle(view) -> bool:
     return "speak it again" in view.deck
 
 

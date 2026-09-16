@@ -22,11 +22,11 @@ class FakeModel:
     def __init__(self, pieces: list[str]) -> None:
         self.pieces = pieces
 
-    async def astream(self, messages):  # noqa: ANN001, ANN201
+    async def astream(self, messages):
         for piece in self.pieces:
             yield FakeChunk(piece)
 
-    def invoke(self, messages):  # noqa: ANN001, ANN201
+    def invoke(self, messages):
         return FakeChunk("".join(self.pieces))
 
 

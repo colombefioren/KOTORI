@@ -8,7 +8,6 @@ from ai_storyteller.markup import (
     render_deck_idle,
     render_footer,
     render_hero,
-    render_idle_stage,
     render_stage,
     render_status,
     render_words,

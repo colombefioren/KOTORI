@@ -1,3 +1,5 @@
+import itertools
+
 from ai_storyteller.timing import (
     cumulative_fractions,
     estimate_duration,
@@ -54,7 +56,7 @@ def test_word_timings_cover_the_whole_duration():
     timings = word_timings(SAMPLE, duration=12.0)
     assert timings[0].start == 0.0
     assert timings[-1].end == 12.0
-    for earlier, later in zip(timings, timings[1:], strict=False):
+    for earlier, later in itertools.pairwise(timings):
         assert earlier.end <= later.start + 1e-9
 
 
