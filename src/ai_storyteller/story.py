@@ -19,6 +19,12 @@ WRITING_NOTE = "writing…"
 CLOSING_NOTE = "closing the loop…"
 MIN_USEFUL_CHARS = 24
 
+# Streamed frames repaint the whole teleprompter, so pace them: fast enough to
+# feel continuous, slow enough that a chatty model cannot flood the client.
+MIN_EMIT_SECONDS = 0.09
+MAX_EMIT_SECONDS = 0.5
+MIN_NEW_CHARS = 6
+
 
 class StoryError(RuntimeError):
     """Raised when the writer comes back empty-handed."""
@@ -56,13 +62,26 @@ class StoryService:
         buffer = ""
         yield StoryChunk(text="", delta="", note=OPENING_NOTE)
 
+        emitted = False
+        last_emit = time.perf_counter()
+        last_chars = 0
+
         async for chunk in model.astream(self.messages(prepared)):
-            delta = chunk.text() if hasattr(chunk, "text") else str(chunk.content)
+            delta = chunk.text if hasattr(chunk, "text") else str(chunk.content)
             if not delta:
                 continue
             buffer += delta
             text = clean_story(buffer)
-            yield StoryChunk(text=text, delta=delta, note=WRITING_NOTE)
+
+            now = time.perf_counter()
+            grew = len(text) - last_chars
+            due = now - last_emit >= MIN_EMIT_SECONDS and grew >= MIN_NEW_CHARS
+            overdue = now - last_emit >= MAX_EMIT_SECONDS and grew > 0
+            if not emitted or due or overdue:
+                emitted = True
+                last_emit = now
+                last_chars = len(text)
+                yield StoryChunk(text=text, delta=delta, note=WRITING_NOTE)
 
         text = clean_story(buffer)
         if len(text) < MIN_USEFUL_CHARS:
