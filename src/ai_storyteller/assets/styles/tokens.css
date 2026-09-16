@@ -1,0 +1,143 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   AI Storyteller · design tokens
+   Neon brutalism, pastel ink, editorial bones. Always dark, on purpose.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* surfaces */
+  --ast-void: #07070c;
+  --ast-ink: #0b0b13;
+  --ast-panel: #101021;
+  --ast-panel-2: #16162c;
+  --ast-panel-3: #1d1d38;
+  --ast-line: #2a2a48;
+  --ast-line-soft: rgba(160, 160, 220, 0.18);
+
+  /* type */
+  --ast-chalk: #f5f4ff;
+  --ast-mist: #b6b3d8;
+  --ast-dust: #7c7aa0;
+
+  /* pastel neons */
+  --ast-mint: #96f7d2;
+  --ast-lilac: #cbb8ff;
+  --ast-blush: #ffb2cb;
+  --ast-butter: #ffe8a3;
+  --ast-sky: #a6d8ff;
+  --ast-accent: var(--ast-mint);
+  --ast-accent-2: var(--ast-lilac);
+
+  /* glows */
+  --ast-glow-mint: 0 0 22px rgba(150, 247, 210, 0.35);
+  --ast-glow-lilac: 0 0 26px rgba(203, 184, 255, 0.32);
+  --ast-glow-blush: 0 0 22px rgba(255, 178, 203, 0.3);
+  --ast-glow-sky: 0 0 22px rgba(166, 216, 255, 0.3);
+
+  /* brutalist geometry */
+  --ast-r: 2px;
+  --ast-r-lg: 4px;
+  --ast-border: 2px solid var(--ast-line);
+  --ast-border-ink: 2px solid #000;
+  --ast-hard: 6px 6px 0 rgba(0, 0, 0, 0.85);
+  --ast-hard-sm: 3px 3px 0 rgba(0, 0, 0, 0.85);
+  --ast-hard-mint: 6px 6px 0 rgba(150, 247, 210, 0.75);
+  --ast-hard-lilac: 6px 6px 0 rgba(203, 184, 255, 0.75);
+
+  /* type stacks */
+  --ast-display: "Space Grotesk", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --ast-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --ast-serif: "Instrument Serif", "Iowan Old Style", "Times New Roman", serif;
+
+  /* rhythm */
+  --ast-gap: 18px;
+  --ast-pad: 22px;
+  --ast-max: 1460px;
+}
+
+/* ── base canvas ───────────────────────────────────────────────────────────── */
+
+body,
+.gradio-container {
+  background: var(--ast-void);
+  color: var(--ast-chalk);
+  font-family: var(--ast-display);
+}
+
+.gradio-container {
+  background-image:
+    radial-gradient(120% 80% at 12% -10%, rgba(203, 184, 255, 0.13), transparent 55%),
+    radial-gradient(100% 70% at 88% 0%, rgba(150, 247, 210, 0.11), transparent 50%),
+    radial-gradient(80% 60% at 50% 110%, rgba(255, 178, 203, 0.09), transparent 60%),
+    linear-gradient(180deg, var(--ast-ink) 0%, var(--ast-void) 100%);
+  background-attachment: fixed;
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+/* film grain, drawn once and left alone */
+.gradio-container::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+/* faint drafting grid */
+.gradio-container::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(var(--ast-line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ast-line-soft) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px;
+  mask-image: radial-gradient(120% 90% at 50% 0%, #000 20%, transparent 85%);
+}
+
+::selection {
+  background: var(--ast-mint);
+  color: var(--ast-void);
+}
+
+*:focus-visible {
+  outline: 2px dashed var(--ast-mint);
+  outline-offset: 3px;
+}
+
+/* scrollbars sized like the rest of the brutalism */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ast-line) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--ast-line);
+  border: 2px solid var(--ast-void);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--ast-lilac);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
