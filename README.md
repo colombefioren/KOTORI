@@ -20,7 +20,8 @@ read it back while every word lights up in time with the audio.
 [![ci](https://github.com/colombefioren/ai-storyteller/actions/workflows/ci.yml/badge.svg)](https://github.com/colombefioren/ai-storyteller/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.12%2B-07070c?style=flat-square&labelColor=07070c)
 ![gradio](https://img.shields.io/badge/gradio-6-96f7d2?style=flat-square&labelColor=07070c)
-![tests](https://img.shields.io/badge/tests-109-cbb8ff?style=flat-square&labelColor=07070c)
+![tests](https://img.shields.io/badge/tests-150-cbb8ff?style=flat-square&labelColor=07070c)
+![coverage](https://img.shields.io/badge/coverage-95%25-96f7d2?style=flat-square&labelColor=07070c)
 ![license](https://img.shields.io/badge/license-MIT-ffb2cb?style=flat-square&labelColor=07070c)
 
 <a href="docs/preview.svg"><img src="docs/preview.svg" alt="AI Storyteller: streaming prose with the spoken word glowing in mint" width="100%" /></a>
@@ -220,6 +221,8 @@ src/ai_storyteller/
 ├── models.py       StoryRequest / StoryDraft + reading-time maths
 ├── markup.py       HTML for hero, stage, deck, archive, footer
 ├── studio.py       controller: write → voice → archive
+├── callbacks.py    every button's handler, Gradio-free enough to unit-test
+└── ui.py           Blocks layout + event wiring
 ├── theme.py        Gradio theme mirroring the CSS tokens
 ├── frontend.py     css / js / head bundle loader
 ├── ui.py           Blocks layout + event wiring
@@ -230,10 +233,11 @@ src/ai_storyteller/
     └── favicon.svg
 ```
 
-**Why the split?** `studio.py` returns plain HTML strings and dataclasses, so the
-whole product can be driven from tests, a notebook or a CLI with **Gradio nowhere in
-the loop**. `ui.py` stays a thin skin of components and events over that controller —
-which is also why 109 tests run offline in about a second and a half.
+**Why the split?** `studio.py` returns plain HTML strings and dataclasses and
+`callbacks.py` holds every button's handler, so the whole product can be driven from
+tests, a notebook or a CLI with **Gradio nowhere near the logic**. `ui.py` stays a thin
+skin of components and events over that controller — which is why 150 tests run
+offline in under eight seconds at 95% coverage.
 
 ---
 
@@ -285,18 +289,37 @@ docker compose up --build        # reads .env, mounts ./data
 ## Tests, lint and CI
 
 ```bash
-uv run pytest                       # 109 tests, fully offline
+uv run pytest                       # 150 tests, fully offline, ~7 s
 uv run ruff check src tests         # E F I UP B SIM C4 RUF
 uv run ruff format --check src tests
+
+# what CI runs on top of that
+uv run pytest -q --cov=ai_storyteller \
+  --cov-report=term-missing:skip-covered --cov-fail-under=90
 ```
 
 The network is never touched: the writer is faked, speech synthesis is monkeypatched,
-and the app is assembled without being launched. Nine test modules cover config
-parsing, prose cleanup, word timing, the archive, the HTML renderers, the studio
-pipeline, the demo reels, accessibility landmarks and the assembled app.
+and the app is assembled without ever being launched. Eleven modules cover env parsing,
+the chat factory, prose cleanup, word timing, the archive, the HTML renderers, the
+domain model, the studio pipeline, every interface callback, the demo reels,
+accessibility landmarks and the assembled app.
 
-CI (`.github/workflows/ci.yml`) runs, on every push and PR: **lint → format check →
-tests → docker build**, so a broken stylesheet or an unbuildable image fails loudly.
+### Continuous integration and delivery
+
+| workflow | trigger | what it does |
+|:--|:--|:--|
+| [`ci.yml`](.github/workflows/ci.yml) | every push and PR | lint → format check → tests with a **90% coverage floor** → docker build |
+| [`deploy.yml`](.github/workflows/deploy.yml) | `v*` tags or manual | publishes a **multi-arch image to GHCR** (`linux/amd64`, `linux/arm64`) and, if the `HF_SPACE` repository variable is set, mirrors the commit to a Space |
+
+```bash
+# a released image, ready to run
+docker run -p 7860:7860 -v storyteller-data:/data \
+  -e MODEL_NAME=gpt-4o-mini -e API_KEY=sk-… \
+  ghcr.io/colombefioren/ai-storyteller:latest
+```
+
+To enable the Space mirror: add a repository **variable** `HF_SPACE` (`user/space-name`)
+and a secret `HF_TOKEN` with write access. Skip both and the job simply does not run.
 
 ---
 
