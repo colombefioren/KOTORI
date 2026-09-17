@@ -51,9 +51,37 @@ def test_asset_bundle_is_complete():
 
 def test_scripts_expose_the_client_contract():
     source = script_source()
-    for marker in ("window.ASTBus", "window.ASTPlayer", "window.ASTToast", "window.ASTCodec"):
+    for marker in (
+        "window.ASTBus",
+        "window.ASTPlayer",
+        "window.ASTToast",
+        "window.ASTCodec",
+        "window.ASTTheme",
+        "window.ASTVoices",
+        "window.ASTRooms",
+    ):
         assert marker in source
     assert "ast-trail" in source
+
+
+def test_the_client_owns_the_rooms():
+    source = script_source()
+    # the tabs are flipped in the browser, and the server talks through a signal
+    assert "index-tab" in source
+    assert "data-room" in source
+    assert "ast-room" in source
+    assert "MutationObserver" in source
+    assert 'role="tab"' not in source  # nothing queries gradio's own tab markup
+
+
+def test_the_room_is_chosen_before_the_first_paint():
+    head = head_html()
+    assert "data-room" in head
+    assert "data-theme" in head
+    # with scripting off, every room is shown rather than two being hidden
+    assert "<noscript>" in head
+    for room in ("room-home", "room-playground", "room-history"):
+        assert room in head
 
 
 def test_head_html_loads_the_webfonts():
