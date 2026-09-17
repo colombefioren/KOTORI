@@ -13,7 +13,7 @@ def test_empty_library_reports_zeroes(tmp_path: Path):
     assert library.load() == []
     stats = library.stats()
     assert (stats.drafts, stats.words, stats.minutes) == (0, 0, 0)
-    assert stats.top_genre == "—"
+    assert stats.top_genre == "not yet"
 
 
 def test_save_then_load_is_newest_first(tmp_path: Path):
@@ -79,9 +79,9 @@ def test_stats_track_words_and_top_genre(tmp_path: Path):
 
 def test_archive_round_trips_through_disk(tmp_path: Path):
     path = tmp_path / "library.jsonl"
-    saved = StoryDraft(topic="the lamp", story="Hi.", voice_label="Aurora — English · US")
+    saved = StoryDraft(topic="the lamp", story="Hi.", voice_label="Aurora · English · US")
     StoryLibrary(path).save(saved)
     reloaded = StoryLibrary(path).get(saved.story_id)
     assert reloaded is not None
-    assert reloaded.voice_label == "Aurora — English · US"
+    assert reloaded.voice_label == "Aurora · English · US"
     assert reloaded.created_at == saved.created_at

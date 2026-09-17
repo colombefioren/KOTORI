@@ -25,7 +25,7 @@ class ArchiveStats:
     drafts: int = 0
     words: int = 0
     minutes: int = 0
-    top_genre: str = "—"
+    top_genre: str = "not yet"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -67,7 +67,7 @@ class StoryLibrary:
             drafts=len(drafts),
             words=words,
             minutes=round(sum(draft.reading_seconds for draft in drafts) / 60),
-            top_genre=genres.most_common(1)[0][0] if genres else "—",
+            top_genre=genres.most_common(1)[0][0] if genres else "not yet",
         )
 
     # ── writing ──────────────────────────────────────────────────────────────
