@@ -25,7 +25,7 @@ spoken back while every word warms up in time with the voice.
 ![langchain](https://img.shields.io/badge/langchain-1.4-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
 ![docker](https://img.shields.io/badge/docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![uv](https://img.shields.io/badge/uv-managed-DE5FE9?style=for-the-badge&logo=uv&logoColor=white)
-![tests](https://img.shields.io/badge/tests-201%20passing-2EA44F?style=for-the-badge&logo=pytest&logoColor=white)
+![tests](https://img.shields.io/badge/tests-198%20passing-2EA44F?style=for-the-badge&logo=pytest&logoColor=white)
 ![licence](https://img.shields.io/badge/licence-MIT-6f6573?style=for-the-badge)
 
 </div>
