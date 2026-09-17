@@ -11,6 +11,7 @@
   /* ── the index tabs ───────────────────────────────────────────────────── */
 
   var currentRoom = "";
+  var lastSignalRoom = null;
 
   function tabButtons() {
     return Array.prototype.slice.call(document.querySelectorAll("#ast-tabs .index-tab"));
@@ -64,23 +65,22 @@
     else badge.setAttribute("hidden", "");
   }
 
-  /* the server moves the reader by re-rendering a hidden note */
+  /* the server moves the reader by re-rendering a hidden note, but Gradio
+     also redraws that same gr.HTML component (a whole new node, same
+     "home" text) on its own from time to time, unrelated to anything the
+     user did. Watching the node itself (by identity, or via a
+     MutationObserver attached to it) re-triggers on that redraw and snaps
+     a client-side tab switch straight back to "home". Comparing against
+     the last *value* we saw, not the node, is what tells "the server just
+     asked to move the reader" apart from "Gradio repainted the same note
+     it always shows" — only the former should ever call show(). */
   function watchRoom() {
     var signal = document.getElementById("ast-room");
     if (!signal) return;
-    var apply = function () {
-      var room = (signal.textContent || "").trim();
-      if (room && room !== currentRoom) show(room);
-    };
-    if (signal.dataset.kotoriWatch !== "1") {
-      signal.dataset.kotoriWatch = "1";
-      new MutationObserver(apply).observe(signal, {
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-    }
-    apply();
+    var room = (signal.textContent || "").trim();
+    if (!room || room === lastSignalRoom) return;
+    lastSignalRoom = room;
+    if (room !== currentRoom) show(room);
   }
 
   window.ASTRooms = { show: show, current: function () { return currentRoom; } };
@@ -511,12 +511,28 @@
     watchRoom();
   });
 
-  window.addEventListener("load", function () {
+  /* ASTBus's first flush rides on requestAnimationFrame, which browsers
+     throttle or withhold entirely for a tab that loads in the background
+     (never painted, so there is nothing to animate). A tab opened that way
+     must still land on the right room the moment its HTML exists, so this
+     runs the same boot work directly off DOMContentLoaded too, instead of
+     only ever waiting on a frame that may not come until the tab is
+     actually looked at. */
+  function boot() {
     applyTrailPreference();
     roomPanels();
     syncCount();
     watchRoom();
     show(currentRoom || "home");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  window.addEventListener("load", function () {
     window.setTimeout(restoreFromHash, 600);
   });
 })();
