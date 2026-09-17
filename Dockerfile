@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ─────────────────────────────────────────────────────────────────────────────
-# AI Storyteller — single container, non-root, with a writable data volume
+# KOTORI — single container, non-root, with a writable data volume
 # ─────────────────────────────────────────────────────────────────────────────
 FROM python:3.12-slim
 
@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_COMPILE_BYTECODE=1 \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
-    AI_STORYTELLER_DATA_DIR=/data \
+    KOTORI_DATA_DIR=/data \
     PORT=7860 \
     GRADIO_SERVER_NAME=0.0.0.0
 
@@ -28,11 +28,11 @@ COPY .env.example ./
 
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN useradd --create-home --uid 10001 studio \
+RUN useradd --create-home --uid 10001 kotori \
  && mkdir -p /data \
- && chown -R studio:studio /data /app /opt/venv
+ && chown -R kotori:kotori /data /app /opt/venv
 
-USER studio
+USER kotori
 EXPOSE 7860
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \

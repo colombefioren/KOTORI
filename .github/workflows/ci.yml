@@ -38,7 +38,7 @@ jobs:
       - name: test
         run: |
           uv run pytest -q \
-            --cov=ai_storyteller \
+            --cov=kotori \
             --cov-report=term-missing:skip-covered \
             --cov-fail-under=90
 
@@ -47,4 +47,4 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: build the image
-        run: docker build -t ai-storyteller:ci .
+        run: docker build -t kotori:ci .

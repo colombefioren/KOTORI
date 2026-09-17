@@ -2,7 +2,7 @@
 # Docs: https://render.com/docs/blueprint-spec
 services:
   - type: web
-    name: ai-storyteller
+    name: kotori
     runtime: docker
     plan: starter
     region: frankfurt
@@ -15,9 +15,9 @@ services:
         sync: false
       - key: BASE_URL
         sync: false
-      - key: AI_STORYTELLER_DATA_DIR
+      - key: KOTORI_DATA_DIR
         value: /var/data
     disk:
-      name: storyteller-archive
+      name: kotori-archive
       mountPath: /var/data
       sizeGB: 1
