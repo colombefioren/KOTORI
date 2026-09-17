@@ -122,15 +122,18 @@ body,
   -webkit-font-smoothing: antialiased;
 }
 
+/* The desk is linen, not a gradient. Two small dried blotches sit where someone
+   left a wet brush down — off-centre, uneven, and never symmetrical. */
 .gradio-container {
-  /* a linen weave, with two pastel washes dried into it */
   background-color: var(--desk) !important;
   background-image:
-    radial-gradient(46% 34% at 12% 4%, rgba(242, 179, 205, 0.34), transparent 70%),
-    radial-gradient(40% 30% at 92% 10%, rgba(179, 208, 242, 0.32), transparent 72%),
-    radial-gradient(52% 40% at 78% 96%, rgba(249, 213, 228, 0.26), transparent 74%),
-    repeating-linear-gradient(90deg, rgba(68, 59, 72, 0.035) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(0deg, rgba(68, 59, 72, 0.03) 0 1px, transparent 1px 4px);
+    radial-gradient(9% 6% at 7% 9%, rgba(226, 136, 174, 0.16), transparent 70%),
+    radial-gradient(6% 5% at 12% 13%, rgba(226, 136, 174, 0.1), transparent 70%),
+    radial-gradient(11% 7% at 88% 22%, rgba(130, 170, 224, 0.16), transparent 72%),
+    radial-gradient(7% 9% at 72% 88%, rgba(242, 179, 205, 0.14), transparent 72%),
+    repeating-linear-gradient(90deg, rgba(68, 59, 72, 0.038) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(68, 59, 72, 0.03) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(68, 59, 72, 0.014) 0 1px, transparent 1px 11px);
   max-width: 100% !important;
   padding: 0 !important;
 }
@@ -138,10 +141,12 @@ body,
 :root[data-theme="dark"] .gradio-container,
 :root.dark .gradio-container {
   background-image:
-    radial-gradient(46% 34% at 12% 4%, rgba(189, 95, 139, 0.22), transparent 70%),
-    radial-gradient(40% 30% at 92% 10%, rgba(91, 131, 182, 0.24), transparent 72%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 4px);
+    radial-gradient(9% 6% at 7% 9%, rgba(231, 156, 190, 0.12), transparent 70%),
+    radial-gradient(11% 7% at 88% 22%, rgba(157, 192, 238, 0.12), transparent 72%),
+    radial-gradient(7% 9% at 72% 88%, rgba(231, 156, 190, 0.08), transparent 72%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0 1px, transparent 1px 11px);
 }
 
 /* paper grain over the whole desk */
