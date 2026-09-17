@@ -1,7 +1,7 @@
 import random
 
-from ai_storyteller.models import StoryRequest
-from ai_storyteller.prompts import (
+from kotori.models import StoryRequest
+from kotori.prompts import (
     GENRES,
     MOODS,
     TOPIC_SEEDS,

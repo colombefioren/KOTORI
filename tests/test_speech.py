@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from ai_storyteller.speech import (
+from kotori.speech import (
     DEFAULT_VOICE,
     VOICES,
     audio_data_uri,

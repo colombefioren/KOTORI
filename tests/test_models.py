@@ -2,7 +2,7 @@
 
 import pytest
 
-from ai_storyteller.models import (
+from kotori.models import (
     StoryDraft,
     StoryRequest,
     count_words,

@@ -1,7 +1,7 @@
 """The studio should be navigable without a mouse and legible to a screen reader."""
 
-from ai_storyteller.config import Settings
-from ai_storyteller.markup import (
+from kotori.config import Settings
+from kotori.markup import (
     render_archive_list,
     render_archive_preview,
     render_deck,
@@ -15,7 +15,7 @@ from ai_storyteller.markup import (
     render_thinking,
     render_words,
 )
-from ai_storyteller.models import StoryDraft
+from kotori.models import StoryDraft
 
 STORY = "She waited, and the city answered. Was it real?"
 
@@ -100,6 +100,6 @@ def test_footer_links_are_described():
 
 
 def _stats():
-    from ai_storyteller.library import ArchiveStats
+    from kotori.library import ArchiveStats
 
     return ArchiveStats(drafts=1, words=12, minutes=1, top_genre="Noir")

@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from ai_storyteller.library import StoryLibrary
-from ai_storyteller.models import StoryDraft
+from kotori.library import StoryLibrary
+from kotori.models import StoryDraft
 
 
 def draft(topic: str, story: str = "Once the sea answered.", genre: str = "Noir") -> StoryDraft:

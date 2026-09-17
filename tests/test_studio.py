@@ -3,11 +3,11 @@ from pathlib import Path
 
 import pytest
 
-from ai_storyteller import studio as studio_module
-from ai_storyteller.config import Settings
-from ai_storyteller.models import StoryDraft
-from ai_storyteller.story import StoryChunk
-from ai_storyteller.studio import Studio
+from kotori import studio as studio_module
+from kotori.config import Settings
+from kotori.models import StoryDraft
+from kotori.story import StoryChunk
+from kotori.studio import Studio
 
 PROSE = (
     "The lamp turned twice and the sea leaned closer, patient as debt. "

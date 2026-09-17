@@ -1,6 +1,6 @@
 import itertools
 
-from ai_storyteller.timing import (
+from kotori.timing import (
     cumulative_fractions,
     estimate_duration,
     split_words,

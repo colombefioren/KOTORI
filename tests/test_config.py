@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from ai_storyteller.config import (
+from kotori.config import (
     PROJECT_ROOT,
     Settings,
     ensure_writable_dir,

@@ -1,6 +1,6 @@
-from ai_storyteller.config import Settings
-from ai_storyteller.library import ArchiveStats
-from ai_storyteller.markup import (
+from kotori.config import Settings
+from kotori.library import ArchiveStats
+from kotori.markup import (
     SHELF_PAPER,
     STAGE_PAPER,
     archive_choices,
@@ -17,7 +17,7 @@ from ai_storyteller.markup import (
     render_thinking,
     render_words,
 )
-from ai_storyteller.models import StoryDraft
+from kotori.models import StoryDraft
 
 STORY = "The lamp turned twice and the sea leaned closer, patient as debt."
 

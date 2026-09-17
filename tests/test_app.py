@@ -2,9 +2,9 @@ from pathlib import Path
 
 import gradio as gr
 
-from ai_storyteller.app import build_demo, launch_options
-from ai_storyteller.config import Settings
-from ai_storyteller.frontend import (
+from kotori.app import build_demo, launch_options
+from kotori.config import Settings
+from kotori.frontend import (
     SCRIPT_FILES,
     STYLE_FILES,
     favicon_path,
@@ -13,7 +13,7 @@ from ai_storyteller.frontend import (
     script_source,
     stylesheet_paths,
 )
-from ai_storyteller.theme import Scratchbook
+from kotori.theme import Scratchbook
 
 EXPECTED_IDS = {
     "ast-header",

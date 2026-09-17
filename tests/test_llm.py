@@ -3,8 +3,8 @@
 import pytest
 from langchain_openai import ChatOpenAI
 
-from ai_storyteller.config import Settings
-from ai_storyteller.llm import EngineNotConfiguredError, build_chat_model, describe_engine
+from kotori.config import Settings
+from kotori.llm import EngineNotConfiguredError, build_chat_model, describe_engine
 
 
 def test_missing_credentials_raise_a_readable_error():

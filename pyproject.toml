@@ -1,7 +1,7 @@
 [project]
-name = "ai-storyteller"
-version = "0.1.0"
-description = "A dark, editorial-grade Gradio studio that writes stories and reads them aloud."
+name = "kotori"
+version = "0.3.0"
+description = "KOTORI — a pastel paper studio that writes a story and reads it back to you."
 readme = "README.md"
 authors = [
     { name = "colombefioren", email = "colomberakotonjanahary@gmail.com" }
@@ -23,10 +23,10 @@ dependencies = [
 ]
 
 [project.scripts]
-ai-storyteller = "ai_storyteller:main"
+kotori = "kotori:main"
 
 [project.urls]
-Homepage = "https://github.com/colombefioren/ai-storyteller"
+Homepage = "https://github.com/colombefioren/kotori"
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
@@ -52,7 +52,7 @@ ignore = ["E501", "RUF001"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
 # gradio layouts are nested contexts by design: merging `with` blocks hurts
-"src/ai_storyteller/ui.py" = ["SIM117"]
+"src/kotori/ui.py" = ["SIM117"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -61,7 +61,7 @@ testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.coverage.run]
-source = ["src/ai_storyteller"]
+source = ["src/kotori"]
 branch = true
 
 [tool.coverage.report]

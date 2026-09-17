@@ -5,11 +5,11 @@ import asyncio
 import gradio as gr
 import pytest
 
-from ai_storyteller import callbacks
-from ai_storyteller.config import Settings
-from ai_storyteller.prompts import TOPIC_SEEDS
-from ai_storyteller.story import StoryChunk, StoryError
-from ai_storyteller.studio import Studio
+from kotori import callbacks
+from kotori.config import Settings
+from kotori.prompts import TOPIC_SEEDS
+from kotori.story import StoryChunk, StoryError
+from kotori.studio import Studio
 
 
 def arguments(**overrides) -> dict:

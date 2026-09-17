@@ -3,14 +3,14 @@ import random
 
 import pytest
 
-from ai_storyteller import demo as demo_module
-from ai_storyteller.demo import (
+from kotori import demo as demo_module
+from kotori.demo import (
     DEMO_CHUNK_WORDS,
     DEMO_STORIES,
     demo_stream,
     pick_demo_story,
 )
-from ai_storyteller.models import StoryRequest
+from kotori.models import StoryRequest
 
 
 @pytest.fixture(autouse=True)
