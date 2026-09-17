@@ -10,8 +10,6 @@
 (function () {
   "use strict";
 
-  var GLYPH_PLAY = "▶";
-  var GLYPH_PAUSE = "❚❚";
   var players = [];
   var rafId = 0;
 
@@ -100,9 +98,9 @@
     if (label) label.textContent = formatTime(current) + " / " + formatTime(duration);
   }
 
-  function glyph(player, value) {
+  function glyph(player, playing) {
     var node = part(player, "glyph");
-    if (node) node.textContent = value;
+    if (node) node.classList.toggle("is-playing", playing);
   }
 
   function frame() {
@@ -128,7 +126,7 @@
 
   function speaking(player, on) {
     if (player.paper) player.paper.classList.toggle("sheet--speaking", on);
-    glyph(player, on ? GLYPH_PAUSE : GLYPH_PLAY);
+    glyph(player, on);
   }
 
   function pauseOthers(audio) {

@@ -562,6 +562,36 @@
 .tp-chip--butter { background: var(--cream); border-color: var(--line-2); color: var(--ink-2); }
 .tp-chip--sky { background: var(--sky); border-color: var(--blue-400); color: var(--blue-500); }
 
+/* ── the play/pause glyph: a drawn triangle, not a font character ─────────── */
+
+.glyph {
+  display: grid;
+  place-items: center;
+}
+
+/* .glyph__pause on its own and ".glyph svg" have equal specificity, so
+   whichever came later in the file would win outright and show both icons
+   stacked at once. Scoping the base "visible" rule to the pair keeps every
+   show/hide declaration below at the same (0,1,0) specificity, so the plain
+   source order — default state, then the .is-playing overrides — is what
+   actually decides which one renders. */
+.glyph__play,
+.glyph__pause {
+  display: block;
+}
+
+.glyph__pause {
+  display: none;
+}
+
+.glyph.is-playing .glyph__play {
+  display: none;
+}
+
+.glyph.is-playing .glyph__pause {
+  display: block;
+}
+
 /* ── the reader ────────────────────────────────────────────────────────────── */
 
 .deck {
@@ -606,7 +636,7 @@
   transition: transform 0.18s ease, background 0.2s ease;
 }
 
-.deck__play span { font-size: 22px; transform: translateX(2.5px); }
+.deck__play .glyph svg { width: 26px; height: 26px; }
 .deck__play:hover { transform: rotate(-4deg) scale(1.03); }
 .deck__play:active { transform: rotate(0) scale(0.97); }
 
@@ -843,7 +873,7 @@
   transition: transform 0.16s ease, background 0.2s ease;
 }
 
-.mini__play span { font-size: 13px; transform: translateX(1.5px); }
+.mini__play .glyph svg { width: 15px; height: 15px; }
 .mini__play:hover { transform: rotate(-5deg) scale(1.04); }
 
 .mini__rail {
