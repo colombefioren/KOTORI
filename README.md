@@ -1,7 +1,7 @@
 ---
 title: AI Storyteller
 emoji: "✦"
-colorFrom: gray
+colorFrom: pink
 colorTo: green
 sdk: docker
 app_port: 7860
@@ -13,20 +13,20 @@ short_description: Streamed stories that read themselves aloud
 
 # ✦ AI&nbsp;STORYTELLER
 
-**Stories that speak** — a dark, editorial-grade story studio.
-Type a seed, watch the prose arrive word by word, then let a synthesised voice
-read it back while every word lights up in time with the audio.
+**Stories that speak** — a pastel, editorial-grade story studio that feels like a
+scratchbook. Type a seed, watch the prose arrive word by word, then let a
+synthesised voice read it back while every word warms up in time with the audio.
 
 [![ci](https://github.com/colombefioren/ai-storyteller/actions/workflows/ci.yml/badge.svg)](https://github.com/colombefioren/ai-storyteller/actions/workflows/ci.yml)
-![python](https://img.shields.io/badge/python-3.12%2B-07070c?style=flat-square&labelColor=07070c)
-![gradio](https://img.shields.io/badge/gradio-6-96f7d2?style=flat-square&labelColor=07070c)
-![tests](https://img.shields.io/badge/tests-150-cbb8ff?style=flat-square&labelColor=07070c)
-![coverage](https://img.shields.io/badge/coverage-95%25-96f7d2?style=flat-square&labelColor=07070c)
-![license](https://img.shields.io/badge/license-MIT-ffb2cb?style=flat-square&labelColor=07070c)
+![python](https://img.shields.io/badge/python-3.12%2B-a795e0?style=flat-square&labelColor=f7f1e7)
+![gradio](https://img.shields.io/badge/gradio-6-7cb79b?style=flat-square&labelColor=f7f1e7)
+![tests](https://img.shields.io/badge/tests-170-d98ea2?style=flat-square&labelColor=f7f1e7)
+![coverage](https://img.shields.io/badge/coverage-96%25-d8b96b?style=flat-square&labelColor=f7f1e7)
+![license](https://img.shields.io/badge/license-MIT-7a6d58?style=flat-square&labelColor=f7f1e7)
 
-<a href="docs/preview.svg"><img src="docs/preview.svg" alt="AI Storyteller: streaming prose with the spoken word glowing in mint" width="100%" /></a>
+<a href="docs/preview.svg"><img src="docs/preview.svg" alt="AI Storyteller: a paper page with streaming prose, the spoken word highlighted, and a rounded player" width="100%" /></a>
 
-<sub>↑ drawn from the real markup and palette — the live thing streams, scrolls and glows.</sub>
+<sub>↑ drawn from the live markup and palette — the real thing streams word by word, then reads itself aloud.</sub>
 
 </div>
 
@@ -58,7 +58,7 @@ uv run ai-storyteller
 # → http://127.0.0.1:7860
 ```
 
-No key? **Just press *ignite*.** The studio ships three original demo reels, so the
+No key? **Just press *write the story*.** The studio ships three original demo reels, so the
 full pipeline — streaming prose, synthesised voice, karaoke, archive, exports —
 works before you have ever opened `.env`. Add credentials later and the same button
 writes something nobody has read before.
@@ -76,33 +76,42 @@ BASE_URL=https://api.your-endpoint.com/v1
 
 | | |
 |:---|:---|
-| **Live teleprompter** | Tokens stream into the stage as the writer thinks; a neon caret marks the exact word being written and the paper scrolls itself. |
-| **Karaoke playback** | The mp3 drives word highlighting — spoken words stay lit, the current word glows, the ones ahead wait in the dark. |
-| **Trailing halo** | A pastel glow chases the spoken word down the page (`requestAnimationFrame`, not a CSS toy). |
-| **Cursor trail** | A canvas ribbon of pastel neon follows the pointer across the studio, toggled with `T`. |
-| **Editorial voice** | Serif reading face, mono micro-labels, 6px hard shadows, 2px corners — brutalism on a soft palette. |
-| **One dark theme** | Light *and* dark slots hold the same values on purpose: the design cannot be broken by an OS preference. |
+| **A loading state, always** | The button answers the moment it is pressed: a ruled page and a blinking cursor appear before the model's first token, and the button locks itself while the writer works. |
+| **Live teleprompter** | Tokens arrive word by word on squared paper; a lavender caret marks where the writer is looking and the page scrolls itself. |
+| **Karaoke playback** | The mp3 drives word highlighting — spoken words stay ink, the current word sits on a butter highlight, the ones ahead wait, faint. |
+| **Trailing halo** | A soft pastel light chases the spoken word down the page (`requestAnimationFrame`, not a CSS toy). |
+| **One player per story** | Every deck carries its own `<audio>` and points at its own page, so a shelf full of stories can never play the wrong voice. |
+| **A shelf you can listen to** | Pick a story and it opens with its own player, its own recording and its own karaoke — a voice is only synthesised when it is missing. |
+| **Cursor trail** | A canvas ribbon of pastel ink follows the pointer, toggled with `T` and remembered in `localStorage`. |
+| **Paper, not neon** | Warm paper, 18px radii, soft shadows, a ruled margin: Lora for prose, Fraunces for headlines, Karla for the interface, Caveat for the margins. |
+| **One theme** | Light *and* dark slots hold the same values on purpose: the design cannot be broken by an OS preference. |
 | **Twelve voices** | gTTS presets across eight languages and accents, from `Aurora (US)` to `Nori (JP)`. |
 | **Ten genres × eight moods** | Every register carries a note that steers the brief ("neon rain, rented bodies, debt"). |
-| **Client-side exports** | Markdown, plain text, mp3 and share links are built in the browser — no extra round-trips. |
-| **A real archive** | Drafts land in an append-only JSONL shelf you can preview, reopen, re-voice, delete or burn. |
-| **Command palette** | `⌘/Ctrl + K`, `/` to focus the seed, `space` to play, `?` for the full sheet. |
+| **Client-side exports** | Markdown, mp3 and share links are built in the browser — no extra round-trips. |
+| **A real archive** | Drafts land in an append-only JSONL shelf you can read, re-record, delete or clear. |
+| **Command palette** | `⌘/Ctrl + K`, `/` to jump to the topic, `S` for the shelf, `space` to play, `?` for the full sheet. |
 | **Reduced motion aware** | `prefers-reduced-motion` turns off the trail, the halo and every reveal. |
 | **Deployable as-is** | Dockerfile, compose file, Render blueprint and Spaces front matter included. |
 
 <details>
-<summary><b>The eight seats in the studio</b></summary>
+<summary><b>The four rooms of the studio</b></summary>
 
-| # | seat | what it does |
+| # | room | what it holds |
 |:--|:--|:--|
-| 01 | **the seed** | your topic, or one of sixteen hand-written prompts |
-| 02 | **genre × mood** | ten registers, eight atmospheres, rendered as pastel chips |
-| 03 | **length** | 120–500 words, with a floor the writer is explicitly told to respect |
-| 04 | **voice** | twelve gTTS presets, plus a "speak slowly" switch |
-| 05 | **the stage** | streaming prose on editorial paper, with meta chips |
-| 06 | **the deck** | custom player, karaoke rail, exports, share link |
-| 07 | **the shelf** | the JSONL archive: preview, reopen, re-voice, delete, burn |
-| 08 | **the shell** | palette, shortcuts, toasts, restored share links, cursor trail |
+| 01 | **the composer** | your topic (or a rolled seed), and one quiet drawer with genre · mood · voice · length |
+| 02 | **the page** | the story as it arrives, with meta chips: words, reading time, genre, mood, voice |
+| 03 | **the player** | one round play button, a seek rule, and four extras: from the top · save the mp3 · copy the words · share a link |
+| 04 | **the shelf** | every story kept, each with its own player; delete, re-record or clear from one drawer |
+
+</details>
+
+<details>
+<summary><b>The three buttons that used to be eight</b></summary>
+
+The old build had *ignite story*, *surprise me*, *stop*, *open in stage*, *speak it again*,
+*refresh*, *delete draft* and *burn the archive*. Now the shelf is a reading pane with a
+player inside it, so listening to an old story needs no button at all — and the only
+remaining controls say exactly what they do.
 
 </details>
 
@@ -124,7 +133,7 @@ prose ──▶ word weights ──▶ data-w on every <span> ──▶ cumulati
                                 ┌─────────────────────────────────┴──────────┐
                                 ▼               ▼                            ▼
                           words behind     current word                 words ahead
-                          stay lit         glows + halo                 wait in the dark
+                          stay ink         butter highlight + halo      wait, faint
 ```
 
 Weight = a base + the word's length + a pause for its trailing punctuation, so
@@ -137,9 +146,9 @@ stay in sync without a single server round-trip after the audio exists.
 
 | script | owns |
 |:--|:--|
-| `trail.js` | the shared `ASTBus` DOM bus, forced dark mode, the cursor canvas |
-| `teleprompter.js` | word timing, the halo, play/pause, the seek rail, auto-scroll |
-| `deck.js` | copy, `.md`/`.txt`/`.mp3` downloads, share links, the story codec |
+| `trail.js` | the shared `ASTBus` DOM bus, forced light mode, the cursor canvas |
+| `teleprompter.js` | one player per deck: word timing, the halo, play/pause, the seek rail, auto-scroll |
+| `deck.js` | copy, `.md`/`.mp3` saves and share links, scoped to the deck the button lives in |
 | `shell.js` | toasts, command palette, shortcuts sheet, `#s=` link restore |
 
 `ASTBus` is a `MutationObserver` plus one `requestAnimationFrame` flush, so a
@@ -169,7 +178,7 @@ uv run ai-storyteller   # same as: uv run python app.py  ·  uv run python -m ai
 | `MAX_TOKENS` | `900` | hard ceiling per story |
 | `REQUEST_TIMEOUT` | `60` | seconds before a write is abandoned |
 | `AI_STORYTELLER_DATA_DIR` | `./data` | archive + rendered mp3s (falls back to a temp dir if read-only) |
-| `FORCE_DARK` | `1` | the studio ships dark-first |
+| `FORCE_LIGHT` | `1` | the studio is paper-first (set `0` to let Gradio theme itself) |
 | `PORT` / `GRADIO_SERVER_PORT` | `7860` | server port (`PORT` wins — that is what hosts inject) |
 | `GRADIO_SERVER_NAME` | `0.0.0.0` | bind address |
 
@@ -179,26 +188,28 @@ uv run ai-storyteller   # same as: uv run python app.py  ·  uv run python -m ai
 
 <div align="center">
 
-![void](https://img.shields.io/badge/-07070c-07070c?style=flat-square)&nbsp;![ink](https://img.shields.io/badge/-0b0b13-0b0b13?style=flat-square)&nbsp;![panel](https://img.shields.io/badge/-101021-101021?style=flat-square)&nbsp;![line](https://img.shields.io/badge/-2a2a48-2a2a48?style=flat-square)&nbsp;![mist](https://img.shields.io/badge/-b6b3d8-b6b3d8?style=flat-square)&nbsp;![chalk](https://img.shields.io/badge/-f5f4ff-f5f4ff?style=flat-square)&nbsp;![mint](https://img.shields.io/badge/-96f7d2-96f7d2?style=flat-square)&nbsp;![lilac](https://img.shields.io/badge/-cbb8ff-cbb8ff?style=flat-square)&nbsp;![blush](https://img.shields.io/badge/-ffb2cb-ffb2cb?style=flat-square)&nbsp;![butter](https://img.shields.io/badge/-ffe8a3-ffe8a3?style=flat-square)&nbsp;![sky](https://img.shields.io/badge/-a6d8ff-a6d8ff?style=flat-square)
+![paper](https://img.shields.io/badge/-f7f1e7-f7f1e7?style=flat-square)&nbsp;![card](https://img.shields.io/badge/-fffdf8-fffdf8?style=flat-square)&nbsp;![sunk](https://img.shields.io/badge/-fdf8f0-fdf8f0?style=flat-square)&nbsp;![line](https://img.shields.io/badge/-ecdfca-ecdfca?style=flat-square)&nbsp;![ink](https://img.shields.io/badge/-4b3f2f-4b3f2f?style=flat-square)&nbsp;![soft](https://img.shields.io/badge/-7c6c57-7c6c57?style=flat-square)&nbsp;![faint](https://img.shields.io/badge/-a79579-a79579?style=flat-square)&nbsp;![sage](https://img.shields.io/badge/-b7ddc8-b7ddc8?style=flat-square)&nbsp;![lavender](https://img.shields.io/badge/-d6cbf4-d6cbf4?style=flat-square)&nbsp;![rose](https://img.shields.io/badge/-f3c1cc-f3c1cc?style=flat-square)&nbsp;![butter](https://img.shields.io/badge/-f8e6b2-f8e6b2?style=flat-square)&nbsp;![sky](https://img.shields.io/badge/-c5ddf2-c5ddf2?style=flat-square)
 
 </div>
 
 | token | value | used for |
 |:--|:--|:--|
-| `--ast-void` | `#07070c` | page canvas, paper |
-| `--ast-panel` | `#101021` | panels, cards, ticker |
-| `--ast-mint` | `#96f7d2` | primary action, the current word |
-| `--ast-lilac` | `#cbb8ff` | secondary accent, focus, chips |
-| `--ast-blush` | `#ffb2cb` | destructive, warnings, voice chips |
-| `--ast-butter` | `#ffe8a3` | playful highlights, demo mode lamp |
-| `--ast-sky` | `#a6d8ff` | engine and model chips |
-| type | Space Grotesk · JetBrains Mono · Instrument Serif | interface · labels · prose |
-| geometry | 2px radius · 2px borders · 6px hard shadows | the brutalism |
+| `--paper` | `#f7f1e7` | the page itself, under pastel washes and a dot grid |
+| `--card` / `--card-sunk` | `#fffdf8` / `#fdf8f0` | cards · inputs and the squared paper |
+| `--ink` / `--ink-soft` / `--ink-faint` | `#4b3f2f` / `#7c6c57` / `#a79579` | prose and interface · labels · words not yet spoken |
+| `--lavender` / `--lavender-deep` | `#d6cbf4` / `#a795e0` | the primary action, the caret, focus rings |
+| `--sage-deep` | `#7cb79b` | the ready lamp, "words" chip |
+| `--rose-deep` | `#d98ea2` | the margin rule, destructive actions, errors |
+| `--butter` / `--butter-deep` | `#f8e6b2` / `#d8b96b` | the word being spoken · the demo lamp |
+| `--sky-deep` | `#8ab3d6` | engine and model chips |
+| type | Fraunces · Lora · Karla · Caveat | headlines · prose · interface · margin notes |
+| geometry | 18px cards · 999px pills · soft shadows · 1px hairlines | the scratchbook |
 
 Everything lives in `assets/styles/tokens.css`; `theme.py` mirrors the same palette
 into Gradio's theme so components that ship their own CSS still match. The stylesheet
 is split into **tokens → layout → components → animations** so a change of mood means
-editing one file, not hunting through a thousand lines.
+editing one file, not hunting through a thousand lines. The four typefaces are
+requested once, in the document head, from Google Fonts.
 
 <p align="center">
   <img src="docs/preview.svg" alt="the same palette applied to the studio" width="620" />
@@ -219,16 +230,15 @@ src/ai_storyteller/
 ├── timing.py       word weights → the karaoke timeline
 ├── library.py      append-only JSONL archive + stats
 ├── models.py       StoryRequest / StoryDraft + reading-time maths
-├── markup.py       HTML for hero, stage, deck, archive, footer
-├── studio.py       controller: write → voice → archive
+├── markup.py       HTML for the hero, the page, the player, the shelf, footer
+├── studio.py       controller: write → voice → archive (cached recordings)
 ├── callbacks.py    every button's handler, Gradio-free enough to unit-test
-└── ui.py           Blocks layout + event wiring
 ├── theme.py        Gradio theme mirroring the CSS tokens
 ├── frontend.py     css / js / head bundle loader
 ├── ui.py           Blocks layout + event wiring
 ├── app.py          launch(): theme, css, js, favicon, port
 └── assets/
-    ├── styles/     tokens · layout · components · animations   (4 files, ~1.1k lines)
+    ├── styles/     tokens · layout · components · animations   (4 files, ~1.2k lines)
     ├── scripts/    trail · teleprompter · deck · shell         (4 files, ~1.1k lines)
     └── favicon.svg
 ```
@@ -236,8 +246,8 @@ src/ai_storyteller/
 **Why the split?** `studio.py` returns plain HTML strings and dataclasses and
 `callbacks.py` holds every button's handler, so the whole product can be driven from
 tests, a notebook or a CLI with **Gradio nowhere near the logic**. `ui.py` stays a thin
-skin of components and events over that controller — which is why 150 tests run
-offline in under eight seconds at 95% coverage.
+skin of components and events over that controller — which is why 170 tests run
+offline in about eight seconds at 96% coverage.
 
 ---
 
@@ -245,11 +255,11 @@ offline in under eight seconds at 95% coverage.
 
 | key | action | | key | action |
 |:--|:--|:--|:--|:--|
-| `⌘/Ctrl + K` | command palette | | `A` | jump to the archive |
-| `/` | focus the seed field | | `P` | open a shared story |
-| `⌘/Ctrl + Enter` | ignite a story | | `T` | toggle the cursor trail |
+| `⌘/Ctrl + K` | command palette | | `S` | scroll to your shelf |
+| `/` | jump to the topic field | | `P` | open a shared story |
+| `⌘/Ctrl + Enter` | write the story | | `T` | toggle the cursor trail |
 | `space` | play / pause the voice | | `?` | shortcut sheet |
-| `←` `→` | scrub five seconds | | `Esc` | close overlays |
+| `←` `→` | skip five seconds | | `Esc` | close overlays |
 
 ---
 
@@ -289,7 +299,7 @@ docker compose up --build        # reads .env, mounts ./data
 ## Tests, lint and CI
 
 ```bash
-uv run pytest                       # 150 tests, fully offline, ~7 s
+uv run pytest                       # 170 tests, fully offline, ~7 s
 uv run ruff check src tests         # E F I UP B SIM C4 RUF
 uv run ruff format --check src tests
 
@@ -325,17 +335,25 @@ and a secret `HF_TOKEN` with write access. Skip both and the job simply does not
 
 ## Notes on taste
 
+- **Paper, not dashboards.** The interface is a page you write on: one column of
+  reading, rounded corners, hairline rules and a margin in rose. Pastels do the
+  pointing, so nothing has to shout — no neon, no glow, no hard offsets.
 - **The theme is one theme.** Light/dark slots hold identical values, so an OS
   preference can never produce the half-styled app that usually ships.
-- **One accent per moment.** Mint means *act* or *here*; lilac is structure; blush is
-  danger; butter is play. Nothing decorative borrows a semantic colour.
+- **One accent per moment.** Lavender means *act*; sage means *ready*; butter is the
+  word being spoken; rose is the margin and anything destructive.
+- **Loading is part of the design.** Pressing the button paints a ruled page and a
+  waiting cursor immediately — the writer is never a silent freeze — and the button is
+  handed back by the last frame, or by *stop*.
+- **One player per story.** Each deck owns its audio, its page and its own exports, and
+  the recording on disk is reused, so "listen to that one again" is instant and correct.
 - **Motion earns its place.** The halo tracks the spoken word because it *is* the
   reading position; the cursor trail is the only purely ambient effect and it has an
   off switch (`T`), a preference in `localStorage`, and respect for reduced motion.
 - **Template safety.** Every user- and model-authored string goes through
-  `html.escape` in `markup.py`; prose cannot inject markup into the stage.
+  `html.escape` in `markup.py`; prose cannot inject markup into the page.
 - **Nothing is hidden from the keyboard.** Skip link, landmarks, labelled player
-  controls, `aria-live` only on the *live* paper.
+  controls, `aria-live` only on the *live* page and the waiting page.
 
 ---
 
