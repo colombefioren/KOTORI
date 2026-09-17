@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
-from langchain_openai import ChatOpenAI
+from typing import TYPE_CHECKING
 
 from ..config import Settings
+
+if TYPE_CHECKING:
+    from langchain_openai import ChatOpenAI
 
 
 class EngineNotConfiguredError(RuntimeError):
@@ -27,6 +30,8 @@ def build_chat_model(
     """Create a streaming-capable chat model for any OpenAI-compatible endpoint."""
     if not settings.is_configured:
         raise EngineNotConfiguredError
+
+    from langchain_openai import ChatOpenAI
 
     return ChatOpenAI(
         model=settings.model_name,

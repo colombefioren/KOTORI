@@ -6,8 +6,6 @@ import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 
-from langchain_core.prompts import ChatPromptTemplate
-
 from ..config import Settings, get_settings
 from .llm import build_chat_model
 from .models import StoryDraft, StoryRequest
@@ -47,6 +45,8 @@ class StoryService:
         self.settings = settings or get_settings()
 
     def messages(self, request: StoryRequest) -> list[tuple[str, str]]:
+        from langchain_core.prompts import ChatPromptTemplate
+
         prompt = ChatPromptTemplate.from_messages(build_messages(request))
         return prompt.format_messages()
 
