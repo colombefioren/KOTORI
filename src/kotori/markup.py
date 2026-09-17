@@ -138,9 +138,7 @@ def render_tabs(active: str = "home", kept: int = 0) -> str:
         badge = ""
         if room == "history":
             shown = "" if kept else " hidden"
-            badge = (
-                f'<span class="index-tab__count"{shown} data-role="count">{kept}</span>'
-            )
+            badge = f'<span class="index-tab__count"{shown} data-role="count">{kept}</span>'
         aria = ' aria-selected="true"' if on else ' aria-selected="false"'
         tabindex = "0" if on else "-1"
         buttons.append(
@@ -180,7 +178,7 @@ def render_masthead(settings: Settings, stats: ArchiveStats) -> str:
   </div>
   <div class="masthead__side">
     <p class="masthead__note">
-      {kept} stor{'y' if kept == 1 else 'ies'} kept · {words}<br>
+      {kept} stor{"y" if kept == 1 else "ies"} kept · {words}<br>
       {escape(settings.engine_label)}
     </p>
     <button type="button" class="theme-switch" id="ast-theme"
@@ -280,14 +278,11 @@ def render_home_notes(settings: Settings) -> str:
         ),
         (
             "Voices come from Google Translate's speech service.",
-            "That is the only outbound call at playback time, and only for a "
-            "new recording.",
+            "That is the only outbound call at playback time, and only for a new recording.",
         ),
         (engine, "The studio never shows or asks for your credentials."),
     )
-    items = "".join(
-        f"<li><b>{escape(title)}</b> · {escape(body)}</li>" for title, body in notes
-    )
+    items = "".join(f"<li><b>{escape(title)}</b> · {escape(body)}</li>" for title, body in notes)
     return f"""
 <div class="home__notes">
   <div class="card card--plain">
@@ -448,7 +443,7 @@ def render_deck(
     return f"""
 <div class="deck" data-paper="{STAGE_PAPER}" data-story-id="{escape(draft.story_id)}"
      data-slug="{escape(draft.slug)}" data-duration-hint="{duration_hint:.2f}"
-     data-autoplay="{'1' if autoplay else '0'}"
+     data-autoplay="{"1" if autoplay else "0"}"
      role="group" aria-label="story player and extras">
   {_tape("blue", "left")}
   <audio class="deck__audio" preload="metadata" src="{escape(audio_src, quote=True)}"></audio>

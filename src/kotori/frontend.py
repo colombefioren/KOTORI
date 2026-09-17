@@ -26,6 +26,7 @@ SCRIPT_FILES: tuple[str, ...] = (
     "shell.js",
 )
 
+
 def _font(name: str, axes: str = "") -> str:
     """A Google Fonts request line, with the family name URL-encoded."""
     family = name.replace(" ", "+")

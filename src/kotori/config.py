@@ -141,9 +141,7 @@ class Settings:
 def load_settings() -> Settings:
     """Build a :class:`Settings` instance from the process environment."""
     # the old AI_STORYTELLER_ name is still honoured so existing volumes keep working
-    data_dir_raw = (
-        _first_env("KOTORI_DATA_DIR", "AI_STORYTELLER_DATA_DIR") or str(DEFAULT_DATA_DIR)
-    )
+    data_dir_raw = _first_env("KOTORI_DATA_DIR", "AI_STORYTELLER_DATA_DIR") or str(DEFAULT_DATA_DIR)
     data_dir = Path(data_dir_raw).expanduser()
     if not data_dir.is_absolute():
         data_dir = (PROJECT_ROOT / data_dir).resolve()

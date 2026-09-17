@@ -298,7 +298,11 @@ class Studio:
         """Empty the shelf; returns choices, the ledger, the masthead and a note."""
         count = self.library.clear()
         drafts = self.drafts()
-        note = f"cleared {count} stor{'y' if count == 1 else 'ies'}" if count else "the shelf was empty"
+        note = (
+            f"cleared {count} stor{'y' if count == 1 else 'ies'}"
+            if count
+            else "the shelf was empty"
+        )
         return self.choices(drafts), self.history_html(drafts), self.masthead(), render_status(note)
 
     # ── restore ──────────────────────────────────────────────────────────────

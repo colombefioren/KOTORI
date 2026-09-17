@@ -22,10 +22,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from gradio_client import Client  # noqa: E402
+from gradio_client import Client
 
-from kotori.app import build_demo, launch_options  # noqa: E402
-from kotori.config import Settings  # noqa: E402
+from kotori.app import build_demo, launch_options
+from kotori.config import Settings
 
 
 def wait_for(url: str, timeout: float = 90.0) -> None:
@@ -104,7 +104,7 @@ def main() -> int:
         print(f"  from history   {'from the history' in pick(opened, 'sheet-wrap')}")
 
         spoken = client.predict(story_id, api_name="/record_voice")
-        print(f"record_voice     play={'deck__play' in pick(spoken, 'class=\"deck\"')}")
+        print(f"record_voice     play={'deck__play' in pick(spoken, 'class="deck"')}")
 
         deleted = client.predict(story_id, api_name="/delete_selected")
         print(f"delete_selected  empty={'nothing here yet' in deleted[2]}")

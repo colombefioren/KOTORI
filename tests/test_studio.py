@@ -166,9 +166,7 @@ def test_opening_an_archived_story_reuses_its_recording(
     assert opened.audio is not None and Path(opened.audio).exists()
 
 
-def test_a_recording_that_vanished_is_made_again(
-    studio: Studio, monkeypatch: pytest.MonkeyPatch
-):
+def test_a_recording_that_vanished_is_made_again(studio: Studio, monkeypatch: pytest.MonkeyPatch):
     ignite(studio)
     draft = studio.library.load()[0]
     assert draft.audio_path
