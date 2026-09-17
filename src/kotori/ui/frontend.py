@@ -2,15 +2,107 @@
 
 Gradio 6 takes stylesheets and scripts at ``launch()`` time, so the UI stays
 declarative and the assets stay plain text files that are easy to iterate on.
+
+The ship's own stylesheet and script are passed to ``launch(css_paths=…, js=…,
+head=…)``.  Gradio 6 stores those in ``window.gradio_config`` but its shipped
+``index.html`` template does not render them back into the page — so the tabs
+that ``shell.js`` drives never become visible.  :func:`_patch_gradio_template`
+fixes that at import time by inserting three Jinja2 guards into the installed
+template; the call is idempotent, so it is safe to run on every start-up and
+survives ``uv sync`` re-installs.
 """
 
 from __future__ import annotations
 
+import importlib.resources
+import logging
 from functools import lru_cache
 from pathlib import Path
 
 from ..config import ASSETS_DIR, Settings
 from .theme import DISPLAY_FONT, HAND_FONT, MONO_FONT, SANS_FONT, SERIF_FONT
+
+_LOG = logging.getLogger("kotori")
+
+_TEMPLATE_INJECTION = (
+    "\t\t{% if config.get('css') %}"
+    "<style>{{ config.get('css') | safe }}</style>{% endif %}\n"
+    "\t\t{% if config.get('head') %}"
+    "{{ config.get('head') | safe }}{% endif %}\n"
+    "\t\t{% if config.get('js') %}"
+    "<script>{{ config.get('js') | safe }}</script>{% endif %}\n"
+)
+
+#: Unique marker that is present only when our three injection lines have
+#: already been written into the template.  Used to make the patch idempotent.
+_TEMPLATE_MARKER = "config.get('css') | safe }}"
+
+
+def _gradio_template_path() -> Path | None:
+    """Return the path to the installed ``index.html`` template, or ``None``."""
+    try:
+        path = importlib.resources.files("gradio").joinpath(
+            "templates/frontend/index.html"
+        )
+        if path.is_file():
+            return Path(str(path))
+    except Exception:
+        pass
+    return None
+
+
+def _patch_gradio_template() -> bool:
+    """Inject CSS / JS / head rendering into Gradio 6's index template.
+
+    Gradio 6 reads ``css_paths``, ``js`` and ``head`` from ``launch()`` and
+    stores them in the page config, but the shipped template never writes them
+    into the DOM.  Without them the custom stylesheet and script that make the
+    index tabs work are silently dropped.
+
+    The fix is a three-line Jinja2 insertion before the
+    ``<script data-gradio-mode>`` block.  It is idempotent — the function
+    checks for a marker before patching and returns ``False`` immediately when
+    the template is already patched or cannot be located.
+    """
+    path = _gradio_template_path()
+    if path is None:
+        _LOG.warning(
+            "KOTORI could not locate the Gradio index template; "
+            "custom CSS/JS/head may not be injected."
+        )
+        return False
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        _LOG.warning("KOTORI could not read the Gradio index template.")
+        return False
+    if _TEMPLATE_MARKER in text:
+        return False
+    anchor = "\t\t<script data-gradio-mode>"
+    idx = text.find(anchor)
+    if idx == -1:
+        _LOG.warning(
+            "KOTORI could not find the injection point in the Gradio template."
+        )
+        return False
+    patched = text[:idx] + _TEMPLATE_INJECTION + text[idx:]
+    try:
+        path.write_text(patched, encoding="utf-8")
+    except OSError:
+        # a read-only install (some managed platforms ship a read-only
+        # site-packages) must not take the whole app down with it — the app
+        # still boots, just without the custom tabs/CSS/JS until the host
+        # gives the venv write access.
+        _LOG.warning(
+            "KOTORI could not write the patched Gradio template (read-only "
+            "install?); custom CSS/JS/head will not be injected."
+        )
+        return False
+    _LOG.info("KOTORI patched the Gradio index template for CSS/JS/head.")
+    return True
+
+
+_patch_gradio_template()
 
 STYLE_FILES: tuple[str, ...] = (
     "tokens.css",
