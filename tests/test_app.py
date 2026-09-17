@@ -120,16 +120,21 @@ def test_app_renders_branding_and_controls(settings: Settings, tmp_path: Path):
     assert "nothing here yet" in values
 
 
-def test_the_three_tabs_are_named(settings: Settings):
+def test_the_three_rooms_and_their_tabs_are_named(settings: Settings):
     demo = build_demo(settings)
     config = demo.get_config_file()
-    tabs = [
-        component
+    ids = {component.get("props", {}).get("elem_id") for component in config["components"]}
+    assert {"room-home", "room-playground", "room-history"} <= ids
+
+    strip = " ".join(
+        str(component.get("props", {}).get("value", ""))
         for component in config["components"]
-        if component.get("type") == "tabitem"
-    ]
-    ids = [component.get("props", {}).get("id") for component in tabs]
-    assert ids == ["home", "playground", "history"]
+        if component.get("props", {}).get("elem_id") == "ast-tabs"
+    )
+    for room in ("home", "playground", "history"):
+        assert f'data-room="{room}"' in strip
+    assert strip.count('role="tab"') == 3
+    assert 'aria-selected="true"' in strip
 
 
 def test_history_starts_empty(settings: Settings):

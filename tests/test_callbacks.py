@@ -72,8 +72,8 @@ def test_rearm_hands_the_composer_back(studio: Studio):
     assert callbacks.rearm(studio)["interactive"] is True
 
 
-def test_show_playground_switches_tab(studio: Studio):
-    assert callbacks.show_playground(studio)["selected"] == "playground"
+def test_show_playground_sends_a_room_signal(studio: Studio):
+    assert 'data-room="playground"' in callbacks.show_playground(studio)
 
 
 def test_demo_story_writes_a_reel_and_moves_to_the_playground(offline_studio: Studio):
@@ -82,9 +82,9 @@ def test_demo_story_writes_a_reel_and_moves_to_the_playground(offline_studio: St
 
     collected = asyncio.run(run())
     assert collected and all(len(frame) == 5 for frame in collected)
-    _stage, deck, _status, _button, tabs = collected[-1]
+    _stage, deck, _status, _button, room = collected[-1]
     assert "deck__play" in deck
-    assert tabs["selected"] == "playground"
+    assert 'data-room="playground"' in room
 
 
 def test_refresh_history_reports_the_ledger(studio: Studio):
@@ -115,11 +115,11 @@ def test_refresh_history_handles_an_empty_shelf(studio: Studio):
 def test_open_selected_puts_a_story_on_the_page_and_switches_tab(studio: Studio):
     frames(studio)
     story_id = studio.library.load()[0].story_id
-    stage, deck, status, tabs = callbacks.open_selected(studio, story_id)
+    stage, deck, status, room = callbacks.open_selected(studio, story_id)
     assert "from the history" in stage
     assert "deck__play" in deck
     assert "opened" in status
-    assert tabs["selected"] == "playground"
+    assert 'data-room="playground"' in room
 
 
 def test_record_voice_shows_the_work_then_the_recording(studio: Studio):
