@@ -25,8 +25,14 @@
     });
   }
 
-  function show(room) {
+  function briefField() {
+    var node = document.getElementById("ast-topic");
+    return node ? node.querySelector("textarea, input") : null;
+  }
+
+  function show(room, options) {
     if (ROOMS.indexOf(room) < 0) room = "home";
+    var moved = room !== currentRoom;
     currentRoom = room;
     document.documentElement.setAttribute("data-room", room);
     tabButtons().forEach(function (button) {
@@ -34,6 +40,17 @@
       button.setAttribute("aria-selected", on ? "true" : "false");
       button.setAttribute("tabindex", on ? "0" : "-1");
     });
+    /* walking into the playground on purpose puts the cursor in the brief */
+    if (moved && room === "playground" && options && options.focus) {
+      var field = briefField();
+      if (field) {
+        try {
+          field.focus({ preventScroll: true });
+        } catch (error) {
+          field.focus();
+        }
+      }
+    }
     return room;
   }
 
@@ -73,11 +90,15 @@
     if (!node || !node.closest) return;
     var tab = node.closest("#ast-tabs .index-tab");
     if (tab) {
-      show(tab.getAttribute("data-room"));
+      show(tab.getAttribute("data-room"), { focus: true });
+      return;
+    }
+    if (node.closest("#ast-start")) {
+      show("playground", { focus: true });
       return;
     }
     var jump = node.closest("[data-room-jump]");
-    if (jump) show(jump.getAttribute("data-room-jump"));
+    if (jump) show(jump.getAttribute("data-room-jump"), { focus: true });
   });
 
   /* ── toasts ───────────────────────────────────────────────────────────── */
@@ -405,7 +426,7 @@
       var next = buttons[(at + step + buttons.length) % buttons.length];
       if (next) {
         event.preventDefault();
-        show(next.getAttribute("data-room"));
+        show(next.getAttribute("data-room"), { focus: true });
         next.focus();
       }
       return;
