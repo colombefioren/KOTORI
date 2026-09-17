@@ -21,7 +21,7 @@ spoken back while every word warms up in time with the voice.
 [![ci](https://github.com/colombefioren/kotori/actions/workflows/ci.yml/badge.svg)](https://github.com/colombefioren/kotori/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.12%2B-bd5f8b?style=flat-square&labelColor=fffdfa)
 ![gradio](https://img.shields.io/badge/gradio-6-5b83b6?style=flat-square&labelColor=fffdfa)
-![tests](https://img.shields.io/badge/tests-176-e288ae?style=flat-square&labelColor=fffdfa)
+![tests](https://img.shields.io/badge/tests-199-e288ae?style=flat-square&labelColor=fffdfa)
 ![coverage](https://img.shields.io/badge/coverage-95%25-82aae0?style=flat-square&labelColor=fffdfa)
 ![licence](https://img.shields.io/badge/licence-MIT-6f6573?style=flat-square&labelColor=fffdfa)
 
@@ -40,7 +40,7 @@ spoken back while every word warms up in time with the voice.
 - [what is actually in here](#what-is-actually-in-here)
 - [how the karaoke works](#how-the-karaoke-works)
 - [run it locally](#run-it-locally)
-- [the design system](#the-design-system)
+- [the design system](#the-design-system) · [full design notes](docs/design.md)
 - [architecture](#architecture)
 - [keyboard](#keyboard)
 - [deploy it](#deploy-it)
@@ -256,6 +256,10 @@ are split **tokens → layout → components → animations**, so a change of mo
 one file rather than hunting through a thousand lines. The five typefaces are requested
 once, in the document head, from Google Fonts.
 
+**[→ the full design notes](docs/design.md)** cover the palette and what each pastel means,
+the five typefaces and their jobs, the paper craft (torn edges, washi tape, index cards,
+how motion is rationed), the accessibility contract, and the things deliberately left out.
+
 ---
 
 ## architecture
@@ -351,7 +355,7 @@ docker compose up --build        # reads .env, mounts ./data
 ## tests, lint and ci
 
 ```bash
-uv run pytest                       # 176 tests, fully offline, ~9 s
+uv run pytest                       # 199 tests, fully offline, ~9 s
 uv run ruff check src tests         # E F I UP B SIM C4 RUF
 uv run ruff format --check src tests
 
@@ -364,7 +368,8 @@ The network is never touched: the writer is faked, speech synthesis is monkeypat
 the app is assembled without ever being launched. The suite covers env parsing, the chat
 factory, prose cleanup, word timing, the archive, the HTML renderers, the domain model, the
 studio pipeline, every interface callback, the demo reels, the accessibility landmarks, the
-index tabs and rooms, and the assembled app.
+index tabs and rooms, the stylesheet's coverage of every rendered class, the wording of this
+readme, and the assembled app.
 
 ### continuous integration and delivery
 
