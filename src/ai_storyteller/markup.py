@@ -1,36 +1,42 @@
 """Server-side HTML rendering.
 
 Everything the browser needs is rendered here: word spans carry their timing
-weight in ``data-w`` so the client can drive karaoke highlighting, and the
-hidden payload textareas give the export buttons something to copy.
+weight in ``data-w`` so the client can drive karaoke highlighting, every player
+carries its own ``<audio>`` element (so a shelf full of stories can never leak
+one story's voice into another), and hidden payload textareas give the export
+buttons something to copy.
 """
 
 from __future__ import annotations
 
 import html
-import json
 from collections.abc import Sequence
 
 from .config import APP_NAME, APP_TAGLINE, Settings
 from .library import ArchiveStats
-from .models import StoryDraft, count_words, format_duration, humanize_ms
+from .models import StoryDraft, format_duration, humanize_ms
 from .speech import Voice, resolve_voice
 from .timing import word_weight
 
 escape = html.escape
 
-TICKER_ITEMS: tuple[str, ...] = (
+#: Decorative margin notes in the hero — a scrap of the studio's own story.
+NOTES: tuple[str, ...] = (
     "streamed prose",
-    "synthesised voice",
-    "karaoke teleprompter",
-    "local archive",
+    "a small, patient voice",
+    "karaoke, word by word",
+    "kept in a local book",
     "no accounts, no tracking",
-    "press <b>?</b> for shortcuts",
 )
+
+#: The player used by the write stage.
+STAGE_PAPER = "paper-stage"
+#: The player used by the shelf.
+SHELF_PAPER = "paper-shelf"
 
 
 def _chips(items: Sequence[tuple[str, str]]) -> str:
-    """``(label, colour)`` pairs rendered as brutalist chips."""
+    """``(label, colour)`` pairs rendered as pastel chips."""
     if not items:
         return ""
     spans = "".join(
@@ -46,24 +52,26 @@ def render_section(index: str, title: str, meta: str = "") -> str:
     return f'<p class="ast-section"><b>{escape(index)}</b>{escape(title)}{tail}</p>'
 
 
-def render_ticker() -> str:
-    body = "".join(f"<span>{item}</span><i>✦</i>" for item in TICKER_ITEMS)
-    return (
-        '<div class="ast-ticker" aria-hidden="true">'
-        f'<div class="ast-ticker__track">{body}{body}</div>'
-        "</div>"
-    )
+def render_notes() -> str:
+    """A decorative strip of margin notes. Never announced to assistive tech."""
+    spans = "".join(f"<span>{escape(note)}</span><i>✽</i>" for note in NOTES)
+    return f'<p class="ast-notes" aria-hidden="true">{spans}</p>'
 
 
 def render_hero(settings: Settings, stats: ArchiveStats) -> str:
-    """Ticker + headline + stat strip, in one swappable block."""
-    dot = "ast-dot" if settings.is_configured else "ast-dot ast-dot--off"
-    engine = settings.engine_label
+    """Skip link, headline, stat pills — the whole masthead."""
+    if settings.is_configured:
+        dot = "ast-dot"
+        engine = settings.engine_label
+    else:
+        dot = "ast-dot ast-dot--demo"
+        engine = "the demo reels"
+
     stat_rows = (
-        ("drafts archived", f"{stats.drafts:,}", "mint"),
+        ("stories kept", f"{stats.drafts:,}", "mint"),
         ("words written", f"{stats.words:,}", "lilac"),
         ("minutes voiced", f"{stats.minutes:,}", "blush"),
-        ("dominant genre", stats.top_genre, "butter"),
+        ("favourite genre", stats.top_genre, "butter"),
         ("engine", engine, "sky"),
     )
     stats_html = "".join(
@@ -72,30 +80,31 @@ def render_hero(settings: Settings, stats: ArchiveStats) -> str:
         for label, value, tone in stat_rows
     )
     return f"""
-{render_ticker()}
-<div class="ast-shell">
-  <a class="ast-skip" href="#ast-composer">skip to the composer</a>
-  <header class="ast-hero" role="banner">
-    <div>
-      <span class="ast-eyebrow"><i class="{dot}"></i>{escape(APP_NAME)} · v{escape(settings.version)}</span>
-      <h1 class="ast-headline">Stories<br /><em>that speak</em><br /><span>for themselves</span></h1>
-      <p class="ast-lede">
-        A writer and a voice in one dark room. Type a topic, watch the prose arrive
-        word by word, then let <b>{escape(engine)}</b> read it back to you while every
-        word lights up in time with the audio.
-      </p>
-    </div>
-    <p class="ast-heroblurb">
-      <strong>{escape(APP_TAGLINE)}</strong>
-      streamed prose<br />
-      karaoke playback<br />
-      mp3 + markdown export<br />
-      jsonl archive<br />
-      pastel brutalism
+<a class="ast-skip" href="#ast-composer">skip to the composer</a>
+<div class="ast-aurora" aria-hidden="true"></div>
+<header class="ast-hero" role="banner">
+  <div>
+    <span class="ast-eyebrow">
+      <i class="{dot}"></i>{escape(APP_NAME)}
+      <span class="ast-eyebrow__tag">v{escape(settings.version)} · {escape(engine)}</span>
+    </span>
+    <h1 class="ast-headline">Stories that <em>speak</em> for themselves</h1>
+    <p class="ast-lede">
+      Write a topic on the left, or roll a seed and let it surprise you. The story
+      arrives word by word on the page, then reads itself back to you while every
+      word warms up as it is spoken.
     </p>
-  </header>
-  <dl class="ast-stats">{stats_html}</dl>
-</div>
+    {render_notes()}
+  </div>
+  <p class="ast-heroblurb">
+    <strong>{escape(APP_TAGLINE)}</strong>
+    a quiet page,<br />
+    a small voice,<br />
+    and a shelf of stories<br />
+    you can keep.
+  </p>
+</header>
+<dl class="ast-stats">{stats_html}</dl>
 """
 
 
@@ -107,23 +116,46 @@ STATUS_DOTS: dict[str, str] = {
 }
 
 
-def render_status(note: str = "idle · waiting for a topic", tone: str = "idle") -> str:
-    """Status ticker line; ``tone`` picks the lamp colour."""
+def render_status(note: str = "ready when you are", tone: str = "idle") -> str:
+    """Status line; ``tone`` picks the lamp colour."""
     dot = STATUS_DOTS.get(tone, STATUS_DOTS["idle"])
-    return f'<div class="ast-status"><i class="{dot}"></i><b>{escape(note)}</b></div>'
+    return (
+        f'<p class="ast-status" role="status"><i class="{dot}" aria-hidden="true"></i>'
+        f"<b>{escape(note)}</b></p>"
+    )
 
 
 def render_idle_stage() -> str:
-    """The empty stage: instructions instead of a void."""
-    return """
-<div class="tp-stage">
+    """The empty page: an invitation instead of a void."""
+    return f"""
+<div class="ast-card tp-stage">
   <div class="tp-empty">
-    <span>the stage is empty</span>
+    <h3>the page is still blank</h3>
+    <ol>
+      <li>Write a topic in the composer — or press <b>surprise me</b>.</li>
+      <li>Press <b>write the story</b> and watch it arrive, word by word.</li>
+      <li>Then press play and follow the light as it is read aloud.</li>
+    </ol>
+  </div>
+  <div class="tp-paper" id="{STAGE_PAPER}">
     <p class="tp-placeholder">
-      Write a topic on the left — or roll a seed — and the story will arrive here,
-      word by word, with a caret blinking where the writer is looking.
+      Somewhere a lighthouse keeper is opening a letter she has not written yet…
     </p>
-    <span>then press play to hear it read aloud</span>
+  </div>
+</div>
+"""
+
+
+def render_thinking(topic: str = "", note: str = "shaping the first line…") -> str:
+    """The loading state: a page being ruled while the writer thinks."""
+    chips = [(topic, "lilac")] if topic else []
+    return f"""
+<div class="ast-card tp-stage tp-stage--waiting" role="status" aria-live="polite">
+  {_chips(chips)}
+  <div class="tp-paper tp-paper--waiting">
+    <div class="tp-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p class="tp-caption"><span class="ast-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      {escape(note)}</p>
   </div>
 </div>
 """
@@ -153,15 +185,16 @@ def render_stage(
     *,
     live: bool = False,
     note: str | None = None,
+    paper_id: str = STAGE_PAPER,
 ) -> str:
-    """The teleprompter paper: prose plus the meta chips."""
+    """The story page: prose plus the meta chips."""
     if draft is None or not draft.story.strip():
         return render_idle_stage()
 
     voice: Voice = resolve_voice(draft.voice)
     chips = [
         (f"{draft.words} words", "mint"),
-        (f"{format_duration(draft.reading_seconds)} read", "lilac"),
+        (f"{format_duration(draft.reading_seconds)} to read", "lilac"),
         (draft.genre, ""),
         (draft.mood.lower(), ""),
         (voice.choice, "blush"),
@@ -174,10 +207,10 @@ def render_stage(
     live_cls = " tp-paper--live" if live else ""
     aria = ' aria-live="polite" aria-busy="true"' if live else ""
     return f"""
-<div class="tp-stage" data-story-id="{escape(draft.story_id)}" role="region"
+<div class="ast-card tp-stage" data-story-id="{escape(draft.story_id)}" role="region"
      aria-label="story stage for {escape(draft.title)}">
   {_chips(chips)}
-  <div class="tp-paper{live_cls}" id="ast-paper"{aria}>
+  <div class="tp-paper{live_cls}" id="{escape(paper_id)}"{aria}>
     <div class="tp-halo" aria-hidden="true"></div>
     {render_words(draft.story, live=live)}
   </div>
@@ -185,91 +218,114 @@ def render_stage(
 """
 
 
-def render_deck(draft: StoryDraft, audio_uri: str, *, duration_hint: float = 0.0) -> str:
-    """Custom player plus client-side export tools."""
-    markdown = draft.markdown()
+def render_deck(
+    draft: StoryDraft,
+    audio_uri: str,
+    *,
+    duration_hint: float = 0.0,
+    paper_id: str = STAGE_PAPER,
+    autoplay: bool = True,
+) -> str:
+    """The player: one play button, a rail, and a quiet row of extras."""
     voice: Voice = resolve_voice(draft.voice)
     return f"""
-<div class="deck" data-story-id="{escape(draft.story_id)}"
+<div class="deck" data-paper="{escape(paper_id)}" data-story-id="{escape(draft.story_id)}"
      data-slug="{escape(draft.slug)}" data-duration-hint="{duration_hint:.2f}"
+     data-autoplay="{"1" if autoplay else "0"}"
      role="group" aria-label="story player and exports">
-  <audio id="ast-audio" preload="metadata" src="{escape(audio_uri, quote=True)}"></audio>
+  <audio class="deck__audio" preload="metadata" src="{escape(audio_uri, quote=True)}"></audio>
   <textarea hidden class="deck__payload" data-kind="text">{escape(draft.story)}</textarea>
-  <textarea hidden class="deck__payload" data-kind="markdown">{escape(markdown)}</textarea>
+  <textarea hidden class="deck__payload" data-kind="markdown">{escape(draft.markdown())}</textarea>
 
   <div class="deck__top">
     <button type="button" class="deck__play" data-role="toggle"
             aria-label="Play or pause the spoken story">
       <span data-role="glyph">▶</span>
     </button>
-    <span class="deck__label">{escape("now speaking")} · {escape(voice.choice)}</span>
-    <div class="deck__rail" data-role="rail" role="slider" aria-label="Seek in the narration"
-         aria-valuemin="0" aria-valuemax="100" tabindex="0">
-      <div class="deck__fill" data-role="fill"></div>
+    <div class="deck__body">
+      <p class="deck__label"><b data-role="caption">now speaking · {escape(voice.choice)}</b></p>
+      <div class="deck__rail" data-role="rail" role="slider" aria-label="Seek in the narration"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+        <div class="deck__fill" data-role="fill"></div>
+      </div>
+      <span class="deck__time" data-role="time">0:00 / 0:00</span>
     </div>
-    <span class="deck__time" data-role="time">0:00 / 0:00</span>
   </div>
 
-  <p class="deck__scribble" data-role="caption">
-    follow the light: the current word glows, everything behind it stays lit.
+  <p class="deck__hint" data-role="hint">
+    space plays and pauses · ← → skip five seconds · click the rule to seek
   </p>
 
   <div class="deck__tools">
     <button type="button" class="deck__btn" data-act="restart">↺ from the top</button>
-    <button type="button" class="deck__btn" data-act="copy">⧉ copy prose</button>
-    <button type="button" class="deck__btn" data-act="download-md">↓ markdown</button>
-    <button type="button" class="deck__btn" data-act="download-txt">↓ plain text</button>
-    <button type="button" class="deck__btn" data-act="download-mp3">↓ mp3</button>
-    <button type="button" class="deck__btn" data-act="share">↗ share link</button>
+    <button type="button" class="deck__btn" data-act="download-mp3">↓ save the mp3</button>
+    <button type="button" class="deck__btn" data-act="copy">⧉ copy the words</button>
+    <button type="button" class="deck__btn" data-act="download-md">↓ save as markdown</button>
+    <button type="button" class="deck__btn" data-act="share">↗ share a link</button>
   </div>
-  <p class="deck__hint" data-role="hint">
-    space = play/pause · ← → = scrub 5s · click the rail to seek
-  </p>
 </div>
 """
 
 
 def render_deck_idle(message: str = "the voice arrives once a story exists") -> str:
+    """The player while there is nothing to play yet."""
     return f"""
-<div class="deck">
+<div class="deck deck--idle" role="status" aria-live="polite">
   <div class="deck__top">
-    <span class="deck__label">{escape(message)}</span>
+    <span class="ast-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <p class="deck__idle-note">{escape(message)}</p>
   </div>
-  <span class="ast-loading"></span>
 </div>
 """
 
 
-def render_archive_preview(draft: StoryDraft | None) -> str:
-    """Read-only archive card with the full prose."""
+def render_archive_preview(
+    draft: StoryDraft | None,
+    *,
+    audio_uri: str | None = None,
+    duration_hint: float = 0.0,
+) -> str:
+    """The shelf's reading pane: the story, its chips and its own player."""
     if draft is None:
         return """
-<div class="ast-panel">
-  <div class="ar-empty">nothing selected yet · pick a draft on the left</div>
+<div class="ast-card">
+  <div class="ar-empty">nothing selected yet · pick a story on the left</div>
 </div>
 """
     chips = [
         (f"{draft.words} words", "mint"),
-        (f"{format_duration(draft.reading_seconds)} read", "lilac"),
+        (f"{format_duration(draft.reading_seconds)} to read", "lilac"),
         (draft.genre, ""),
         (draft.mood.lower(), ""),
         (draft.created_label, "butter"),
         (draft.model, "sky"),
     ]
+    player = (
+        render_deck(
+            draft,
+            audio_uri,
+            duration_hint=duration_hint,
+            paper_id=SHELF_PAPER,
+            autoplay=False,
+        )
+        if audio_uri
+        else render_deck_idle("this story has no recording yet · record one to hear it")
+    )
     return f"""
-<div class="ast-panel">
+<div class="ast-card">
   <div class="ar-head">
-    <h4 class="ar-meta">archive · {escape(draft.title)}</h4>
-    <span class="ar-meta">{escape(draft.story_id)}</span>
+    <h3 class="ar-title">{escape(draft.title)}</h3>
+    <p class="ar-meta">from the archive · {escape(draft.story_id)}</p>
   </div>
   {_chips(chips)}
-  <div class="tp-paper" id="ast-paper">{render_words(draft.story)}</div>
+  <div class="tp-paper" id="{SHELF_PAPER}">{render_words(draft.story)}</div>
 </div>
+{player}
 """
 
 
 def archive_choices(drafts: Sequence[StoryDraft]) -> list[tuple[str, str]]:
-    """``(label, id)`` pairs for the archive picker."""
+    """``(label, id)`` pairs for the shelf picker."""
     return [
         (
             f"⟡ {draft.title} — {draft.genre} · {draft.words} words · {draft.created_label}",
@@ -304,17 +360,14 @@ def render_footer(settings: Settings, data_dir: object | None = None) -> str:
     """Credits, licence note and the storage location."""
     location = data_dir or settings.data_dir
     return f"""
-<div class="ast-shell">
-  <footer class="ast-footer">
-    <span>{escape(APP_NAME)} · {escape(APP_TAGLINE)} · built with gradio {escape(_gradio_version())}</span>
-    <span>
-      <a href="https://github.com/colombefioren/ai-storyteller" target="_blank" rel="noreferrer">source</a> ·
-      <a href="/gradio_api/info" target="_blank" rel="noreferrer">api</a> ·
-      <a href="?__theme=dark">dark</a>
-    </span>
-    <span>drafts: {escape(str(location))}</span>
-  </footer>
-</div>
+<footer class="ast-footer">
+  <span>{escape(APP_NAME)} · {escape(APP_TAGLINE)} · written with gradio {escape(_gradio_version())}</span>
+  <span>
+    <a href="https://github.com/colombefioren/ai-storyteller" target="_blank" rel="noreferrer">source</a> ·
+    <a href="/gradio_api/info" target="_blank" rel="noreferrer">api</a>
+  </span>
+  <span>kept in {escape(str(location))}</span>
+</footer>
 """
 
 
@@ -322,19 +375,3 @@ def _gradio_version() -> str:
     import gradio as gr
 
     return gr.__version__
-
-
-def payload_json(payload: dict[str, object]) -> str:
-    """Small helper for embedding JSON in attributes."""
-    return escape(json.dumps(payload, separators=(",", ":")))
-
-
-def summarise(draft: StoryDraft | None) -> str:
-    """One-line description used by status ticker messages."""
-    if draft is None:
-        return "no active story"
-    return f"{draft.words} words · {format_duration(draft.reading_seconds)} · {draft.genre}"
-
-
-def word_count(text: str) -> int:
-    return count_words(text)
