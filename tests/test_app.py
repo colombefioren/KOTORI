@@ -136,7 +136,7 @@ def test_head_html_loads_the_webfonts():
 
 def test_favicon_is_shipped():
     path = favicon_path()
-    assert path is not None and Path(path).suffix == ".svg"
+    assert path is not None and Path(path).suffix == ".png"
 
 
 def test_launch_options_are_wired(settings: Settings):
