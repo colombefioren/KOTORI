@@ -309,7 +309,7 @@
 /* the composer's fields, spaced like items in a notebook */
 .ast-stack {
   display: grid;
-  gap: 14px;
+  gap: 24px;
 }
 
 .home__kicker {

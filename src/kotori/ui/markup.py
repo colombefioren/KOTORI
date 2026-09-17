@@ -357,8 +357,8 @@ def render_idle_sheet() -> str:
         <li>Press play, then read along as the story is spoken.</li>
       </ol>
     </div>
-    {_tape("blue", "right")}
   </div>
+  {_tape("blue", "right")}
 </div>
 """
 
@@ -429,11 +429,12 @@ def render_sheet(
 <div class="sheet-wrap" data-story-id="{escape(draft.story_id)}" role="region"
      aria-label="story page for {escape(draft.title)}">
   {_chips(chips)}
-  <div class="sheet{live_cls}" id="{STAGE_PAPER}"{aria}>
-    <div class="sheet__holes" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="sheet__tape" aria-hidden="true">{_tape("blue", "right")}</div>
-    <div class="tp-halo" aria-hidden="true"></div>
-    {render_words(draft.story, live=live)}
+  <div class="sheet-frame">
+    <div class="sheet{live_cls}" id="{STAGE_PAPER}"{aria}>
+      <div class="sheet__holes" aria-hidden="true"><i></i><i></i><i></i></div>
+      {render_words(draft.story, live=live)}
+    </div>
+    {_tape("blue", "right")}
   </div>
 </div>
 """

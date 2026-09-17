@@ -48,10 +48,10 @@
   --tape-blend: multiply;
   --tape-shine: rgba(255, 255, 255, 0.5);
 
-  /* ── paper geometry: straight, but never machine-straight ──────────────── */
-  --edge-card: 7px 11px 8px 12px;
+  /* ── paper geometry: soft-rounded, but never machine-straight ───────────── */
+  --edge-card: 20px 24px 22px 26px;
   --edge-sheet: 4px 7px 5px 8px;
-  --edge-label: 8px 9px 6px 10px;
+  --edge-label: 14px 16px 13px 15px;
   --edge-tab: 9px 11px 0 0;
   --torn-bottom: polygon(
     0 0, 100% 0, 100% 95.6%, 97% 99.1%, 94% 96.4%, 91% 99.5%, 88% 96.9%,
@@ -76,7 +76,7 @@
 
   /* ── rhythm ────────────────────────────────────────────────────────────── */
   --gap: 24px;
-  --pad: 26px;
+  --pad: 32px;
   --max: 1140px;
   --sheet-line: 35px;
 
