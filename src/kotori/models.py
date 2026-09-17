@@ -8,6 +8,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
+from .config import STORY_WORDS
+
 WORD_RE = re.compile(r"[\w'’-]+", re.UNICODE)
 SLUG_RE = re.compile(r"[^a-z0-9]+")
 WORDS_PER_MINUTE = 150.0
@@ -66,7 +68,8 @@ class StoryRequest:
     topic: str
     genre: str = "Contemporary"
     mood: str = "Melancholic"
-    target_words: int = 260
+    #: Pinned: every story is written to the same length.
+    target_words: int = STORY_WORDS
     voice: str = "aurora"
     slow: bool = False
 
@@ -76,7 +79,7 @@ class StoryRequest:
             topic=(self.topic or "").strip() or fallback_topic,
             genre=self.genre or "Contemporary",
             mood=self.mood or "Melancholic",
-            target_words=max(80, min(600, int(self.target_words or 260))),
+            target_words=STORY_WORDS,
             voice=self.voice or "aurora",
             slow=bool(self.slow),
         )
@@ -90,7 +93,7 @@ class StoryDraft:
     topic: str = ""
     genre: str = "Contemporary"
     mood: str = "Melancholic"
-    target_words: int = 260
+    target_words: int = STORY_WORDS
     story: str = ""
     voice: str = "aurora"
     voice_label: str = ""

@@ -1,10 +1,10 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   teleprompter.js — one player per story.
+   teleprompter.js — one reader per story, and the karaoke that drives it.
 
-   Every player lives inside its own `.deck` element and carries its own
-   <audio>, so the page can hold the story being written *and* a shelf full of
-   older ones without ever playing the wrong voice. Each deck points at the
-   page it narrates through `data-paper`.
+   Every reader lives inside its own `.deck` element with its own <audio>, and
+   points at the page it narrates through `data-paper`. The page can therefore
+   hold the story being written *and* a ledger full of older ones without ever
+   playing the wrong voice.
    ───────────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -13,6 +13,7 @@
   var GLYPH_PLAY = "▶";
   var GLYPH_PAUSE = "❚❚";
   var players = [];
+  var rafId = 0;
 
   function formatTime(seconds) {
     if (!isFinite(seconds) || seconds < 0) seconds = 0;
@@ -57,7 +58,7 @@
       var found = document.getElementById(id);
       if (found) return found;
     }
-    return document.querySelector(".tp-paper");
+    return document.querySelector(".sheet");
   }
 
   function part(player, role) {
@@ -92,11 +93,11 @@
     }
 
     if (player.paper && player.paper.scrollHeight > player.paper.clientHeight + 8) {
-      player.paper.scrollTop = Math.max(0, active.offsetTop - player.paper.clientHeight * 0.42);
+      player.paper.scrollTop = Math.max(0, active.offsetTop - player.paper.clientHeight * 0.4);
     }
 
     var caption = part(player, "caption");
-    if (caption) caption.textContent = "now speaking: “" + active.textContent.trim() + "”";
+    if (caption) caption.textContent = "“" + active.textContent.trim() + "”";
   }
 
   function setRail(player, progress, current, duration) {
@@ -113,8 +114,6 @@
     var node = part(player, "glyph");
     if (node) node.textContent = value;
   }
-
-  var rafId = 0;
 
   function frame() {
     rafId = 0;
@@ -138,14 +137,12 @@
   }
 
   function speaking(player, on) {
-    if (player.paper) player.paper.classList.toggle("tp-paper--speaking", on);
+    if (player.paper) player.paper.classList.toggle("sheet--speaking", on);
     glyph(player, on ? GLYPH_PAUSE : GLYPH_PLAY);
   }
 
-  function pauseOthers(keep) {
-    players.forEach(function (player) {
-      if (player !== keep && player.audio && !player.audio.paused) player.audio.pause();
-    });
+  function pauseOthers(audio) {
+    if (window.ASTVoices) window.ASTVoices.pauseOthers(audio);
   }
 
   function toggle(player) {
@@ -153,7 +150,7 @@
     var audio = player.audio;
     if (!audio) return;
     if (audio.paused) {
-      pauseOthers(player);
+      pauseOthers(audio);
       var promise = audio.play();
       if (promise && promise.catch) promise.catch(function () {});
     } else {
@@ -192,16 +189,17 @@
         return player.deck === deck;
       })[0];
 
-      /* no audio in this deck: forget the old one so a stale player is never
+      /* no audio in this deck: forget the old one, so a stale player is never
          left holding a detached element from the previous story */
       if (!audio || !document.contains(audio)) {
-        if (existing) players = players.filter(function (player) {
-          return player !== existing;
-        });
+        if (existing) {
+          players = players.filter(function (player) {
+            return player !== existing;
+          });
+        }
         return;
       }
       if (existing && existing.audio === audio) return;
-
       if (existing) existing.audio.pause();
       players = players.filter(function (player) {
         return player !== existing;
@@ -210,7 +208,7 @@
     });
 
     autoplay();
-    scrollLivePages();
+    scrollLiveSheets();
   }
 
   function bind(deck, audio) {
@@ -241,7 +239,7 @@
     });
 
     audio.addEventListener("play", function () {
-      pauseOthers(player);
+      pauseOthers(audio);
       speaking(player, true);
       loop();
     });
@@ -280,7 +278,7 @@
     }
   }
 
-  /* a fresh story plays itself when the browser allows it */
+  /* a freshly written story plays itself, if the browser allows it */
   function autoplay() {
     players.forEach(function (player) {
       if (player.played || player.deck.getAttribute("data-autoplay") !== "1") return;
@@ -296,12 +294,9 @@
   }
 
   /* while prose is still arriving, keep the newest words in view */
-  function scrollLivePages() {
-    var pages = document.querySelectorAll(".tp-paper--live");
-    Array.prototype.forEach.call(pages, function (page) {
-      if (!page.parentElement) return;
-      var speaking = page.classList.contains("tp-paper--speaking");
-      if (!speaking) page.scrollTop = page.scrollHeight;
+  function scrollLiveSheets() {
+    Array.prototype.forEach.call(document.querySelectorAll(".sheet--live"), function (sheet) {
+      if (!sheet.classList.contains("sheet--speaking")) sheet.scrollTop = sheet.scrollHeight;
     });
   }
 
@@ -314,16 +309,14 @@
     },
     jump: function (offset) {
       var player = current();
-      if (player) seek(player, (player.audio.currentTime || 0) + offset);
+      if (player && player.audio) seek(player, (player.audio.currentTime || 0) + offset);
     },
     deck: function () {
       var player = current();
       return player ? player.deck : null;
     },
     pause: function () {
-      players.forEach(function (player) {
-        if (player.audio && !player.audio.paused) player.audio.pause();
-      });
+      if (window.ASTVoices) window.ASTVoices.pauseAll();
     },
   };
 

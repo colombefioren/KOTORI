@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from kotori import story as story_module
-from kotori.config import Settings
+from kotori.config import STORY_WORDS, Settings
 from kotori.models import StoryRequest
 from kotori.story import StoryError, StoryService
 
@@ -20,11 +20,11 @@ def collect_chunks(service: StoryService, request: StoryRequest):
     return asyncio.run(run())
 
 
-def test_prepare_fills_empty_topic_and_clamps_length():
+def test_prepare_fills_empty_topic_and_pins_the_length():
     request = StoryRequest(topic="   ", target_words=9999)
     prepared = StoryService(Settings(api_key="x")).prepare(request)
     assert prepared.topic
-    assert prepared.target_words == 600
+    assert prepared.target_words == STORY_WORDS
 
 
 def test_prepare_keeps_a_real_topic():

@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from kotori import studio as studio_module
-from kotori.config import Settings
+from kotori.config import STORY_WORDS, Settings
 from kotori.models import StoryDraft
 from kotori.story import StoryChunk
 from kotori.studio import Studio
@@ -28,7 +28,7 @@ class FakeService:
 
 
 @pytest.fixture(autouse=True)
-def fake_speech(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def fake_speech(monkeypatch: pytest.MonkeyPatch) -> None:
     """Never touch the network: write a tiny stand-in mp3 instead."""
 
     def fake_synthesize(text, *, voice_key, out_dir, stem, slow=False):
@@ -52,12 +52,7 @@ def ignite(studio: Studio):
         return [
             view
             async for view in studio.ignite(
-                topic="the lamp",
-                genre="Noir",
-                mood="Tense",
-                target_words=200,
-                voice="camber",
-                slow=False,
+                topic="the lamp", genre="Noir", mood="Tense", voice="camber", slow=False
             )
         ]
 
@@ -65,7 +60,7 @@ def ignite(studio: Studio):
 
 
 def frame_with(views, needle: str):
-    """The first view whose deck mentions ``needle``."""
+    """The first view whose reader mentions ``needle``."""
     for view in views:
         if needle in view.deck:
             return view
@@ -82,13 +77,19 @@ def test_idle_view_offers_the_demo_without_credentials(tmp_path: Path):
     assert "credentials" in offline.idle_view().status
 
 
+def test_stories_are_always_the_same_length(studio: Studio):
+    views = ignite(studio)
+    assert views[-1].draft is not None
+    assert views[-1].draft.target_words == STORY_WORDS
+
+
 def test_ignite_without_credentials_streams_a_demo_reel(tmp_path: Path):
     offline = Studio(Settings(api_key=None, data_dir=tmp_path), service=FakeService())
     views = ignite(offline)
     assert views[-1].draft is not None
     assert views[-1].draft.model == "demo reel"
-    assert "data:audio/mpeg;base64," in views[-1].deck
-    assert "follow the light" in views[-1].status
+    assert "deck__play" in views[-1].deck
+    assert "read along" in views[-1].status
 
 
 def test_ignite_answers_immediately_with_a_loading_state(studio: Studio):
@@ -99,22 +100,22 @@ def test_ignite_answers_immediately_with_a_loading_state(studio: Studio):
     assert first.draft is None
 
 
-def test_ignite_streams_then_voices_and_archives(studio: Studio):
+def test_ignite_streams_then_records_and_files(studio: Studio):
     views = ignite(studio)
     assert len(views) == 6
     assert views[-1].busy is False
 
-    live = [view for view in views if "tp-paper--live" in view.stage]
+    live = [view for view in views if "sheet--live" in view.stage]
     assert live and all(view.draft is None for view in live)
     assert ">The</span>" in live[0].stage and "tp-caret" in live[0].stage
 
-    assert "synthesising the voice…" in frame_with(views, "synthesising").deck
+    assert "recording the voice…" in frame_with(views, "recording").deck
 
     final = views[-1]
     assert "deck__play" in final.deck
-    assert "data:audio/mpeg;base64," in final.deck
+    assert "/gradio_api/file=" in final.deck
     assert final.audio is not None and Path(final.audio).exists()
-    assert "follow the light" in final.status
+    assert "read along" in final.status
 
     archived = studio.library.load()
     assert len(archived) == 1
@@ -137,17 +138,16 @@ def test_ignite_reports_speech_failure_without_losing_the_story(
     assert studio.library.load()[0].story == PROSE
 
 
-def test_the_shelf_gives_every_story_its_own_player(studio: Studio):
+def test_the_ledger_gives_every_story_its_own_player(studio: Studio):
     ignite(studio)
-    choices, preview, listing = studio.archive_state()
-    assert len(choices) == 1
-    assert "The lamp" in preview
-    assert "ar-item" in listing
+    drafts = studio.drafts()
+    ledger = studio.history_html(drafts)
+    story_id = drafts[0].story_id
 
-    story_id = choices[0][1]
-    assert f'data-story-id="{story_id}"' in preview
-    assert "deck__play" in preview
-    assert "data:audio/mpeg;base64," in preview
+    assert "story-card" in ledger
+    assert f'data-story-id="{story_id}"' in ledger
+    assert "/gradio_api/file=" in ledger
+    assert studio.audio_sources(drafts)[story_id].startswith("/gradio_api/file=")
 
 
 def test_opening_an_archived_story_reuses_its_recording(
@@ -157,21 +157,21 @@ def test_opening_an_archived_story_reuses_its_recording(
     story_id = studio.library.load()[0].story_id
 
     def no_network(*args, **kwargs):
-        raise AssertionError("a saved voice must not be re-synthesised")
+        raise AssertionError("a saved voice must not be recorded twice")
 
     monkeypatch.setattr(studio_module, "synthesize", no_network)
     opened = studio.open_draft(story_id)
-    assert "from the archive" in opened.stage
-    assert "data:audio/mpeg;base64," in opened.deck
+    assert "from the history" in opened.stage
+    assert "/gradio_api/file=" in opened.deck
     assert opened.audio is not None and Path(opened.audio).exists()
-    assert opened.draft is not None and opened.draft.audio_path
 
 
-def test_a_recording_that_vanished_is_replaced_not_faked(
+def test_a_recording_that_vanished_is_made_again(
     studio: Studio, monkeypatch: pytest.MonkeyPatch
 ):
     ignite(studio)
     draft = studio.library.load()[0]
+    assert draft.audio_path
     Path(draft.audio_path).unlink()
 
     calls: list[str] = []
@@ -185,16 +185,24 @@ def test_a_recording_that_vanished_is_replaced_not_faked(
     monkeypatch.setattr(studio_module, "synthesize", counting_synthesize)
     opened = studio.open_draft(draft.story_id)
     assert calls == [draft.slug]
-    assert "data:audio/mpeg;base64," in opened.deck
+    assert "/gradio_api/file=" in opened.deck
 
 
-def test_audio_uri_is_none_without_a_file(studio: Studio, tmp_path: Path):
+def test_an_audio_file_that_is_gone_is_not_offered(studio: Studio, tmp_path: Path):
     missing = StoryDraft(
         story_id="x", topic="t", story=PROSE, audio_path=str(tmp_path / "gone.mp3")
     )
-    assert studio._audio_uri(missing) is None
-    # an unknown id falls back to the empty reading pane
-    assert "nothing selected" in studio.preview("x")
+    assert studio.audio_file(missing) is None
+    assert studio._audio_src(missing) is None
+    assert studio.history_html([missing]).count("mini__audio") == 0
+
+
+def test_respeak_records_a_new_voice(studio: Studio):
+    ignite(studio)
+    story_id = studio.library.load()[0].story_id
+    re_voiced = studio.respeak(story_id)
+    assert "/gradio_api/file=" in re_voiced.deck
+    assert "read along" in re_voiced.status
 
 
 def test_respeak_reports_a_failed_recording(studio: Studio, monkeypatch: pytest.MonkeyPatch):
@@ -211,34 +219,6 @@ def test_respeak_reports_a_failed_recording(studio: Studio, monkeypatch: pytest.
     assert "the voice is unwell" in view.status
 
 
-def test_archive_state_falls_back_when_the_selection_is_gone(studio: Studio):
-    ignite(studio)
-    newest = studio.library.load()[0].story_id
-    choices, preview, _listing = studio.archive_state("nobody")
-    assert choices[0][1] == newest
-    assert f'data-story-id="{newest}"' in preview
-
-
-def test_deck_message_survives_a_foreign_string():
-    assert studio_module._deck_message("<div>nope</div>") == ""
-
-
-def test_archive_state_keeps_a_valid_selection(studio: Studio):
-    ignite(studio)
-    keep = studio.library.load()[0].story_id
-    choices, preview, _listing = studio.archive_state(keep)
-    assert choices[0][1] == keep
-    assert "deck__play" in preview
-
-
-def test_respeak_records_a_new_voice(studio: Studio):
-    ignite(studio)
-    story_id = studio.library.load()[0].story_id
-    re_voiced = studio.respeak(story_id)
-    assert "data:audio/mpeg;base64," in re_voiced.deck
-    assert "follow the light" in re_voiced.status
-
-
 def test_missing_draft_is_reported(studio: Studio):
     assert "nothing selected" in studio.open_draft(None).status
     assert "nothing selected" in studio.respeak("nope").status
@@ -248,12 +228,13 @@ def test_delete_and_clear_report_their_effect(studio: Studio):
     ignite(studio)
     story_id = studio.library.load()[0].story_id
 
-    choices, _preview, _hero, status = studio.delete(story_id)
+    choices, ledger, _masthead, status = studio.delete(story_id)
     assert choices == []
+    assert "nothing here yet" in ledger
     assert "deleted" in status
 
     ignite(studio)
-    _choices, _preview, _hero, status = studio.clear()
+    _choices, _ledger, _masthead, status = studio.clear()
     assert "cleared 1 story" in status
     assert studio.library.load() == []
 
@@ -275,7 +256,8 @@ def test_roll_topic_returns_a_seed(studio: Studio):
     assert len(studio.roll_topic()) > 10
 
 
-def test_footer_shows_the_resolved_data_dir(studio: Studio):
+def test_masthead_and_footer_describe_the_studio(studio: Studio):
+    assert "KOTO<b>RI</b>" in studio.masthead()
     assert str(studio.data_dir) in studio.footer()
 
 

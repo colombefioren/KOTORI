@@ -1,11 +1,11 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   shell.js — toasts, command palette, shortcuts, shared-story restore
+   shell.js — toasts, the command palette, shortcuts, shared-story restore
    ───────────────────────────────────────────────────────────────────────────── */
 
 (function () {
   "use strict";
 
-  var TRAIL_KEY = "ast-trail-off";
+  var TRAIL_KEY = "kotori-trail-off";
 
   /* ── toasts ───────────────────────────────────────────────────────────── */
 
@@ -69,9 +69,8 @@
     }
   }
 
-  function scrollToShelf() {
-    var shelf = document.getElementById("ast-archive-pick");
-    if (shelf) shelf.scrollIntoView({ block: "center", behavior: "smooth" });
+  function tab(name) {
+    if (window.ASTLibrary) window.ASTLibrary.selectTab(name);
   }
 
   function deckAction(action) {
@@ -84,11 +83,12 @@
 
   var SHORTCUTS = [
     ["Ctrl / ⌘ + K", "command palette"],
-    ["/", "jump to the topic field"],
+    ["1 · 2 · 3", "home · playground · history"],
+    ["/", "jump to the brief"],
     ["Ctrl / ⌘ + Enter", "write the story"],
     ["Space", "play or pause the voice"],
     ["← / →", "skip five seconds"],
-    ["S", "scroll to your shelf"],
+    ["D", "paper or night desk"],
     ["P", "open a shared story"],
     ["T", "toggle the cursor trail"],
     ["?", "this sheet"],
@@ -100,25 +100,38 @@
       label: "Write a story",
       hint: "⌘ + ⏎",
       run: function () {
-        if (!click("ast-ignite")) window.ASTToast("the composer is not ready", "error");
+        tab("playground");
+        if (!click("ast-ignite")) window.ASTToast("the brief is not ready", "error");
       },
     },
     {
       label: "Roll a seed topic",
       hint: "surprise me",
       run: function () {
+        tab("playground");
         click("ast-seed");
       },
     },
     {
-      label: "Jump to the topic field",
-      hint: "/",
-      run: focusTopic,
+      label: "Go to the playground",
+      hint: "2",
+      run: function () {
+        tab("playground");
+      },
     },
     {
-      label: "Scroll to your shelf",
-      hint: "S",
-      run: scrollToShelf,
+      label: "Go to the history",
+      hint: "3",
+      run: function () {
+        tab("history");
+      },
+    },
+    {
+      label: "Read the home page",
+      hint: "1",
+      run: function () {
+        tab("home");
+      },
     },
     {
       label: "Play or pause the voice",
@@ -142,6 +155,13 @@
       },
     },
     {
+      label: "Switch the paper",
+      hint: "D",
+      run: function () {
+        if (window.ASTTheme) window.ASTTheme.toggle();
+      },
+    },
+    {
       label: "Open a shared story",
       hint: "P",
       run: function () {
@@ -162,7 +182,9 @@
     overlay.className = "ast-overlay";
     overlay.id = id;
     overlay.dataset.open = "false";
-    overlay.innerHTML = '<div class="ast-sheet"><h3></h3><ul></ul></div>';
+    overlay.innerHTML =
+      '<div class="ast-sheet"><i class="tape tape--blue tape--right" aria-hidden="true"></i>' +
+      "<h3></h3><ul></ul></div>";
     overlay.querySelector("h3").textContent = heading;
     overlay.addEventListener("click", function (event) {
       if (event.target === overlay) closeOverlays();
@@ -175,8 +197,11 @@
   var keysheet = null;
 
   function buildOverlays() {
-    if (!palette) {
-      palette = buildOverlay("ast-palette", "Command palette");
+    if (palette && document.body.contains(palette)) {
+      if (keysheet && document.body.contains(keysheet)) return;
+    }
+    if (!palette || !document.body.contains(palette)) {
+      palette = buildOverlay("ast-palette", "what next?");
       var list = palette.querySelector("ul");
       COMMANDS.forEach(function (command) {
         var item = document.createElement("li");
@@ -194,8 +219,8 @@
         list.appendChild(item);
       });
     }
-    if (!keysheet) {
-      keysheet = buildOverlay("ast-keys", "Keyboard shortcuts");
+    if (!keysheet || !document.body.contains(keysheet)) {
+      keysheet = buildOverlay("ast-keys", "keyboard");
       var rows = keysheet.querySelector("ul");
       SHORTCUTS.forEach(function (pair) {
         var item = document.createElement("li");
@@ -262,11 +287,12 @@
     }
     field.value = text;
     field.dispatchEvent(new Event("input", { bubbles: true }));
+    tab("playground");
     if (!click("ast-adopt")) window.ASTToast("restoring is unavailable right now", "error");
   }
 
   function restoreFromPrompt() {
-    var raw = window.prompt("Paste an AI Storyteller share link (or just the text):");
+    var raw = window.prompt("Paste a KOTORI share link (or just the text):");
     if (!raw) return;
     var marker = raw.indexOf("#s=");
     var payloadText = marker >= 0 ? raw.slice(marker + 3) : raw.trim();
@@ -306,7 +332,8 @@
 
     if (meta && event.key === "Enter") {
       event.preventDefault();
-      if (!click("ast-ignite")) window.ASTToast("the composer is not ready", "error");
+      tab("playground");
+      if (!click("ast-ignite")) window.ASTToast("the brief is not ready", "error");
       return;
     }
 
@@ -347,8 +374,14 @@
     }
 
     var key = (event.key || "").toLowerCase();
-    if (key === "s") {
-      scrollToShelf();
+    if (key === "1") {
+      tab("home");
+    } else if (key === "2") {
+      tab("playground");
+    } else if (key === "3") {
+      tab("history");
+    } else if (key === "d") {
+      if (window.ASTTheme) window.ASTTheme.toggle();
     } else if (key === "p") {
       restoreFromPrompt();
     } else if (key === "t") {
@@ -359,12 +392,10 @@
   /* ── boot ─────────────────────────────────────────────────────────────── */
 
   window.ASTBus.onUpdate(function () {
-    buildOverlays();
     applyTrailPreference();
   });
 
   window.addEventListener("load", function () {
-    buildOverlays();
     applyTrailPreference();
     window.setTimeout(restoreFromHash, 600);
   });

@@ -21,7 +21,8 @@ ENV_KEYS = (
     "TEMPERATURE",
     "MAX_TOKENS",
     "AI_STORYTELLER_DATA_DIR",
-    "FORCE_LIGHT",
+    "KOTORI_DATA_DIR",
+    "KOTORI_THEME",
 )
 
 
@@ -66,11 +67,21 @@ def test_numeric_env_values_fall_back_when_nonsense(monkeypatch: pytest.MonkeyPa
 def test_numeric_env_values_are_read(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("TEMPERATURE", "0.4")
     monkeypatch.setenv("MAX_TOKENS", "256")
-    monkeypatch.setenv("FORCE_LIGHT", "0")
+    monkeypatch.setenv("KOTORI_THEME", "dark")
     settings = load_settings()
     assert settings.temperature == 0.4
     assert settings.max_tokens == 256
-    assert settings.force_light is False
+    assert settings.theme == "dark"
+
+
+def test_an_unknown_theme_falls_back_to_paper(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("KOTORI_THEME", "holographic")
+    assert load_settings().theme == "light"
+
+
+def test_the_old_data_dir_name_still_works(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("AI_STORYTELLER_DATA_DIR", "legacy/archive")
+    assert load_settings().data_dir == (PROJECT_ROOT / "legacy/archive").resolve()
 
 
 def test_relative_data_dir_anchors_to_the_project(monkeypatch: pytest.MonkeyPatch):
@@ -83,13 +94,14 @@ def test_absolute_data_dir_is_kept(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     assert load_settings().data_dir == tmp_path
 
 
-def test_engine_label_and_public_snapshot(tmp_path: Path):
+def test_engine_label_never_names_the_provider(tmp_path: Path):
     offline = Settings(api_key=None, data_dir=tmp_path)
-    assert offline.engine_label == "no engine"
+    assert offline.engine_label == "the demo reels"
     assert offline.public()["has_key"] is False
 
     online = Settings(model_name="test-model", api_key="key", data_dir=tmp_path)
-    assert online.engine_label == "test-model"
+    assert online.engine_label == "a quiet writer"
+    assert "test-model" not in online.engine_label
     snapshot = online.public()
     assert "key" not in snapshot.values()
     assert snapshot["has_key"] is True

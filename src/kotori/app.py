@@ -25,20 +25,27 @@ def _env_int(*names: str, default: int) -> int:
     return default
 
 
-def build_demo(settings: Settings | None = None) -> gr.Blocks:
+def build_studio(settings: Settings | None = None) -> Studio:
+    """One studio per process; its resolved data dir is what Gradio serves."""
+    return Studio(settings or get_settings())
+
+
+def build_demo(settings: Settings | None = None, studio: Studio | None = None) -> gr.Blocks:
     """Fully wired Blocks instance, queue included."""
     settings = settings or get_settings()
-    return configure_queue(build_app(Studio(settings), settings))
+    return configure_queue(build_app(studio or Studio(settings), settings))
 
 
-def launch_options(settings: Settings | None = None) -> dict[str, Any]:
-    """Everything Gradio 6 wants at launch time: theme, css, js and head."""
+def launch_options(
+    settings: Settings | None = None, allowed_paths: list[str] | None = None
+) -> dict[str, Any]:
+    """Everything Gradio 6 wants at launch time: theme, css, js, head, files."""
     settings = settings or get_settings()
-    return {
+    options: dict[str, Any] = {
         "theme": build_theme(),
         "css_paths": stylesheet_paths(),
         "js": script_source(),
-        "head": head_html(),
+        "head": head_html(settings),
         "favicon_path": favicon_path(),
         "server_name": os.getenv("GRADIO_SERVER_NAME", DEFAULT_HOST),
         "server_port": _env_int("PORT", "GRADIO_SERVER_PORT", default=DEFAULT_PORT),
@@ -46,18 +53,23 @@ def launch_options(settings: Settings | None = None) -> dict[str, Any]:
         "quiet": True,
         "pwa": True,
     }
+    if allowed_paths:
+        # the rendered mp3s live in the data dir, and the browser streams them
+        options["allowed_paths"] = list(allowed_paths)
+    return options
 
 
 def launch(settings: Settings | None = None, **overrides: Any) -> gr.Blocks:
     """Build and launch the studio; extra kwargs win over the defaults."""
     settings = settings or get_settings()
-    demo = build_demo(settings)
-    options = launch_options(settings)
+    studio = build_studio(settings)
+    demo = configure_queue(build_app(studio, settings))
+    options = launch_options(settings, allowed_paths=[str(studio.data_dir)])
     options.update(overrides)
     demo.launch(**options)
     return demo
 
 
 def main() -> None:
-    """Console entrypoint (``ai-storyteller``)."""
+    """Console entrypoint (``kotori``)."""
     launch()

@@ -1,4 +1,4 @@
-"""The studio: one place where writing, voicing and archiving meet.
+"""The studio: one place where writing, voicing and filing meet.
 
 Callbacks return plain strings (HTML) and dataclasses, so this module stays
 free of Gradio and can be driven from a notebook or the CLI just as easily.
@@ -10,44 +10,46 @@ import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote
 
-from .config import Settings, ensure_writable_dir, get_settings
+from .config import STORY_WORDS, Settings, ensure_writable_dir, get_settings
 from .demo import DEMO_GENRE, DEMO_MODEL, DEMO_MOOD, demo_stream
 from .library import StoryLibrary
 from .markup import (
-    STAGE_PAPER,
     archive_choices,
-    render_archive_list,
-    render_archive_preview,
     render_deck,
     render_deck_idle,
     render_footer,
-    render_hero,
-    render_idle_stage,
-    render_stage,
+    render_history,
+    render_idle_sheet,
+    render_masthead,
+    render_sheet,
     render_status,
     render_thinking,
 )
 from .models import StoryDraft, StoryRequest
 from .prompts import get_genre, get_mood, random_topic
-from .speech import SpeechError, audio_data_uri, resolve_voice, synthesize
+from .speech import SpeechError, resolve_voice, synthesize
 from .story import StoryService
 from .timing import estimate_duration
 
 OPENING_STATUS = "warming up the pen…"
 OPENING_DEMO = "warming up the pen… (demo reel)"
 WRITING_DECK = "the voice arrives as soon as the story is finished…"
-VOICE_WAIT_NOTE = "synthesising the voice…"
-READY_NOTE = "ready · press play and follow the light"
-SAVED_NOTE = "archived"
+VOICE_WAIT_NOTE = "recording the voice…"
+READY_NOTE = "all yours · press play and read along"
+SAVED_NOTE = "filed in the history"
 DEMO_STATUS = "demo mode · add credentials for your own stories"
+
+#: Where Gradio serves the rendered mp3s from.
+FILE_ROUTE = "/gradio_api/file="
 
 
 @dataclass(slots=True)
 class View:
-    """The swappable regions of the page."""
+    """The swappable regions of the playground."""
 
-    stage: str = field(default_factory=render_idle_stage)
+    stage: str = field(default_factory=render_idle_sheet)
     deck: str = field(default_factory=render_deck_idle)
     status: str = field(default_factory=render_status)
     draft: StoryDraft | None = None
@@ -76,8 +78,8 @@ class Studio:
         self.service = service or StoryService(self.settings)
 
     # ── chrome ───────────────────────────────────────────────────────────────
-    def hero(self) -> str:
-        return render_hero(self.settings, self.library.stats())
+    def masthead(self) -> str:
+        return render_masthead(self.settings, self.library.stats())
 
     def footer(self) -> str:
         return render_footer(self.settings, data_dir=self.data_dir)
@@ -90,36 +92,44 @@ class Studio:
     def roll_topic(self) -> str:
         return random_topic()
 
-    # ── speech ───────────────────────────────────────────────────────────────
-    def _audio_uri(self, draft: StoryDraft | None) -> str | None:
-        """Inline the saved mp3 for a draft, when it is still on disk."""
+    # ── recordings ───────────────────────────────────────────────────────────
+    def audio_file(self, draft: StoryDraft | None) -> Path | None:
+        """The mp3 on disk for a draft, when it is still there."""
         if draft is None or not draft.audio_path:
             return None
         path = Path(draft.audio_path)
         try:
             if not path.is_file() or path.stat().st_size == 0:
                 return None
-            return audio_data_uri(path)
         except OSError:
             return None
+        return path
+
+    def _audio_src(self, draft: StoryDraft | None) -> str | None:
+        """A URL the browser can stream, instead of a megabyte of base64."""
+        path = self.audio_file(draft)
+        return f"{FILE_ROUTE}{quote(str(path), safe='/')}" if path else None
+
+    def audio_sources(self, drafts: list[StoryDraft]) -> dict[str, str]:
+        """``{story_id: src}`` for the ledger, skipping anything unrecorded."""
+        sources: dict[str, str] = {}
+        for draft in drafts:
+            src = self._audio_src(draft)
+            if src:
+                sources[draft.story_id] = src
+        return sources
 
     def _deck(
-        self,
-        draft: StoryDraft,
-        *,
-        force: bool = False,
-        paper_id: str = STAGE_PAPER,
-        autoplay: bool = True,
+        self, draft: StoryDraft, *, force: bool = False, autoplay: bool = True
     ) -> tuple[str, str | None]:
-        """Render the player for ``draft``, reusing the saved voice when possible."""
+        """Render the reader for ``draft``, reusing the saved voice when possible."""
         if not force:
-            uri = self._audio_uri(draft)
-            if uri:
+            existing = self._audio_src(draft)
+            if existing:
                 deck = render_deck(
                     draft,
-                    uri,
+                    existing,
                     duration_hint=estimate_duration(draft.story),
-                    paper_id=paper_id,
                     autoplay=autoplay,
                 )
                 return deck, draft.audio_path
@@ -139,9 +149,8 @@ class Studio:
         self.library.save(draft)
         deck = render_deck(
             draft,
-            audio_data_uri(path),
+            self._audio_src(draft) or "",
             duration_hint=estimate_duration(draft.story),
-            paper_id=paper_id,
             autoplay=autoplay,
         )
         return deck, str(path)
@@ -152,23 +161,15 @@ class Studio:
         topic: str,
         genre: str,
         mood: str,
-        target_words: int,
         voice: str,
-        slow: bool,
+        slow: bool = False,
     ) -> AsyncIterator[View]:
-        """Stream a story, then voice it, then archive it.
+        """Stream a story, then voice it, then file it away.
 
-        The first frame is a loading state, so pressing the button always
-        answers immediately — even while the model is still thinking.
+        The first frame is a loading state, so pressing the button always answers
+        immediately — even while the model is still thinking.
         """
-        request = StoryRequest(
-            topic=topic,
-            genre=genre,
-            mood=mood,
-            target_words=int(target_words or 260),
-            voice=voice,
-            slow=bool(slow),
-        )
+        request = StoryRequest(topic=topic, genre=genre, mood=mood, voice=voice, slow=slow)
         prepared = self.service.prepare(request)
         voice_option = resolve_voice(prepared.voice)
         configured = self.settings.is_configured
@@ -176,9 +177,9 @@ class Studio:
 
         draft = StoryDraft(
             topic=prepared.topic,
+            target_words=STORY_WORDS,
             genre=get_genre(prepared.genre).label if configured else DEMO_GENRE,
             mood=get_mood(prepared.mood).label if configured else DEMO_MOOD,
-            target_words=prepared.target_words,
             voice=voice_option.key,
             voice_label=voice_option.choice,
             model=self.settings.model_name if configured else DEMO_MODEL,
@@ -197,7 +198,7 @@ class Studio:
         async for chunk in frames:
             draft.story = chunk.text
             stage = (
-                render_stage(draft, live=not chunk.finished, note=chunk.note)
+                render_sheet(draft, live=not chunk.finished, note=chunk.note)
                 if draft.story.strip()
                 else render_thinking(prepared.topic, chunk.note)
             )
@@ -212,7 +213,7 @@ class Studio:
         self.library.save(draft)
 
         yield View(
-            stage=render_stage(draft, note=SAVED_NOTE),
+            stage=render_sheet(draft, note=SAVED_NOTE),
             deck=render_deck_idle(VOICE_WAIT_NOTE),
             status=render_status(VOICE_WAIT_NOTE, tone="busy"),
             draft=draft,
@@ -220,11 +221,9 @@ class Studio:
         )
 
         deck, audio = self._deck(draft, force=True)
-        note = (
-            READY_NOTE if audio else (_deck_message(deck) or "the voice is unavailable right now")
-        )
+        note = READY_NOTE if audio else (_deck_message(deck) or "the voice is unavailable")
         yield View(
-            stage=render_stage(draft, note="voiced" if audio else "unvoiced"),
+            stage=render_sheet(draft, note="voiced" if audio else "unvoiced"),
             deck=deck,
             status=render_status(note, tone="idle" if audio else "error"),
             draft=draft,
@@ -232,18 +231,18 @@ class Studio:
         )
 
     def _voiced(self, draft: StoryDraft, *, force: bool = False, autoplay: bool = True) -> View:
-        """Render the stage and player for a draft, voicing it if needed."""
+        """Render the page and reader for a draft, recording it if needed."""
         deck, audio = self._deck(draft, force=force, autoplay=autoplay)
         if audio is None:
-            failed = _deck_message(deck) or "the voice is unavailable right now"
+            note = _deck_message(deck) or "the voice is unavailable right now"
             return View(
-                stage=render_stage(draft, note="unvoiced"),
+                stage=render_sheet(draft, note="unvoiced"),
                 deck=deck,
-                status=render_status(failed, tone="error"),
+                status=render_status(note, tone="error"),
                 draft=draft,
             )
         return View(
-            stage=render_stage(draft, note="voiced"),
+            stage=render_sheet(draft, note="voiced"),
             deck=deck,
             status=render_status(READY_NOTE),
             draft=draft,
@@ -251,74 +250,60 @@ class Studio:
         )
 
     def respeak(self, story_id: str | None) -> View:
-        """Record a fresh voice for an archived draft."""
+        """Record a fresh voice for a story that is already on the shelf."""
         draft = self.library.get(story_id)
         if draft is None:
             return View(status=render_status("nothing selected", tone="error"))
         return self._voiced(draft, force=True)
 
-    # ── archive ──────────────────────────────────────────────────────────────
-    def archive_state(self, selected: str | None = None) -> tuple[list[tuple[str, str]], str, str]:
-        """Choices, the reading pane for ``selected``, and the listing."""
-        drafts = self.library.load()
-        chosen = self._pick(drafts, selected)
-        return (
-            archive_choices(drafts),
-            self.preview(chosen.story_id if chosen else None),
-            render_archive_list(drafts),
-        )
-
-    def preview(self, story_id: str | None) -> str:
-        """The shelf reading pane, complete with that story's own player."""
-        draft = self.library.get(story_id)
-        if draft is None:
-            return render_archive_preview(None)
-        return render_archive_preview(
-            draft,
-            audio_uri=self._audio_uri(draft),
-            duration_hint=estimate_duration(draft.story),
-        )
-
     def open_draft(self, story_id: str | None) -> View:
-        """Put an archived story back on the writing stage."""
+        """Put an archived story back on the playground page."""
         draft = self.library.get(story_id)
         if draft is None:
             return View(status=render_status("nothing selected", tone="error"))
         deck, audio = self._deck(draft, autoplay=False)
         return View(
-            stage=render_stage(draft, note="from the archive"),
+            stage=render_sheet(draft, note="from the history"),
             deck=deck,
             status=render_status(f"opened {draft.title}"),
             draft=draft,
             audio=audio,
         )
 
+    # ── history ──────────────────────────────────────────────────────────────
+    def drafts(self) -> list[StoryDraft]:
+        return self.library.load()
+
+    def history_html(self, drafts: list[StoryDraft] | None = None) -> str:
+        """The ledger: every story, with its own recording."""
+        entries = self.drafts() if drafts is None else drafts
+        return render_history(entries, self.audio_sources(entries))
+
+    def choices(self, drafts: list[StoryDraft] | None = None) -> list[tuple[str, str]]:
+        return archive_choices(self.drafts() if drafts is None else drafts)
+
     def delete(self, story_id: str | None) -> tuple[list[tuple[str, str]], str, str, str]:
-        """Drop one draft; returns choices, preview, hero and a status line."""
+        """Drop one story; returns choices, the ledger, the masthead and a note."""
         removed = self.library.delete(story_id)
-        choices, preview, _listing = self.archive_state()
+        drafts = self.drafts()
         note = "story deleted" if removed else "nothing selected"
         return (
-            choices,
-            preview,
-            self.hero(),
+            self.choices(drafts),
+            self.history_html(drafts),
+            self.masthead(),
             render_status(note, tone="idle" if removed else "error"),
         )
 
     def clear(self) -> tuple[list[tuple[str, str]], str, str, str]:
-        """Burn the archive; returns choices, preview, hero and a status line."""
+        """Empty the shelf; returns choices, the ledger, the masthead and a note."""
         count = self.library.clear()
-        choices, preview, _listing = self.archive_state()
-        note = (
-            f"cleared {count} stor{'y' if count == 1 else 'ies'}"
-            if count
-            else "the shelf was empty"
-        )
-        return (choices, preview, self.hero(), render_status(note))
+        drafts = self.drafts()
+        note = f"cleared {count} stor{'y' if count == 1 else 'ies'}" if count else "the shelf was empty"
+        return self.choices(drafts), self.history_html(drafts), self.masthead(), render_status(note)
 
     # ── restore ──────────────────────────────────────────────────────────────
     def adopt(self, text: str | None) -> View:
-        """Bring a shared story back into the studio."""
+        """Bring a story that arrived through a share link into the studio."""
         story = (text or "").strip()
         if not story:
             return View(status=render_status("nothing to restore", tone="error"))
@@ -334,27 +319,17 @@ class Studio:
         )
         self.library.save(draft)
         return View(
-            stage=render_stage(draft, note="restored from a link"),
+            stage=render_sheet(draft, note="restored from a link"),
             deck=render_deck_idle("press play below once this story has a voice"),
             status=render_status("restored · press play to hear it"),
             draft=draft,
         )
 
-    # ── helpers ──────────────────────────────────────────────────────────────
-    @staticmethod
-    def _pick(drafts: list[StoryDraft], selected: str | None) -> StoryDraft | None:
-        """Keep the selection when it still exists, else fall back to the newest."""
-        if selected:
-            for draft in drafts:
-                if draft.story_id == selected:
-                    return draft
-        return drafts[0] if drafts else None
-
 
 def _deck_message(deck: str) -> str:
     """Pull the message back out of an idle player, for the status line."""
-    start = deck.find('class="deck__idle-note">')
+    marker = 'class="deck__idle-note">'
+    start = deck.find(marker)
     if start < 0:
         return ""
-    body = deck[start + len('class="deck__idle-note">') :]
-    return body.split("<", 1)[0].strip()
+    return deck[start + len(marker) :].split("<", 1)[0].strip()

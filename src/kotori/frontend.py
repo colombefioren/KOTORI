@@ -9,8 +9,8 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from .config import ASSETS_DIR
-from .theme import DISPLAY_FONT, HAND_FONT, SANS_FONT, SERIF_FONT
+from .config import ASSETS_DIR, Settings
+from .theme import DISPLAY_FONT, HAND_FONT, MONO_FONT, SANS_FONT, SERIF_FONT
 
 STYLE_FILES: tuple[str, ...] = (
     "tokens.css",
@@ -26,12 +26,20 @@ SCRIPT_FILES: tuple[str, ...] = (
     "shell.js",
 )
 
-#: Google Fonts axes: display serif, prose serif, UI sans, a handwriting.
+def _font(name: str, axes: str = "") -> str:
+    """A Google Fonts request line, with the family name URL-encoded."""
+    family = name.replace(" ", "+")
+    return f"family={family}{axes}" if axes else f"family={family}"
+
+
+#: Google Fonts: a bookish display face, a Garamond for prose, a friendly UI
+#: sans, a marker for the margins and a typewriter for everything stamped.
 FONT_REQUESTS: tuple[str, ...] = (
-    f"family={DISPLAY_FONT}:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700",
-    f"family={SERIF_FONT}:ital,wght@0,400..700;1,400..700",
-    f"family={SANS_FONT}:wght@400..700",
-    f"family={HAND_FONT}:wght@400..700",
+    _font(DISPLAY_FONT, ":ital,opsz,wght@0,9..144,400..700;1,9..144,400..700"),
+    _font(SERIF_FONT, ":ital,wght@0,400..700;1,400..700"),
+    _font(SANS_FONT, ":wght@400..700"),
+    _font(HAND_FONT, ":wght@300..700"),
+    _font(MONO_FONT),
 )
 
 STYLE_DIR = ASSETS_DIR / "styles"
@@ -62,18 +70,27 @@ def script_source() -> str:
     return "\n\n".join(parts)
 
 
-def head_html() -> str:
-    """Head tags: webfonts, theme colour and the favicon."""
+def head_html(settings: Settings | None = None) -> str:
+    """Head tags: webfonts, the theme bootstrap and the social card."""
     fonts = "&".join(FONT_REQUESTS)
+    default = (settings.theme if settings else "light") or "light"
     return (
-        '<meta name="theme-color" content="#f7f1e7" />\n'
-        '<meta name="color-scheme" content="light" />\n'
-        '<meta property="og:title" content="AI Storyteller" />\n'
-        '<meta property="og:description" content="A scratchbook that writes a story '
-        'and reads it back to you, word by word." />\n'
+        '<meta name="theme-color" content="#f6eef2" />\n'
+        '<meta name="color-scheme" content="light dark" />\n'
+        '<meta property="og:title" content="KOTORI" />\n'
+        '<meta property="og:description" content="A pastel paper studio that writes a short '
+        'story from one line, then reads it back to you word by word." />\n'
         '<link rel="preconnect" href="https://fonts.googleapis.com" />\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n'
         f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?{fonts}&display=swap" />\n'
+        # paint in the right theme before the first frame, so there is no flash
+        "<script>(function(){try{var saved=localStorage.getItem('kotori-theme');"
+        f"var theme=saved||'{default}';"
+        "if(!saved&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)"
+        "{theme='dark';}"
+        "document.documentElement.setAttribute('data-theme',theme);"
+        "if(theme==='dark'){document.documentElement.classList.add('dark');}"
+        "}catch(e){}})();</script>\n"
     )
 
 

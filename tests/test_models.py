@@ -2,6 +2,7 @@
 
 import pytest
 
+from kotori.config import STORY_WORDS
 from kotori.models import (
     StoryDraft,
     StoryRequest,
@@ -126,10 +127,13 @@ def test_request_normalisation():
     assert prepared.topic == "a fallback"
     assert prepared.genre == "Contemporary"
     assert prepared.mood == "Melancholic"
-    assert prepared.target_words == 80
+    assert prepared.target_words == STORY_WORDS
     assert prepared.voice == "aurora"
     assert prepared.slow is False
 
 
-def test_request_normalisation_keeps_a_sane_length():
-    assert StoryRequest(topic="x", target_words=999).normalised("y").target_words == 600
+def test_the_length_is_always_the_same():
+    """There is no slider: whatever anyone asks for, a story is 400 words."""
+    assert STORY_WORDS == 400
+    assert StoryRequest(topic="x", target_words=999).normalised("y").target_words == STORY_WORDS
+    assert StoryDraft().target_words == STORY_WORDS

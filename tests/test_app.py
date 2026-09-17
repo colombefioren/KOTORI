@@ -2,7 +2,7 @@ from pathlib import Path
 
 import gradio as gr
 
-from kotori.app import build_demo, launch_options
+from kotori.app import build_demo, build_studio, launch_options
 from kotori.config import Settings
 from kotori.frontend import (
     SCRIPT_FILES,
@@ -13,10 +13,15 @@ from kotori.frontend import (
     script_source,
     stylesheet_paths,
 )
-from kotori.theme import Scratchbook
+from kotori.theme import Washi
 
 EXPECTED_IDS = {
-    "ast-header",
+    "ast-masthead",
+    "ast-tabs",
+    "ast-home-intro",
+    "ast-home-steps",
+    "ast-start",
+    "ast-demo",
     "ast-topic",
     "ast-ignite",
     "ast-seed",
@@ -24,12 +29,13 @@ EXPECTED_IDS = {
     "ast-status",
     "ast-stage",
     "ast-deck",
-    "ast-archive-pick",
-    "ast-archive-preview",
-    "ast-archive-status",
+    "ast-history",
+    "ast-history-pick",
+    "ast-history-status",
+    "ast-refresh",
+    "ast-pick",
+    "ast-open",
     "ast-delete",
-    "ast-record",
-    "ast-clear",
     "ast-incoming",
     "ast-adopt",
     "ast-footer",
@@ -56,7 +62,11 @@ def test_head_html_loads_the_webfonts():
     assert "theme-color" in head
     assert "color-scheme" in head
     assert "Fraunces" in head
-    assert "Caveat" in head
+    assert "Kalam" in head
+    assert "Special+Elite" in head
+    # the theme is chosen before the first paint, so there is no flash
+    assert "kotori-theme" in head
+    assert "data-theme" in head
 
 
 def test_favicon_is_shipped():
@@ -66,11 +76,18 @@ def test_favicon_is_shipped():
 
 def test_launch_options_are_wired(settings: Settings):
     options = launch_options(settings)
-    assert isinstance(options["theme"], Scratchbook)
+    assert isinstance(options["theme"], Washi)
     assert options["js"] and options["head"]
     assert options["css_paths"]
     assert options["favicon_path"]
     assert options["server_port"] == 7860
+    assert "allowed_paths" not in options
+
+
+def test_launch_options_serve_the_archive(settings: Settings, tmp_path: Path):
+    studio = build_studio(Settings(data_dir=tmp_path, api_key="k"))
+    options = launch_options(settings, allowed_paths=[str(studio.data_dir)])
+    assert options["allowed_paths"] == [str(tmp_path)]
 
 
 def test_port_can_be_overridden_by_env(settings: Settings, monkeypatch):
@@ -97,18 +114,31 @@ def test_app_renders_branding_and_controls(settings: Settings, tmp_path: Path):
     values = " ".join(
         str(component.get("props", {}).get("value", "")) for component in config["components"]
     )
-    assert "Stories" in values
+    assert "KOTO<b>RI</b>" in values
     assert "write the story" in values
     assert "the page is still blank" in values
+    assert "nothing here yet" in values
 
 
-def test_archive_tab_starts_empty(settings: Settings):
+def test_the_three_tabs_are_named(settings: Settings):
+    demo = build_demo(settings)
+    config = demo.get_config_file()
+    tabs = [
+        component
+        for component in config["components"]
+        if component.get("type") == "tabitem"
+    ]
+    ids = [component.get("props", {}).get("id") for component in tabs]
+    assert ids == ["home", "playground", "history"]
+
+
+def test_history_starts_empty(settings: Settings):
     demo = build_demo(settings)
     config = demo.get_config_file()
     radios = [
         component
         for component in config["components"]
         if component.get("type") == "radio"
-        and component.get("props", {}).get("elem_id") == "ast-archive-pick"
+        and component.get("props", {}).get("elem_id") == "ast-history-pick"
     ]
     assert radios and radios[0]["props"]["choices"] == []

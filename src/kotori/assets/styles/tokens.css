@@ -1,126 +1,147 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   AI Storyteller · design tokens
-   A scratchbook: warm paper, soft pastels, rounded corners, gentle ink.
+   KOTORI · design tokens
+   A washi-tape scrapbook: pink and blue pastels on paper, two themes (light and
+   dark), hand-drawn outlines, typewriter labels and handwriting in the margins.
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
   color-scheme: light;
 
-  /* paper */
-  --paper: #f7f1e7;
-  --paper-deep: #efe6d7;
-  --card: #fffdf8;
-  --card-sunk: #fdf8f0;
-  --line: #ecdfca;
-  --line-soft: #f2e8d9;
-  --line-strong: #ddc9ac;
+  /* washi — the two pastel families everything is cut from */
+  --pink-100: #fdeff4;
+  --pink-200: #f9d8e4;
+  --pink-300: #f3bcd0;
+  --pink-400: #e28bad;
+  --pink-500: #c06590;
+  --blue-100: #ebf2fc;
+  --blue-200: #d6e5f8;
+  --blue-300: #b4cdf0;
+  --blue-400: #7fa8dd;
+  --blue-500: #5d86bb;
 
-  /* ink */
-  --ink: #4b3f2f;
-  --ink-soft: #7c6c57;
-  --ink-faint: #a79579;
+  /* paper and desk */
+  --desk: #f6eef2;
+  --paper: #fffdfb;
+  --paper-2: #fdf7f6;
+  --paper-3: #f8efee;
+  --line: #ecdde2;
+  --line-2: #dcc6ce;
+  --ink: #3a3542;
+  --ink-2: #6d6675;
+  --ink-3: #9c94a3;
 
-  /* pastels */
-  --rose: #f3c1cc;
-  --rose-deep: #d98ea2;
-  --sage: #b7ddc8;
-  --sage-deep: #7cb79b;
-  --lavender: #d6cbf4;
-  --lavender-deep: #a795e0;
-  --butter: #f8e6b2;
-  --butter-deep: #d8b96b;
-  --sky: #c5ddf2;
-  --sky-deep: #8ab3d6;
-  --peach: #f9d4b8;
+  /* accents */
+  --accent: var(--pink-400);
+  --accent-2: var(--blue-400);
+  --accent-soft: var(--pink-100);
+  --accent-soft-2: var(--blue-100);
+  --highlight: var(--blue-200);
+  --danger: var(--pink-500);
 
-  --accent: var(--lavender-deep);
-  --accent-soft: #ede8fb;
+  /* how tape behaves on this paper */
+  --tape-blend: multiply;
+  --tape-alpha: 0.88;
 
-  /* geometry — everything is soft and rounded now */
-  --r-xs: 8px;
-  --r-sm: 12px;
-  --r: 18px;
-  --r-lg: 26px;
-  --r-pill: 999px;
+  /* hand-drawn geometry */
+  --wobble: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --wobble-sm: 125px 10px 115px 8px / 8px 115px 10px 125px;
+  --wobble-card: 22px 20px 24px 18px / 20px 24px 18px 22px;
 
-  --shadow-xs: 0 1px 2px rgba(84, 66, 46, 0.06);
-  --shadow-sm: 0 6px 16px -14px rgba(84, 66, 46, 0.55);
-  --shadow: 0 2px 4px rgba(84, 66, 46, 0.04), 0 22px 40px -32px rgba(84, 66, 46, 0.6);
-  --shadow-lift: 0 3px 6px rgba(84, 66, 46, 0.05), 0 30px 46px -30px rgba(84, 66, 46, 0.5);
+  --shadow-1: 0 1px 1px rgba(58, 53, 66, 0.05), 0 6px 14px -12px rgba(58, 53, 66, 0.5);
+  --shadow-2: 0 2px 3px rgba(58, 53, 66, 0.04), 0 20px 34px -28px rgba(58, 53, 66, 0.65);
+  --shadow-tape: 0 1px 2px rgba(58, 53, 66, 0.12);
 
   /* type */
   --display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --serif: "Lora", Georgia, "Times New Roman", serif;
-  --sans: "Karla", ui-sans-serif, system-ui, sans-serif;
-  --hand: "Caveat", "Bradley Hand", cursive;
+  --serif: "EB Garamond", Garamond, Georgia, serif;
+  --ui: "Karla", ui-sans-serif, system-ui, sans-serif;
+  --hand: "Kalam", "Bradley Hand", cursive;
+  --type: "Special Elite", "Courier New", monospace;
 
   /* rhythm */
-  --gap: 26px;
-  --pad: 26px;
-  --max: 1160px;
+  --gap: 22px;
+  --pad: 24px;
+  --max: 1120px;
+  --sheet-line: 34px;
+
+  /* the grain and the weave, drawn once */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.34'/%3E%3C/svg%3E");
 }
 
-/* ── base canvas ───────────────────────────────────────────────────────────── */
+/* ── the night desk ────────────────────────────────────────────────────────── */
+
+:root[data-theme="dark"],
+:root.dark {
+  color-scheme: dark;
+
+  --desk: #191722;
+  --paper: #232030;
+  --paper-2: #1e1b29;
+  --paper-3: #2b2739;
+  --line: #38334a;
+  --line-2: #4c4562;
+  --ink: #f4eff8;
+  --ink-2: #c5bcd1;
+  --ink-3: #8e86a1;
+
+  --accent-soft: #33283c;
+  --accent-soft-2: #262f45;
+  --highlight: var(--blue-400);
+
+  /* tape reads as tape, not as paint, on a dark page */
+  --tape-blend: multiply;
+  --tape-alpha: 0.62;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.35), 0 22px 36px -30px rgba(0, 0, 0, 0.9);
+  --shadow-tape: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ── the desk ──────────────────────────────────────────────────────────────── */
 
 body,
 .gradio-container {
-  background: var(--paper);
+  background: var(--desk);
   color: var(--ink);
-  font-family: var(--sans);
+  font-family: var(--ui);
   -webkit-font-smoothing: antialiased;
 }
 
 .gradio-container {
-  background-color: var(--paper) !important;
+  background-color: var(--desk) !important;
   background-image:
-    radial-gradient(70% 50% at 8% -8%, rgba(214, 203, 244, 0.55), transparent 60%),
-    radial-gradient(60% 45% at 96% 4%, rgba(183, 221, 200, 0.5), transparent 62%),
-    radial-gradient(70% 55% at 50% 108%, rgba(243, 193, 204, 0.42), transparent 66%),
-    linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
-  background-attachment: fixed;
+    repeating-linear-gradient(90deg, rgba(192, 101, 144, 0.035) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(93, 134, 187, 0.035) 0 1px, transparent 1px 3px);
   max-width: 100% !important;
   padding: 0 !important;
 }
 
-/* paper grain — barely there, just enough to feel printed */
+/* paper grain over the whole desk */
 .gradio-container::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.22;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
-}
-
-/* faint dot grid, like squared notebook paper */
-.gradio-container::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image: radial-gradient(rgba(122, 104, 80, 0.16) 1px, transparent 1px);
-  background-size: 26px 26px;
-  mask-image: radial-gradient(120% 90% at 50% 0%, #000 12%, transparent 82%);
+  opacity: 0.28;
+  mix-blend-mode: soft-light;
+  background-image: var(--grain);
 }
 
 ::selection {
-  background: var(--butter);
+  background: var(--pink-200);
   color: var(--ink);
 }
 
 *:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--blue-400);
   outline-offset: 3px;
-  border-radius: var(--r-xs);
+  border-radius: 4px;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-color: var(--line-2) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -129,14 +150,14 @@ body,
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--line-strong);
+  background: var(--line-2);
   border: 3px solid transparent;
   background-clip: content-box;
-  border-radius: var(--r-pill);
+  border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--lavender-deep);
+  background: var(--pink-300);
   background-clip: content-box;
 }
 

@@ -18,9 +18,15 @@ PROJECT_ROOT = PACKAGE_DIR.parents[1]
 ASSETS_DIR = PACKAGE_DIR / "assets"
 DEFAULT_DATA_DIR = PROJECT_ROOT / "data"
 
-APP_NAME = "AI Storyteller"
-APP_TAGLINE = "stories that speak"
-VERSION = "0.2.0"
+APP_NAME = "KOTORI"
+APP_TAGLINE = "a little bird that tells you stories"
+VERSION = "0.3.0"
+
+#: The length every story is written to. There is no slider any more.
+STORY_WORDS = 400
+
+#: The two moods the studio knows how to dress itself in.
+THEMES = ("light", "dark")
 
 load_dotenv(PROJECT_ROOT / ".env")
 
@@ -75,6 +81,12 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return raw.lower() in {"1", "true", "yes", "on"}
 
 
+def _theme(raw: str | None) -> str:
+    """Only the two themes the studio actually ships."""
+    value = (raw or "").strip().lower()
+    return value if value in THEMES else "light"
+
+
 @dataclass(frozen=True, slots=True)
 class Settings:
     """Immutable snapshot of the runtime configuration."""
@@ -86,8 +98,8 @@ class Settings:
     max_tokens: int = 900
     request_timeout: float = 60.0
     data_dir: Path = DEFAULT_DATA_DIR
-    #: The studio is a scratchbook: paper, pastel ink, always light.
-    force_light: bool = True
+    #: Which theme to open in; the toggle in the UI overrides it per visitor.
+    theme: str = "light"
     version: str = VERSION
 
     @property
@@ -97,7 +109,8 @@ class Settings:
 
     @property
     def engine_label(self) -> str:
-        return self.model_name if self.is_configured else "no engine"
+        """A neutral name for the writer — never the model, never the provider."""
+        return "a quiet writer" if self.is_configured else "the demo reels"
 
     @property
     def archive_path(self) -> Path:
@@ -127,7 +140,10 @@ class Settings:
 
 def load_settings() -> Settings:
     """Build a :class:`Settings` instance from the process environment."""
-    data_dir_raw = _first_env("AI_STORYTELLER_DATA_DIR") or str(DEFAULT_DATA_DIR)
+    # the old AI_STORYTELLER_ name is still honoured so existing volumes keep working
+    data_dir_raw = (
+        _first_env("KOTORI_DATA_DIR", "AI_STORYTELLER_DATA_DIR") or str(DEFAULT_DATA_DIR)
+    )
     data_dir = Path(data_dir_raw).expanduser()
     if not data_dir.is_absolute():
         data_dir = (PROJECT_ROOT / data_dir).resolve()
@@ -140,7 +156,7 @@ def load_settings() -> Settings:
         max_tokens=_env_int("MAX_TOKENS", 900),
         request_timeout=_env_float("REQUEST_TIMEOUT", 60.0),
         data_dir=data_dir,
-        force_light=_env_bool("FORCE_LIGHT", True),
+        theme=_theme(_first_env("KOTORI_THEME")),
     )
 
 
