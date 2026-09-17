@@ -7,28 +7,42 @@ or a server. ``ui.py`` binds them with ``functools.partial``.
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 
 import gradio as gr
 
 from .llm import EngineNotConfiguredError
-from .markup import render_status
+from .markup import render_deck_idle, render_stage, render_status, render_thinking
 from .speech import SpeechError
 from .story import StoryError
 from .studio import Studio
 
-StageOutputs = tuple[str, str, str]
+#: stage, deck, status, and the composer button's own state
+StageOutputs = tuple[str, str, str, object]
 ArchiveOutputs = tuple[object, str, str, str]
 
 EXPECTED_ERRORS = (StoryError, SpeechError, EngineNotConfiguredError)
 
+WRITE_LABEL = "write the story"
+BUSY_LABEL = "writing…"
 
-def _radio_update(choices: list[tuple[str, str]]) -> object:
-    return gr.update(choices=choices, value=choices[0][1] if choices else None)
+
+def _radio_update(choices: list[tuple[str, str]], value: str | None = None) -> object:
+    if value is None:
+        value = choices[0][1] if choices else None
+    return gr.update(choices=choices, value=value)
 
 
-def _plural(count: int, noun: str) -> str:
-    return f"{count} {noun}" + ("" if count == 1 else "s")
+def _composer(busy: bool) -> object:
+    """The primary button, labelled and locked while the writer works."""
+    return gr.update(value=BUSY_LABEL if busy else WRITE_LABEL, interactive=not busy)
+
+
+def _plural(count: int, singular: str, plural: str | None = None) -> str:
+    """``1 story`` / ``3 stories`` without an awkward ``storys``."""
+    if count == 1:
+        return f"1 {singular}"
+    return f"{count} {plural or singular + 's'}"
 
 
 async def stream_story(
@@ -40,7 +54,7 @@ async def stream_story(
     voice: str,
     slow: bool,
 ) -> AsyncIterator[StageOutputs]:
-    """Stream a story into the stage; failures surface as a Gradio error toast."""
+    """Stream a story into the page; failures surface as a Gradio error toast."""
     try:
         async for view in studio.ignite(
             topic=topic,
@@ -50,30 +64,55 @@ async def stream_story(
             voice=voice,
             slow=bool(slow),
         ):
-            yield view.stage, view.deck, view.status
+            yield view.stage, view.deck, view.status, _composer(view.busy)
     except EXPECTED_ERRORS as error:
+        # hand the studio back to the writer before the toast appears
+        yield (
+            render_thinking(topic, "the writer stopped early"),
+            render_deck_idle(str(error)),
+            render_status(str(error), tone="error"),
+            _composer(False),
+        )
         raise gr.Error(str(error)) from error
 
 
-def refresh_archive(studio: Studio) -> ArchiveOutputs:
-    """Re-read the shelf and refresh the hero stats."""
-    choices, preview, _listing = studio.archive_state()
-    note = _plural(len(choices), "draft") + " on the shelf"
-    return _radio_update(choices), preview, studio.hero(), render_status(note)
+def rearm(studio: Studio) -> object:
+    """Put the composer button back after a stop."""
+    return _composer(False)
+
+
+def refresh_archive(studio: Studio, selected: str | None = None) -> ArchiveOutputs:
+    """Re-read the shelf, keeping the current selection when it still exists."""
+    choices, preview, _listing = studio.archive_state(selected)
+    value = selected if any(value == selected for _label, value in choices) else None
+    note = _plural(len(choices), "story", "stories") + " on the shelf"
+    return _radio_update(choices, value), preview, studio.hero(), render_status(note)
 
 
 def preview_selected(studio: Studio, story_id: str | None) -> str:
+    """The reading pane for the story picked on the shelf."""
     return studio.preview(story_id)
 
 
-def open_selected(studio: Studio, story_id: str | None) -> StageOutputs:
-    view = studio.open_draft(story_id)
-    return view.stage, view.deck, view.status
+def record_voice(studio: Studio, story_id: str | None) -> Iterator[tuple[str, str, str]]:
+    """Re-record a story's voice, showing the work while it happens."""
+    draft = studio.library.get(story_id)
+    if draft is None:
+        yield (
+            render_stage(None),
+            render_deck_idle("nothing selected"),
+            render_status("nothing selected", tone="error"),
+        )
+        return
 
+    yield (
+        render_stage(draft, note="recording…"),
+        render_deck_idle("recording a fresh voice for this story…"),
+        render_status("recording a fresh voice…", tone="busy"),
+    )
 
-def speak_selected(studio: Studio, story_id: str | None) -> StageOutputs:
     view = studio.respeak(story_id)
-    return view.stage, view.deck, view.status
+    yield view.stage, view.deck, view.status
 
 
 def delete_selected(studio: Studio, story_id: str | None) -> ArchiveOutputs:
