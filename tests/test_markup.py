@@ -1,6 +1,7 @@
 from kotori.config import Settings
 from kotori.library import ArchiveStats
 from kotori.markup import (
+    ROOMS,
     STAGE_PAPER,
     archive_choices,
     render_deck,
@@ -13,8 +14,11 @@ from kotori.markup import (
     render_idle_sheet,
     render_label,
     render_masthead,
+    render_room_signal,
     render_sheet,
     render_status,
+    render_sticky,
+    render_tabs,
     render_thinking,
     render_words,
 )
@@ -151,6 +155,49 @@ def test_the_home_page_explains_what_this_is():
 def test_labels_are_typewritten_rules():
     assert "the brief" in render_label("the brief", "one line is enough")
     assert "one line is enough" in render_label("the brief", "one line is enough")
+    assert "doodle-slot" not in render_label("the brief")
+    assert "doodle-slot" in render_label("the brief", doodle="arrow")
+
+
+def test_the_index_tabs_are_three_paper_tabs():
+    strip = render_tabs("home", kept=2)
+    assert strip.count('role="tab"') == 3
+    assert 'role="tablist"' in strip
+    assert [room for room, _ in ROOMS] == ["home", "playground", "history"]
+    for room in ("home", "playground", "history"):
+        assert f'data-room="{room}"' in strip
+        assert f'aria-controls="room-{room}"' in strip
+        assert f'id="tab-{room}"' in strip
+    # the open room is the one marked selected
+    assert 'id="tab-home" aria-controls="room-home" aria-selected="true"' in strip
+    assert 'id="tab-playground" aria-controls="room-playground" aria-selected="false"' in strip
+
+
+def test_the_history_tab_carries_a_hidden_count():
+    assert 'data-role="count">3<' in render_tabs("home", kept=3)
+    assert "hidden" in render_tabs("home", kept=0)
+
+
+def test_the_room_signal_names_a_real_room():
+    assert 'data-room="playground">playground<' in render_room_signal("playground")
+    assert 'data-room="home"' in render_room_signal("somewhere-else")
+    assert 'data-room="home"' in render_room_signal()
+
+
+def test_sticky_notes_are_pastel_and_optional():
+    note = render_sticky("press surprise me")
+    assert "press surprise me" in note
+    assert 'class="sticky"' in note
+    assert "sticky--blue" in render_sticky("a tip", tone="blue")
+    assert "<script>" not in render_sticky("<script>alert(1)</script>")
+
+
+def test_the_home_page_tapes_up_a_polaroid():
+    intro = render_home_intro(Settings(api_key="key"))
+    assert 'class="polaroid"' in intro
+    assert "polaroid__print" in intro
+    assert "the little bird" in intro
+    assert "tape" in intro
 
 
 def test_status_tones_pick_a_lamp():
@@ -173,6 +220,15 @@ def test_every_history_card_gets_its_own_player():
     assert "tape" in cards
     assert 'data-act="open"' in cards
     assert 'data-act="delete"' in cards
+
+
+def test_the_index_cards_are_index_cards():
+    cards = render_history([draft()], {draft().story_id: AUDIO})
+    # the punched index number, and a rose rule under the title
+    assert 'class="story-card__index"' in cards
+    assert "ABCD" in cards
+    assert 'class="story-card__head"' in cards
+    assert "stamp" in cards
 
 
 def test_a_story_without_a_recording_says_so():
