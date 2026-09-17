@@ -1,6 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Motion: paper settling, a blinking caret, hopping dots.
-   Everything yields to prefers-reduced-motion (see tokens.css).
+   Motion: paper settling onto the desk, a blinking caret, hopping dots, tape
+   that gives when a card is picked up. Everything yields to reduced motion
+   (see tokens.css).
    ───────────────────────────────────────────────────────────────────────────── */
 
 @keyframes caret-blink {
@@ -19,12 +20,12 @@
 }
 
 @keyframes stick {
-  from { transform: rotate(-2deg) translateY(10px); opacity: 0; }
+  from { transform: rotate(-2deg) translateY(12px); opacity: 0; }
   to { transform: rotate(0) translateY(0); opacity: 1; }
 }
 
 @keyframes settle {
-  from { transform: translateY(14px) rotate(-1.2deg); opacity: 0; }
+  from { transform: translateY(16px) rotate(-1.4deg); opacity: 0; }
   to { transform: translateY(0) rotate(0); opacity: 1; }
 }
 
@@ -38,13 +39,20 @@
   to { background: transparent; }
 }
 
+@keyframes sway {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50% { transform: rotate(0.6deg); }
+}
+
 /* ── pieces arriving on the desk ───────────────────────────────────────────── */
 
 .masthead > *,
 .steps,
 .home__topic,
+.polaroid,
 .ast-grid > *,
 .ast-full,
+.deck,
 .story-card {
   animation: settle 0.66s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -57,19 +65,22 @@
 
 /* ── while the story is being written ──────────────────────────────────────── */
 
-.sheet--live,
-.sheet--waiting { animation: breath 3.4s ease-in-out infinite; }
-
+.sheet--live .tp-caret { animation-duration: 0.9s; }
 .tp-word.is-fresh { animation: ink-wet 1.5s ease forwards; }
 
 /* ── a fresh recording invites a click if autoplay was blocked ─────────────── */
 
 .deck__play--ready { animation: breath 2.3s ease-in-out infinite; }
 
-/* ── tape settles when a card is touched ───────────────────────────────────── */
+/* ── tape gives a little when the card under it is touched ─────────────────── */
 
 .card:hover > .tape,
-.story-card:hover > .tape {
-  transform: rotate(-3deg) translateY(-1px);
+.story-card:hover > .tape,
+.deck:hover > .tape {
+  transform: rotate(-4deg) translateY(-1px);
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* ── the little bird sways ─────────────────────────────────────────────────── */
+
+.polaroid:hover { animation: sway 3.2s ease-in-out infinite; }
