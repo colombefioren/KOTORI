@@ -264,13 +264,9 @@
   }
 
   function selectTab(name) {
-    var buttons = document.querySelectorAll('#ast-tabs [role="tab"]');
-    for (var i = 0; i < buttons.length; i += 1) {
-      var label = (buttons[i].textContent || "").trim().toLowerCase();
-      if (label.indexOf(name) === 0) {
-        buttons[i].click();
-        return true;
-      }
+    if (window.ASTRooms) {
+      window.ASTRooms.show(name);
+      return true;
     }
     return false;
   }

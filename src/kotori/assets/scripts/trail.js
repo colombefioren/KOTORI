@@ -128,7 +128,7 @@
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   if (reduced.matches) return;
 
-  var COLOURS = ["#e28bad", "#7fa8dd", "#f3bcd0", "#b4cdf0", "#c06590"];
+  var COLOURS = ["#e288ae", "#82aae0", "#f2b3cd", "#b3d0f2", "#bd5f8b"];
   var MAX_POINTS = 26;
 
   var canvas = document.createElement("canvas");
