@@ -9,8 +9,11 @@ from kotori.markup import (
     render_history,
     render_idle_sheet,
     render_masthead,
+    render_room_signal,
     render_sheet,
     render_status,
+    render_sticky,
+    render_tabs,
     render_thinking,
     render_words,
 )
@@ -37,6 +40,30 @@ def test_the_masthead_offers_a_skip_link_and_a_landmark():
     assert 'href="#ast-tabs"' in masthead
     assert 'role="banner"' in masthead
     assert 'aria-label="Switch between the paper and the night desk"' in masthead
+
+
+def test_the_tab_strip_is_a_real_tablist():
+    strip = render_tabs("playground")
+    assert 'role="tablist"' in strip
+    assert 'aria-label="KOTORI rooms"' in strip
+    assert strip.count('role="tab"') == 3
+    # the open tab is tabbable, the rest are reachable with the arrow keys
+    assert 'aria-selected="true" tabindex="0"' in strip
+    assert strip.count('aria-selected="false" tabindex="-1"') == 2
+    assert strip.count('aria-controls="room-') == 3
+
+
+def test_the_room_signal_is_readable_but_not_seen():
+    signal = render_room_signal("history")
+    assert 'class="room-signal"' in signal
+    assert "history" in signal
+    assert "aria-hidden" not in signal
+
+
+def test_sticky_notes_are_prose_not_decorations():
+    note = render_sticky("press surprise me")
+    assert "aria-hidden" not in note
+    assert "<p" in note
 
 
 def test_the_sheet_is_a_labelled_region():
