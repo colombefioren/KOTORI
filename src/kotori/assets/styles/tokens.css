@@ -90,6 +90,15 @@
 :root.dark {
   color-scheme: dark;
 
+  /* the light pastel washes (pink-100/200, blue-100/200) drive hover and chip
+     backgrounds; left at their day-desk values they paint near-white behind
+     --ink's near-white night-desk text, so hovering a button erases its own
+     label. These are the same washes, darkened to work under light text. */
+  --pink-100: #3a2634;
+  --pink-200: #4c2f42;
+  --blue-100: #1f2740;
+  --blue-200: #283358;
+
   --desk: #191725;
   --desk-2: #221e2f;
   --paper: #262233;

@@ -74,9 +74,9 @@ def test_numeric_env_values_are_read(monkeypatch: pytest.MonkeyPatch):
     assert settings.theme == "dark"
 
 
-def test_an_unknown_theme_falls_back_to_paper(monkeypatch: pytest.MonkeyPatch):
+def test_an_unknown_theme_falls_back_to_the_night_desk(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("KOTORI_THEME", "holographic")
-    assert load_settings().theme == "light"
+    assert load_settings().theme == "dark"
 
 
 def test_the_old_data_dir_name_still_works(monkeypatch: pytest.MonkeyPatch):

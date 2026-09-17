@@ -84,7 +84,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
 def _theme(raw: str | None) -> str:
     """Only the two themes the studio actually ships."""
     value = (raw or "").strip().lower()
-    return value if value in THEMES else "light"
+    return value if value in THEMES else "dark"
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,7 +99,7 @@ class Settings:
     request_timeout: float = 60.0
     data_dir: Path = DEFAULT_DATA_DIR
     #: Which theme to open in; the toggle in the UI overrides it per visitor.
-    theme: str = "light"
+    theme: str = "dark"
     version: str = VERSION
 
     @property
