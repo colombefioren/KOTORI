@@ -1,14 +1,14 @@
 from pathlib import Path
 
-import pytest
 import gradio as gr
+import pytest
 
 from kotori.app import build_demo, build_studio, launch_options
 from kotori.config import Settings
 from kotori.ui.frontend import (
+    _TEMPLATE_MARKER,
     SCRIPT_FILES,
     STYLE_FILES,
-    _TEMPLATE_MARKER,
     _gradio_template_path,
     _patch_gradio_template,
     favicon_path,
@@ -82,7 +82,6 @@ def test_scripts_expose_the_client_contract():
         "window.ASTPlayer",
         "window.ASTToast",
         "window.ASTCodec",
-        "window.ASTTheme",
         "window.ASTVoices",
         "window.ASTRooms",
     ):
@@ -103,22 +102,10 @@ def test_the_client_owns_the_rooms():
 def test_the_room_is_chosen_before_the_first_paint():
     head = head_html()
     assert "data-room" in head
-    assert "data-theme" in head
     # with scripting off, every room is shown rather than two being hidden
     assert "<noscript>" in head
     for room in ("room-home", "room-playground", "room-history"):
         assert room in head
-
-
-def test_a_light_deployment_follows_the_operating_system():
-    head = head_html(Settings(theme="light"))
-    assert "!saved&&true&&window.matchMedia" in head
-
-
-def test_a_dark_deployment_stays_dark():
-    head = head_html(Settings(theme="dark"))
-    assert "!saved&&false&&window.matchMedia" in head
-    assert "theme=saved||'dark'" in head
 
 
 def test_head_html_loads_the_webfonts():
@@ -129,9 +116,6 @@ def test_head_html_loads_the_webfonts():
     assert "Fraunces" in head
     assert "Kalam" in head
     assert "Special+Elite" in head
-    # the theme is chosen before the first paint, so there is no flash
-    assert "kotori-theme" in head
-    assert "data-theme" in head
 
 
 def test_favicon_is_shipped():

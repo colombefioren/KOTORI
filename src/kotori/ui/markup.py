@@ -116,7 +116,9 @@ def _bird() -> str:
         'stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>'
         "</svg>"
     )
-    return f'<span class="polaroid__print">{dots}{_mark(size=200, css_class="polaroid__mark")}</span>'
+    return (
+        f'<span class="polaroid__print">{dots}{_mark(size=200, css_class="polaroid__mark")}</span>'
+    )
 
 
 # ── chrome ──────────────────────────────────────────────────────────────────
@@ -174,7 +176,7 @@ def render_room_signal(active: str = "home") -> str:
 
 
 def render_masthead(settings: Settings, stats: ArchiveStats) -> str:
-    """The brand, the shelf count and the theme switch."""
+    """The brand and the shelf count."""
     kept = stats.drafts
     words = f"{stats.words} words" if stats.words else "no words yet"
     return f"""
@@ -192,11 +194,6 @@ def render_masthead(settings: Settings, stats: ArchiveStats) -> str:
       {kept} stor{"y" if kept == 1 else "ies"} kept · {words}<br>
       {escape(settings.engine_label)}
     </p>
-    <button type="button" class="theme-switch" id="ast-theme"
-            aria-label="Switch between the paper and the night desk">
-      <span class="theme-switch__dot" aria-hidden="true"></span>
-      <span data-role="theme-word">night desk</span>
-    </button>
   </div>
 </header>
 """
@@ -226,7 +223,7 @@ def render_home_intro(settings: Settings) -> str:
     </p>
     <p class="home__lede home__lede--soft">{escape(engine)}</p>
   </div>
-  <figure class="polaroid">
+  <figure class="polaroid paper-light">
     {_tape("blue", "mid")}
     {_bird()}
     <figcaption>kotori, <i>“the little bird”</i></figcaption>
@@ -268,7 +265,7 @@ def render_home_steps() -> str:
     return f"""
 <div class="home__start">
   <p class="ast-label">how it goes</p>
-  <ol class="steps">{items}</ol>
+  <ol class="steps paper-light">{items}</ol>
 </div>
 """
 
@@ -453,7 +450,7 @@ def render_deck(
     """The reader: one play button, a rule to seek on, a quiet row of extras."""
     voice: Voice = resolve_voice(draft.voice)
     return f"""
-<div class="deck" data-paper="{STAGE_PAPER}" data-story-id="{escape(draft.story_id)}"
+<div class="deck paper-light" data-paper="{STAGE_PAPER}" data-story-id="{escape(draft.story_id)}"
      data-slug="{escape(draft.slug)}" data-duration-hint="{duration_hint:.2f}"
      data-autoplay="{"1" if autoplay else "0"}"
      role="group" aria-label="story player and extras">
@@ -495,7 +492,7 @@ def render_deck(
 def render_deck_idle(message: str = "the voice arrives once a story exists") -> str:
     """The reader while there is nothing to play yet."""
     return f"""
-<div class="deck deck--idle" role="status" aria-live="polite">
+<div class="deck deck--idle paper-light" role="status" aria-live="polite">
   {_tape("blue", "left")}
   <div class="deck__top">
     <span class="ast-dots" aria-hidden="true"><i></i><i></i><i></i></span>

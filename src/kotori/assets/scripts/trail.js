@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   trail.js — the DOM bus, the paper/night-desk switch, and the cursor trail
+   trail.js — the shared DOM bus and the cursor trail
    ───────────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -51,76 +51,6 @@
       subtree: true,
     });
     schedule();
-  });
-
-  /* ── the switch between the paper and the night desk ──────────────────── */
-
-  var THEME_KEY = "kotori-theme";
-
-  function currentTheme() {
-    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-  }
-
-  function paintSwitches(theme) {
-    var word = theme === "dark" ? "paper" : "night desk";
-    Array.prototype.forEach.call(
-      document.querySelectorAll('[data-role="theme-word"]'),
-      function (node) {
-        node.textContent = word;
-      }
-    );
-    Array.prototype.forEach.call(document.querySelectorAll("#ast-theme"), function (node) {
-      node.setAttribute("data-theme", theme);
-    });
-  }
-
-  function applyTheme(theme, remember) {
-    var root = document.documentElement;
-    theme = theme === "dark" ? "dark" : "light";
-    root.setAttribute("data-theme", theme);
-    root.classList.toggle("dark", theme === "dark");
-    root.classList.remove("light", "dark-mode");
-    if (document.body) {
-      document.body.classList.toggle("dark", theme === "dark");
-    }
-    if (remember) {
-      try {
-        window.localStorage.setItem(THEME_KEY, theme);
-      } catch (error) {
-        /* private mode: the theme just will not be remembered */
-      }
-    }
-    paintSwitches(theme);
-  }
-
-  window.ASTTheme = {
-    get: currentTheme,
-    set: function (theme) {
-      applyTheme(theme, true);
-    },
-    toggle: function () {
-      applyTheme(currentTheme() === "dark" ? "light" : "dark", true);
-    },
-  };
-
-  /* one delegated listener survives every re-render of the masthead */
-  document.addEventListener("click", function (event) {
-    var node = event.target;
-    while (node && node !== document.body) {
-      if (node.id === "ast-theme") {
-        event.preventDefault();
-        window.ASTTheme.toggle();
-        return;
-      }
-      node = node.parentNode;
-    }
-  });
-
-  onReady(function () {
-    applyTheme(currentTheme(), false);
-  });
-  window.ASTBus.onUpdate(function () {
-    applyTheme(currentTheme(), false);
   });
 
   /* ── the cursor trail: pink and blue ink ──────────────────────────────── */
