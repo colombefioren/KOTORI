@@ -1,4 +1,4 @@
-"""AI Storyteller — a dark studio that writes stories and reads them aloud."""
+"""KOTORI — a pastel paper studio that writes a short story and reads it aloud."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""``python -m ai_storyteller`` launches the studio."""
+"""``python -m kotori`` launches the studio."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Environment-driven configuration for the AI Storyteller studio.
+"""Environment-driven configuration for the KOTORI studio.
 
 Every tunable lives here so the rest of the codebase stays free of ``os.getenv``.
 """
@@ -62,7 +62,7 @@ def _env_int(name: str, default: int) -> int:
 
 def ensure_writable_dir(path: Path) -> Path:
     """Create ``path``, falling back to a temp dir on read-only hosts."""
-    for candidate in (path, Path(tempfile.gettempdir()) / "ai-storyteller"):
+    for candidate in (path, Path(tempfile.gettempdir()) / "kotori"):
         try:
             candidate.mkdir(parents=True, exist_ok=True)
             probe = candidate / ".write-probe"

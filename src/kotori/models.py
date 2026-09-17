@@ -139,7 +139,7 @@ class StoryDraft:
             f"{format_duration(self.reading_seconds)} read\n"
             f"> voiced by {self.voice_label or self.voice} · {self.model}\n\n"
             f"{self.story.strip()}\n\n"
-            f"---\n*{self.created_label} · AI Storyteller*\n"
+            f"---\n*{self.created_label} · KOTORI*\n"
         )
 
     def to_dict(self) -> dict[str, Any]:
