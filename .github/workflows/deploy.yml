@@ -3,6 +3,10 @@ name: deploy
 # Delivery: tag a release (`git tag v0.2.0 && git push --tags`) to publish a
 # multi-arch image to GHCR. If a `HF_SPACE` repository variable is set, the same
 # commit is mirrored to a Hugging Face Space (needs an `HF_TOKEN` secret).
+#
+# Branch model:
+#   preprod — default branch, CI runs here
+#   prod    — stable branch; promotion = merge preprod → prod, then tag
 on:
   push:
     tags: ["v*"]
@@ -40,7 +44,7 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable={{is_tag}}
 
       - name: build and push
         uses: docker/build-push-action@v6
