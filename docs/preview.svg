@@ -1,228 +1,171 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 880" width="1200" height="880" role="img" aria-label="AI Storyteller studio interface: streaming prose with the spoken word highlighted in mint">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900"
+     role="img" aria-labelledby="title desc">
+  <title id="title">AI Storyteller — a pastel scratchbook studio</title>
+  <desc id="desc">A warm paper page holding a composer card, a story being read aloud with the
+  spoken word highlighted, a rounded player with a pastel play button, and a shelf of saved
+  stories. Drawn to match the live stylesheet.</desc>
+
   <defs>
-    <linearGradient id="canvas" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0b0b13"/>
-      <stop offset="1" stop-color="#07070c"/>
+    <filter id="wash" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="70" />
+    </filter>
+    <linearGradient id="action" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d6cbf4" />
+      <stop offset="1" stop-color="#f3c1cc" />
     </linearGradient>
-    <radialGradient id="auroraLilac" cx="0.15" cy="0.05" r="0.6">
-      <stop offset="0" stop-color="#cbb8ff" stop-opacity="0.22"/>
-      <stop offset="1" stop-color="#cbb8ff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="auroraMint" cx="0.85" cy="0" r="0.55">
-      <stop offset="0" stop-color="#96f7d2" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#96f7d2" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="auroraBlush" cx="0.5" cy="1.05" r="0.6">
-      <stop offset="0" stop-color="#ffb2cb" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#ffb2cb" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#96f7d2" stop-opacity="0.5"/>
-      <stop offset="0.55" stop-color="#96f7d2" stop-opacity="0.14"/>
-      <stop offset="1" stop-color="#96f7d2" stop-opacity="0"/>
-    </radialGradient>
     <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#96f7d2"/>
-      <stop offset="0.55" stop-color="#cbb8ff"/>
-      <stop offset="1" stop-color="#ffb2cb"/>
+      <stop offset="0" stop-color="#b7ddc8" />
+      <stop offset="0.55" stop-color="#d6cbf4" />
+      <stop offset="1" stop-color="#f3c1cc" />
     </linearGradient>
-    <pattern id="grid" width="96" height="96" patternUnits="userSpaceOnUse">
-      <path d="M96 0H0V96" fill="none" stroke="#a0a0dc" stroke-opacity="0.09" stroke-width="1"/>
-    </pattern>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#c9bcf2" stop-opacity="0.8" />
+      <stop offset="0.6" stop-color="#f3c1cc" stop-opacity="0.25" />
+      <stop offset="1" stop-color="#f3c1cc" stop-opacity="0" />
+    </radialGradient>
+    <filter id="card" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#5a4a35" flood-opacity="0.13" />
+    </filter>
     <style>
-      .mono { font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace; }
-      .sans { font-family: "Space Grotesk", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
-      .serif { font-family: "Instrument Serif", "Iowan Old Style", "Times New Roman", serif; }
-      .label { font-size: 11px; letter-spacing: 3.4px; fill: #7c7aa0; }
-      .chip { font-size: 10px; letter-spacing: 1.8px; }
-      .body { font-size: 20px; }
+      .serif { font-family: "Lora", Georgia, serif; fill: #4b3f2f; }
+      .display { font-family: "Fraunces", Georgia, serif; fill: #4b3f2f; }
+      .sans { font-family: "Karla", "Helvetica Neue", Arial, sans-serif; fill: #4b3f2f; }
+      .label { font-family: "Karla", Arial, sans-serif; fill: #a79579; font-size: 12px;
+               letter-spacing: 2.4px; text-transform: uppercase; }
+      .hand { font-family: "Caveat", "Segoe Script", cursive; fill: #7c6c57; }
+      .faint { fill: #a79579; }
     </style>
   </defs>
 
-  <!-- canvas -->
-  <rect width="1200" height="880" fill="url(#canvas)"/>
-  <rect width="1200" height="880" fill="url(#grid)"/>
-  <rect width="1200" height="880" fill="url(#auroraLilac)"/>
-  <rect width="1200" height="880" fill="url(#auroraMint)"/>
-  <rect width="1200" height="880" fill="url(#auroraBlush)"/>
-
-  <!-- ticker -->
-  <rect x="0" y="0" width="1200" height="38" fill="#101021"/>
-  <line x1="0" y1="38" x2="1200" y2="38" stroke="#2a2a48" stroke-width="2"/>
-  <text class="mono label" x="30" y="24" fill="#b6b3d8">STREAMED PROSE</text>
-  <text x="164" y="24" fill="#96f7d2" font-size="11">✦</text>
-  <text class="mono label" x="186" y="24" fill="#b6b3d8">SYNTHESISED VOICE</text>
-  <text x="352" y="24" fill="#cbb8ff" font-size="11">✦</text>
-  <text class="mono label" x="374" y="24" fill="#b6b3d8">KARAOKE TELEPROMPTER</text>
-  <text x="576" y="24" fill="#96f7d2" font-size="11">✦</text>
-  <text class="mono label" x="598" y="24" fill="#b6b3d8">LOCAL ARCHIVE</text>
-  <text x="742" y="24" fill="#cbb8ff" font-size="11">✦</text>
-  <text class="mono label" x="764" y="24" fill="#b6b3d8">NO ACCOUNTS, NO TRACKING</text>
-  <text x="994" y="24" fill="#96f7d2" font-size="11">✦</text>
-  <text class="mono label" x="1016" y="24" fill="#b6b3d8">PRESS ? FOR SHORTCUTS</text>
-
-  <!-- hero -->
-  <g transform="translate(56, 92)">
-    <rect x="0" y="0" width="218" height="30" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
-    <circle cx="18" cy="15" r="4" fill="#96f7d2"/>
-    <text class="mono label" x="32" y="19" fill="#7c7aa0">AI STORYTELLER · V0.2.0</text>
+  <rect width="1200" height="900" fill="#f7f1e7" />
+  <g filter="url(#wash)" opacity="0.9">
+    <ellipse cx="90" cy="30" rx="260" ry="160" fill="#d6cbf4" opacity="0.7" />
+    <ellipse cx="1120" cy="80" rx="240" ry="150" fill="#b7ddc8" opacity="0.65" />
+    <ellipse cx="620" cy="900" rx="460" ry="190" fill="#f3c1cc" opacity="0.55" />
+  </g>
+  <g opacity="0.5">
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#7a6850" opacity="0.22" />
+    </pattern>
+    <rect width="1200" height="900" fill="url(#dots)" />
   </g>
 
-  <text class="sans" x="56" y="188" font-size="74" font-weight="700" fill="#f5f4ff" letter-spacing="-3">STORIES</text>
-  <text class="serif" x="56" y="252" font-size="76" font-style="italic" fill="#96f7d2" letter-spacing="-1">that speak</text>
-  <text class="sans" x="56" y="316" font-size="74" font-weight="700" fill="none" stroke="#cbb8ff" stroke-width="1.4" letter-spacing="-3">FOR THEMSELVES</text>
-
-  <g class="serif" font-size="19" fill="#b6b3d8">
-    <text x="600" y="150">A writer and a voice in one dark room. Type a</text>
-    <text x="600" y="178">topic, watch the prose arrive word by word, then</text>
-    <text x="600" y="206">let <tspan fill="#f5f4ff">deepseek-v4-pro</tspan> read it back while every</text>
-    <text x="600" y="234">word lights up in time with the audio.</text>
+  <!-- masthead -->
+  <g>
+    <rect x="60" y="46" width="316" height="34" rx="17" fill="#fffdf8" stroke="#ecdfca" />
+    <circle cx="82" cy="63" r="5" fill="#7cb79b" />
+    <text x="96" y="68" class="label">AI Storyteller</text>
+    <text x="246" y="68" class="label" style="letter-spacing:0;text-transform:none">v0.2.0</text>
+    <text x="60" y="140" class="display" font-size="46" font-weight="500">
+      Stories that <tspan fill="#a795e0" font-style="italic">speak</tspan> for themselves
+    </text>
+    <text x="60" y="172" class="serif" font-size="16" fill="#7c6c57">
+      Write a topic, watch the story arrive word by word, then let it read itself back to you.
+    </text>
+    <text x="60" y="202" class="label" style="font-size:11px">streamed prose ✽ a small voice ✽ karaoke ✽ a shelf you keep</text>
   </g>
-  <g class="mono label" font-size="10">
-    <text x="1050" y="150" fill="#f5f4ff">STORIES THAT SPEAK</text>
-    <text x="1050" y="172">STREAMED PROSE</text>
-    <text x="1050" y="192">KARAOKE PLAYBACK</text>
-    <text x="1050" y="212">MP3 · MARKDOWN</text>
-    <text x="1050" y="232">JSONL ARCHIVE</text>
-  </g>
-  <line x1="1034" y1="136" x2="1034" y2="240" stroke="#cbb8ff" stroke-width="3"/>
-
-  <!-- stat strip -->
-  <g transform="translate(56, 352)">
-    <rect x="0" y="0" width="1088" height="66" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
-    <g class="mono label" font-size="10">
-      <text x="22" y="24">DRAFTS ARCHIVED</text>
-      <text x="240" y="24">WORDS WRITTEN</text>
-      <text x="458" y="24">MINUTES VOICED</text>
-      <text x="676" y="24">DOMINANT GENRE</text>
-      <text x="894" y="24">ENGINE</text>
-    </g>
-    <g class="sans" font-size="26" font-weight="700">
-      <text x="22" y="54" fill="#96f7d2">38</text>
-      <text x="240" y="54" fill="#cbb8ff">9,412</text>
-      <text x="458" y="54" fill="#ffb2cb">61</text>
-      <text x="676" y="54" fill="#ffe8a3">Noir</text>
-      <text x="894" y="54" fill="#a6d8ff" font-size="19">deepseek-v4-pro</text>
-    </g>
-    <line x1="218" y1="10" x2="218" y2="56" stroke="#2a2a48" stroke-width="2"/>
-    <line x1="436" y1="10" x2="436" y2="56" stroke="#2a2a48" stroke-width="2"/>
-    <line x1="654" y1="10" x2="654" y2="56" stroke="#2a2a48" stroke-width="2"/>
-    <line x1="872" y1="10" x2="872" y2="56" stroke="#2a2a48" stroke-width="2"/>
-  </g>
-
-  <!-- section labels -->
-  <g class="mono label" font-size="10">
-    <text x="56" y="462" letter-spacing="3.4">01 / COMPOSER</text>
-    <text x="512" y="462" letter-spacing="3.4">02 / STAGE</text>
-  </g>
-  <line x1="190" y1="458" x2="470" y2="458" stroke="#2a2a48" stroke-width="2" stroke-dasharray="8 6"/>
-  <line x1="640" y1="458" x2="1144" y2="458" stroke="#2a2a48" stroke-width="2" stroke-dasharray="8 6"/>
 
   <!-- composer -->
-  <g transform="translate(56, 474)">
-    <rect x="0" y="0" width="414" height="350" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
-    <rect x="6" y="6" width="414" height="350" fill="none" stroke="#000" stroke-opacity="0.85" stroke-width="6" stroke-dasharray="0"/>
+  <g filter="url(#card)">
+    <rect x="60" y="238" width="368" height="330" rx="18" fill="#fffdf8" stroke="#ecdfca" />
+  </g>
+  <text x="88" y="276" class="label">what should happen?</text>
+  <rect x="88" y="290" width="312" height="104" rx="12" fill="#fdf8f0" stroke="#ecdfca" />
+  <text x="106" y="322" class="serif" font-size="15" fill="#a79579" font-style="italic">
+    a lighthouse keeper who receives
+  </text>
+  <text x="106" y="346" class="serif" font-size="15" fill="#a79579" font-style="italic">
+    letters from a ship that sank
+  </text>
+  <text x="106" y="370" class="serif" font-size="15" fill="#a79579" font-style="italic">
+    in 1912
+  </text>
 
-    <text class="mono label" x="24" y="32">THE SEED</text>
-    <rect x="24" y="44" width="366" height="74" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
-    <g class="sans" font-size="15" fill="#7c7aa0" font-style="italic">
-      <text x="38" y="74">a lighthouse keeper who receives</text>
-      <text x="38" y="98">letters from a ship that sank in 1912</text>
-    </g>
+  <rect x="88" y="412" width="196" height="46" rx="23" fill="url(#action)" />
+  <text x="118" y="441" class="sans" font-size="14" font-weight="600">write the story</text>
+  <rect x="296" y="412" width="104" height="46" rx="23" fill="#fffdf8" stroke="#ddc9ac" />
+  <text x="318" y="441" class="sans" font-size="13" fill="#7c6c57">surprise me</text>
 
-    <g>
-      <rect x="24" y="134" width="146" height="36" fill="#96f7d2" stroke="#000" stroke-width="2"/>
-      <text class="mono chip" x="52" y="157" fill="#07070c" letter-spacing="2.4">IGNITE STORY</text>
-      <rect x="182" y="134" width="122" height="36" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
-      <text class="mono chip" x="200" y="157" fill="#f5f4ff">SURPRISE ME</text>
-      <rect x="316" y="134" width="74" height="36" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
-      <text class="mono chip" x="334" y="157" fill="#f5f4ff">STOP</text>
-    </g>
+  <line x1="88" y1="488" x2="400" y2="488" stroke="#ecdfca" stroke-dasharray="4 5" />
+  <text x="88" y="516" class="sans" font-size="12" fill="#a79579">more settings</text>
+  <text x="88" y="546" class="sans" font-size="12" fill="#7c6c57">genre · mood · voice · length</text>
+  <circle cx="94" cy="576" r="5" fill="#7cb79b" />
+  <text x="108" y="581" class="sans" font-size="12" fill="#7c6c57">warming up the pen…</text>
 
-    <text class="mono label" x="24" y="200">GENRE</text>
-    <g class="mono chip" font-size="10">
-      <rect x="24" y="210" width="70" height="26" rx="13" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
-      <text x="40" y="227" fill="#b6b3d8">FOLK</text>
-      <rect x="102" y="210" width="128" height="26" rx="13" fill="#cbb8ff" stroke="#000" stroke-width="2"/>
-      <text x="118" y="227" fill="#07070c">SCIENCE FICTION</text>
-      <rect x="238" y="210" width="72" height="26" rx="13" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
-      <text x="254" y="227" fill="#b6b3d8">NOIR</text>
-      <rect x="318" y="210" width="72" height="26" rx="13" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
-      <text x="334" y="227" fill="#b6b3d8">FABLE</text>
-    </g>
-
-    <text class="mono label" x="24" y="264">MOOD</text>
-    <text class="mono label" x="200" y="264">VOICE</text>
-    <rect x="24" y="274" width="164" height="34" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
-    <text class="sans" x="38" y="296" font-size="15" fill="#f5f4ff">Eerie</text>
-    <rect x="200" y="274" width="190" height="34" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
-    <text class="sans" x="214" y="296" font-size="15" fill="#f5f4ff">Camber — English · UK</text>
-
-    <text class="mono label" x="24" y="330">LENGTH · WORDS</text>
-    <text class="mono label" x="360" y="330" fill="#96f7d2">260</text>
-    <rect x="24" y="338" width="366" height="6" fill="#1d1d38"/>
-    <rect x="24" y="338" width="200" height="6" fill="#96f7d2"/>
-    <circle cx="224" cy="341" r="9" fill="#96f7d2" stroke="#000" stroke-width="2"/>
+  <!-- stage -->
+  <g filter="url(#card)">
+    <rect x="458" y="238" width="682" height="330" rx="18" fill="#fffdf8" stroke="#ecdfca" />
+  </g>
+  <g class="sans" font-size="11">
+    <rect x="482" y="262" width="104" height="26" rx="13" fill="#e6f3ec" stroke="#b7ddc8" />
+    <text x="498" y="279" fill="#5f9880">187 words</text>
+    <rect x="594" y="262" width="112" height="26" rx="13" fill="#ede8fb" stroke="#d6cbf4" />
+    <text x="610" y="279" fill="#8674c4">1:14 to read</text>
+    <rect x="714" y="262" width="74" height="26" rx="13" fill="#fdf8f0" stroke="#ecdfca" />
+    <text x="732" y="279" fill="#7c6c57">Noir</text>
+    <rect x="796" y="262" width="122" height="26" rx="13" fill="#fdeef2" stroke="#f3c1cc" />
+    <text x="812" y="279" fill="#c07d90">Aurora · US</text>
+    <rect x="926" y="262" width="96" height="26" rx="13" fill="#fdf6e2" stroke="#f8e6b2" />
+    <text x="944" y="279" fill="#b9983f">archived</text>
   </g>
 
-  <!-- meta chips -->
-  <g class="mono chip" font-size="10">
-    <rect x="512" y="472" width="96" height="24" fill="#07070c" stroke="#96f7d2" stroke-width="2"/>
-    <text x="524" y="488" fill="#96f7d2">152 WORDS</text>
-    <rect x="616" y="472" width="96" height="24" fill="#07070c" stroke="#cbb8ff" stroke-width="2"/>
-    <text x="628" y="488" fill="#cbb8ff">1:02 READ</text>
-    <rect x="720" y="472" width="70" height="24" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
-    <text x="732" y="488" fill="#b6b3d8">NOIR</text>
-    <rect x="798" y="472" width="86" height="24" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
-    <text x="810" y="488" fill="#b6b3d8">TENSE</text>
-    <rect x="892" y="472" width="150" height="24" fill="#07070c" stroke="#ffb2cb" stroke-width="2"/>
-    <text x="904" y="488" fill="#ffb2cb">CAMBER — ENGLISH · UK</text>
+  <rect x="482" y="304" width="634" height="240" rx="12" fill="#fdf8f0" stroke="#ecdfca" />
+  <line x1="515" y1="304" x2="515" y2="544" stroke="#d98ea2" stroke-opacity="0.35" />
+  <circle cx="724" cy="406" r="76" fill="url(#halo)" />
+  <text x="530" y="346" class="serif" font-size="17">
+    The lighthouse keeper had letters again. They arrived
+  </text>
+  <text x="530" y="382" class="serif" font-size="17">
+    with the tide, sealed in wax the colour of old blood,
+  </text>
+  <rect x="684" y="399" width="59" height="27" rx="6" fill="#f8e6b2" />
+  <text x="530" y="419" class="serif" font-size="17">
+    addressed in her <tspan x="688">own</tspan><tspan x="750"> hand, and the wax</tspan>
+  </text>
+  <text x="530" y="455" class="serif" font-size="17" fill="#a79579">
+    was still warm. The first one asked her to keep the lamp
+  </text>
+  <text x="530" y="491" class="serif" font-size="17" fill="#a79579">
+    lit on the sixteenth of March.
+  </text>
+
+  <!-- player -->
+  <g filter="url(#card)">
+    <rect x="458" y="586" width="682" height="152" rx="18" fill="#fffdf8" stroke="#ecdfca" />
+  </g>
+  <circle cx="524" cy="646" r="31" fill="url(#action)" />
+  <path d="M518 633 l18 13 -18 13 z" fill="#4b3f2f" />
+  <text x="576" y="626" class="label" style="font-size:11px">now speaking: “own”</text>
+  <rect x="576" y="636" width="392" height="12" rx="6" fill="#fdf8f0" stroke="#ecdfca" />
+  <rect x="576" y="636" width="164" height="12" rx="6" fill="url(#rail)" />
+  <text x="982" y="647" class="sans" font-size="12" fill="#a79579">0:31 / 1:14</text>
+  <line x1="482" y1="676" x2="1116" y2="676" stroke="#ecdfca" stroke-dasharray="4 5" />
+  <g class="sans" font-size="12" fill="#7c6c57">
+    <rect x="482" y="694" width="112" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
+    <text x="498" y="713">↺ from the top</text>
+    <rect x="604" y="694" width="120" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
+    <text x="620" y="713">↓ save the mp3</text>
+    <rect x="734" y="694" width="130" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
+    <text x="750" y="713">⧉ copy the words</text>
+    <rect x="874" y="694" width="128" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
+    <text x="890" y="713">↗ share a link</text>
   </g>
 
-  <!-- paper -->
-  <g>
-    <rect x="512" y="506" width="632" height="176" fill="#07070c" stroke="#96f7d2" stroke-width="2"/>
-    <circle cx="876" cy="586" r="86" fill="url(#halo)"/>
-    <g class="serif" font-size="19" fill="#6f6f92">
-      <text x="536" y="546" fill="#f5f4ff">The lighthouse keeper had <tspan fill="#f5f4ff">letters</tspan> again. They arrived with the</text>
-      <text x="536" y="574" fill="#f5f4ff">tide, sealed in wax the colour of old blood, addressed in her</text>
-      <text x="536" y="602" fill="#f5f4ff">own hand. The first one asked her to keep</text>
-      <text x="866" y="602" fill="#07070c"> </text>
-      <text x="536" y="630" fill="#f5f4ff">the lamp lit on the sixteenth of March. The</text>
-      <text x="536" y="658">second apologised for something she had not done yet.</text>
-    </g>
-    <rect x="846" y="586" width="62" height="24" fill="#96f7d2"/>
-    <text class="serif" x="852" y="604" font-size="19" fill="#07070c">lamp</text>
-    <rect x="914" y="588" width="10" height="20" fill="#96f7d2"/>
+  <!-- shelf -->
+  <g filter="url(#card)">
+    <rect x="60" y="586" width="368" height="262" rx="18" fill="#fffdf8" stroke="#ecdfca" />
   </g>
+  <text x="88" y="622" class="label">your shelf</text>
+  <g font-size="13">
+    <rect x="88" y="640" width="312" height="58" rx="12" fill="#ede8fb" stroke="#d6cbf4" />
+    <text x="104" y="663" class="sans" font-weight="600">⟡ The lighthouse keeper</text>
+    <text x="104" y="683" class="sans" font-size="11" fill="#7c6c57">Noir · 187 words · 17 Sep</text>
 
-  <!-- deck -->
-  <g transform="translate(512, 694)">
-    <rect x="0" y="0" width="632" height="140" fill="#16162c" stroke="#2a2a48" stroke-width="2"/>
-    <circle cx="42" cy="40" r="26" fill="#96f7d2" stroke="#000" stroke-width="2"/>
-    <path d="M36 30 L54 40 L36 50 Z" fill="#07070c"/>
-    <text class="mono label" x="82" y="36" font-size="10">NOW SPEAKING · CAMBER</text>
-    <text class="serif" x="82" y="58" font-size="16" fill="#f5f4ff" font-style="italic">now speaking: “lamp”</text>
-    <rect x="82" y="72" width="420" height="14" fill="#07070c" stroke="#2a2a48" stroke-width="2"/>
-    <rect x="82" y="72" width="196" height="14" fill="url(#rail)"/>
-    <text class="mono" x="516" y="84" font-size="11" fill="#b6b3d8">0:38 / 1:02</text>
-
-    <g class="mono chip" font-size="9">
-      <rect x="82" y="100" width="126" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
-      <text x="94" y="117" fill="#f5f4ff">↺ FROM THE TOP</text>
-      <rect x="216" y="100" width="112" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
-      <text x="228" y="117" fill="#f5f4ff">⧉ COPY PROSE</text>
-      <rect x="336" y="100" width="118" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
-      <text x="348" y="117" fill="#f5f4ff">↓ MARKDOWN</text>
-      <rect x="462" y="100" width="122" height="26" fill="#101021" stroke="#2a2a48" stroke-width="2"/>
-      <text x="474" y="117" fill="#f5f4ff">↓ MP3 · LINK</text>
-    </g>
+    <rect x="88" y="708" width="312" height="58" rx="12" fill="#fdf8f0" stroke="#ecdfca" />
+    <text x="104" y="731" class="sans" font-weight="600">⟡ The last video rental on the moon</text>
+    <text x="104" y="751" class="sans" font-size="11" fill="#7c6c57">Science Fiction · 240 words · 16 Sep</text>
   </g>
-
-  <!-- footer -->
-  <line x1="56" y1="852" x2="1144" y2="852" stroke="#2a2a48" stroke-width="2"/>
-  <g class="mono label" font-size="10">
-    <text x="56" y="872">AI STORYTELLER · STORIES THAT SPEAK · BUILT WITH GRADIO 6</text>
-    <text x="1000" y="872">SPACE = PLAY · → = SCRUB 5S</text>
-  </g>
+  <rect x="88" y="780" width="156" height="42" rx="21" fill="#fffdf8" stroke="#ddc9ac" />
+  <text x="110" y="806" class="sans" font-size="13" fill="#7c6c57">delete this story</text>
+  <text x="264" y="806" class="hand" font-size="19">pick one to hear it again</text>
 </svg>
