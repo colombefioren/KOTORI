@@ -172,18 +172,18 @@
         var previous = points[i - 1];
         var point = points[i];
         var ratio = i / points.length;
-        context.globalAlpha = ratio * 0.4;
+        context.globalAlpha = ratio * 0.3;
         context.strokeStyle = point.colour;
-        context.lineWidth = ratio * 2.4 + 0.3;
+        context.lineWidth = ratio * 3.2 + 0.4;
         context.beginPath();
         context.moveTo(previous.x, previous.y);
         context.lineTo(point.x, point.y);
         context.stroke();
       }
-      context.globalAlpha = 0.45;
+      context.globalAlpha = 0.34;
       context.fillStyle = COLOURS[colourIndex];
       context.beginPath();
-      context.arc(head.x, head.y, 2.4, 0, Math.PI * 2);
+      context.arc(head.x, head.y, 2.8, 0, Math.PI * 2);
       context.fill();
       context.globalAlpha = 1;
     }
