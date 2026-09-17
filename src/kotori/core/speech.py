@@ -29,7 +29,7 @@ class Voice:
 
     @property
     def choice(self) -> str:
-        return f"{self.label} — {self.region}"
+        return f"{self.label} · {self.region}"
 
 
 VOICES: tuple[Voice, ...] = (

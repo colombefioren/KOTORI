@@ -36,7 +36,7 @@ def draft() -> StoryDraft:
         genre="Noir",
         mood="Tense",
         voice="camber",
-        voice_label="Camber — English · UK",
+        voice_label="Camber · English · UK",
         elapsed_ms=2500,
     )
 

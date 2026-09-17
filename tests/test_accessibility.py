@@ -31,7 +31,7 @@ def draft() -> StoryDraft:
         genre="Noir",
         mood="Tense",
         voice="aurora",
-        voice_label="Aurora — English · US",
+        voice_label="Aurora · English · US",
     )
 
 

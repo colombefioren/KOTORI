@@ -103,7 +103,7 @@ def test_markdown_export_carries_the_metadata():
         story="She waited.",
         genre="Noir",
         mood="Tense",
-        voice_label="Camber — English · UK",
+        voice_label="Camber · English · UK",
         model="test-model",
     )
     markdown = draft.markdown()

@@ -95,7 +95,7 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
                             genre = gr.Dropdown(
                                 choices=GENRE_LABELS,
                                 value=DEFAULT_GENRE,
-                                label="genre — pick one, or paste your own",
+                                label="genre, pick one or paste your own",
                                 allow_custom_value=True,
                             )
                             with gr.Row():
@@ -136,7 +136,7 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
                             elem_id="ast-deck",
                         )
                         gr.HTML(
-                            '<p class="handnote">every story is four hundred words — '
+                            '<p class="handnote">every story is four hundred words: '
                             "long enough to have weather, short enough for a coffee.</p>"
                         )
 
