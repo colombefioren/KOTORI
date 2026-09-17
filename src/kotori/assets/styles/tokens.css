@@ -1,36 +1,41 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    KOTORI · design tokens
-   A washi-tape scrapbook: pink and blue pastels on paper, two themes (light and
-   dark), hand-drawn outlines, typewriter labels and handwriting in the margins.
+
+   A paper scrapbook in pink and blue pastels. Two desks: the day desk (light)
+   and the night desk (dark). Every colour is cut from the same two pastel
+   families, so tape, highlighter and stamps agree in both rooms.
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
   color-scheme: light;
 
-  /* washi — the two pastel families everything is cut from */
-  --pink-100: #fdeff4;
-  --pink-200: #f9d8e4;
-  --pink-300: #f3bcd0;
-  --pink-400: #e28bad;
-  --pink-500: #c06590;
-  --blue-100: #ebf2fc;
-  --blue-200: #d6e5f8;
-  --blue-300: #b4cdf0;
-  --blue-400: #7fa8dd;
-  --blue-500: #5d86bb;
+  /* ── washi: the two pastels everything is cut from ─────────────────────── */
+  --pink-100: #fdeef4;
+  --pink-200: #f9d5e4;
+  --pink-300: #f2b3cd;
+  --pink-400: #e288ae;
+  --pink-500: #bd5f8b;
+  --blue-100: #edf3fd;
+  --blue-200: #d8e7fa;
+  --blue-300: #b3d0f2;
+  --blue-400: #82aae0;
+  --blue-500: #5b83b6;
 
-  /* paper and desk */
-  --desk: #f6eef2;
-  --paper: #fffdfb;
-  --paper-2: #fdf7f6;
-  --paper-3: #f8efee;
-  --line: #ecdde2;
-  --line-2: #dcc6ce;
-  --ink: #3a3542;
-  --ink-2: #6d6675;
-  --ink-3: #9c94a3;
+  /* ── the desk and the paper on it ──────────────────────────────────────── */
+  --desk: #f2e8ee;
+  --desk-2: #e8dde9;
+  --paper: #fffdfa;
+  --paper-2: #fdf7f8;
+  --paper-3: #f7eef2;
+  --cream: #fdf9f0;
+  --sky: #f4f8fe;
+  --line: #e8dbe2;
+  --line-2: #cdbac5;
+  --ink: #443b48;
+  --ink-2: #6f6573;
+  --ink-3: #9d94a2;
 
-  /* accents */
+  /* ── accents ───────────────────────────────────────────────────────────── */
   --accent: var(--pink-400);
   --accent-2: var(--blue-400);
   --accent-soft: var(--pink-100);
@@ -39,32 +44,43 @@
   --danger: var(--pink-500);
 
   /* how tape behaves on this paper */
+  --tape-alpha: 0.9;
   --tape-blend: multiply;
-  --tape-alpha: 0.88;
+  --tape-shine: rgba(255, 255, 255, 0.5);
 
-  /* hand-drawn geometry */
-  --wobble: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  --wobble-sm: 125px 10px 115px 8px / 8px 115px 10px 125px;
-  --wobble-card: 22px 20px 24px 18px / 20px 24px 18px 22px;
+  /* ── paper geometry: straight, but never machine-straight ──────────────── */
+  --edge-card: 7px 11px 8px 12px;
+  --edge-sheet: 4px 7px 5px 8px;
+  --edge-label: 8px 9px 6px 10px;
+  --edge-tab: 9px 11px 0 0;
+  --torn-bottom: polygon(
+    0 0, 100% 0, 100% 95.6%, 97% 99.1%, 94% 96.4%, 91% 99.5%, 88% 96.9%,
+    85% 99.2%, 82% 95.8%, 79% 99.4%, 76% 96.6%, 73% 99%, 70% 96.2%,
+    67% 99.3%, 64% 95.9%, 61% 99.5%, 58% 96.8%, 55% 99.1%, 52% 96.1%,
+    49% 99.4%, 46% 96.5%, 43% 99.2%, 40% 95.7%, 37% 99.5%, 34% 96.9%,
+    31% 99%, 28% 96.3%, 25% 99.3%, 22% 95.9%, 19% 99.6%, 16% 96.6%,
+    13% 99.2%, 10% 96.4%, 7% 99.5%, 4% 96%, 2% 99.1%, 0 96.8%
+  );
 
-  --shadow-1: 0 1px 1px rgba(58, 53, 66, 0.05), 0 6px 14px -12px rgba(58, 53, 66, 0.5);
-  --shadow-2: 0 2px 3px rgba(58, 53, 66, 0.04), 0 20px 34px -28px rgba(58, 53, 66, 0.65);
-  --shadow-tape: 0 1px 2px rgba(58, 53, 66, 0.12);
+  --shadow-1: 0 1px 1px rgba(68, 59, 72, 0.05), 0 5px 12px -10px rgba(68, 59, 72, 0.55);
+  --shadow-2: 0 2px 3px rgba(68, 59, 72, 0.05), 0 18px 30px -26px rgba(68, 59, 72, 0.6);
+  --drop-sheet: drop-shadow(0 14px 16px rgba(68, 59, 72, 0.16));
+  --sticker-shadow: 2px 3px 0 var(--line-2);
 
-  /* type */
+  /* ── type: a book face, a Garamond, a friendly sans, a marker, a typewriter */
   --display: "Fraunces", "Iowan Old Style", Georgia, serif;
   --serif: "EB Garamond", Garamond, Georgia, serif;
   --ui: "Karla", ui-sans-serif, system-ui, sans-serif;
-  --hand: "Kalam", "Bradley Hand", cursive;
+  --hand: "Kalam", "Bradley Hand", "Comic Sans MS", cursive;
   --type: "Special Elite", "Courier New", monospace;
 
-  /* rhythm */
-  --gap: 22px;
-  --pad: 24px;
-  --max: 1120px;
-  --sheet-line: 34px;
+  /* ── rhythm ────────────────────────────────────────────────────────────── */
+  --gap: 24px;
+  --pad: 26px;
+  --max: 1140px;
+  --sheet-line: 35px;
 
-  /* the grain and the weave, drawn once */
+  /* the grain of the paper, drawn once */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.34'/%3E%3C/svg%3E");
 }
 
@@ -74,30 +90,29 @@
 :root.dark {
   color-scheme: dark;
 
-  --desk: #191722;
-  --paper: #232030;
-  --paper-2: #1e1b29;
-  --paper-3: #2b2739;
-  --line: #38334a;
-  --line-2: #4c4562;
+  --desk: #191725;
+  --desk-2: #221e2f;
+  --paper: #262233;
+  --paper-2: #221f2e;
+  --paper-3: #2d2839;
+  --cream: #2a2636;
+  --sky: #1f2436;
+  --line: #3a3449;
+  --line-2: #514863;
   --ink: #f4eff8;
-  --ink-2: #c5bcd1;
-  --ink-3: #8e86a1;
+  --ink-2: #c6bdd2;
+  --ink-3: #8f87a3;
 
-  --accent-soft: #33283c;
-  --accent-soft-2: #262f45;
-  --highlight: var(--blue-400);
+  --tape-alpha: 0.55;
+  --tape-shine: rgba(255, 255, 255, 0.14);
 
-  /* tape reads as tape, not as paint, on a dark page */
-  --tape-blend: multiply;
-  --tape-alpha: 0.62;
-
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.35), 0 22px 36px -30px rgba(0, 0, 0, 0.9);
-  --shadow-tape: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.42);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 34px -28px rgba(0, 0, 0, 0.9);
+  --drop-sheet: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.5));
+  --sticker-shadow: 2px 3px 0 #14121d;
 }
 
-/* ── the desk ──────────────────────────────────────────────────────────────── */
+/* ── the desk itself ───────────────────────────────────────────────────────── */
 
 body,
 .gradio-container {
@@ -108,12 +123,25 @@ body,
 }
 
 .gradio-container {
+  /* a linen weave, with two pastel washes dried into it */
   background-color: var(--desk) !important;
   background-image:
-    repeating-linear-gradient(90deg, rgba(192, 101, 144, 0.035) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(0deg, rgba(93, 134, 187, 0.035) 0 1px, transparent 1px 3px);
+    radial-gradient(46% 34% at 12% 4%, rgba(242, 179, 205, 0.34), transparent 70%),
+    radial-gradient(40% 30% at 92% 10%, rgba(179, 208, 242, 0.32), transparent 72%),
+    radial-gradient(52% 40% at 78% 96%, rgba(249, 213, 228, 0.26), transparent 74%),
+    repeating-linear-gradient(90deg, rgba(68, 59, 72, 0.035) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(68, 59, 72, 0.03) 0 1px, transparent 1px 4px);
   max-width: 100% !important;
   padding: 0 !important;
+}
+
+:root[data-theme="dark"] .gradio-container,
+:root.dark .gradio-container {
+  background-image:
+    radial-gradient(46% 34% at 12% 4%, rgba(189, 95, 139, 0.22), transparent 70%),
+    radial-gradient(40% 30% at 92% 10%, rgba(91, 131, 182, 0.24), transparent 72%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 4px);
 }
 
 /* paper grain over the whole desk */
@@ -123,7 +151,7 @@ body,
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.28;
+  opacity: 0.22;
   mix-blend-mode: soft-light;
   background-image: var(--grain);
 }
@@ -134,9 +162,8 @@ body,
 }
 
 *:focus-visible {
-  outline: 2px solid var(--blue-400);
+  outline: 2px dashed var(--pink-400);
   outline-offset: 3px;
-  border-radius: 4px;
 }
 
 * {
