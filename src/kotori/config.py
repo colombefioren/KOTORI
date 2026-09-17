@@ -20,7 +20,7 @@ DEFAULT_DATA_DIR = PROJECT_ROOT / "data"
 
 APP_NAME = "KOTORI"
 APP_TAGLINE = "a little bird that tells you stories"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 
 #: The length every story is written to. There is no slider any more.
 STORY_WORDS = 400
