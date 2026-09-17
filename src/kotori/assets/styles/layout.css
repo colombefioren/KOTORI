@@ -275,7 +275,15 @@
 /* the composer's fields, spaced like items in a notebook */
 .ast-stack {
   display: grid;
-  gap: 24px;
+  gap: 30px;
+}
+
+/* the label above the fields, the fields, and the sticky note below all sit
+   in one flex column whose gap Gradio sets from its own spacing scale; this
+   room asked for more air twice over, so it gets a wider gap explicitly
+   rather than whatever the theme's default happens to be. */
+#ast-composer {
+  gap: 30px !important;
 }
 
 .home__kicker {
