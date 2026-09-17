@@ -38,6 +38,26 @@ STAGE_PAPER = "paper-stage"
 # ── small paper helpers ─────────────────────────────────────────────────────
 
 
+def _play_glyph() -> str:
+    """The play/pause icon: a geometric SVG triangle, not a font glyph.
+
+    The Unicode ▶ character sits inside its own em-box off-centre (fonts pad
+    it differently), so no amount of nudging it with a fixed translateX ever
+    optically centred it across browsers and platforms. A hand-drawn
+    triangle in its own square viewBox is centred by construction. Both
+    states are drawn once and toggled with the ``is-playing`` class, which
+    ``deck.js`` sets instead of rewriting text content.
+    """
+    return (
+        '<span data-role="glyph" class="glyph">'
+        '<svg class="glyph__play" viewBox="0 0 24 24" aria-hidden="true">'
+        '<path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>'
+        '<svg class="glyph__pause" viewBox="0 0 24 24" aria-hidden="true">'
+        '<path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>'
+        "</span>"
+    )
+
+
 def _tape(colour: str = "", side: str = "left") -> str:
     """A strip of washi tape, stuck over an edge."""
     cls = "tape"
@@ -464,7 +484,7 @@ def render_deck(
   <div class="deck__top">
     <button type="button" class="deck__play" data-role="toggle"
             aria-label="Play or pause the spoken story">
-      <span data-role="glyph">▶</span>
+      {_play_glyph()}
     </button>
     <div class="deck__body">
       <p class="deck__label">now speaking · <b data-role="caption">{escape(voice.choice)}</b></p>
@@ -533,7 +553,7 @@ def _index_card(draft: StoryDraft, audio_src: str | None) -> str:
        role="group" aria-label="player for {escape(draft.title)}">
     <audio class="mini__audio" preload="none" src="{escape(audio_src, quote=True)}"></audio>
     <button type="button" class="mini__play" data-role="toggle"
-            aria-label="Play or pause this story"><span data-role="glyph">▶</span></button>
+            aria-label="Play or pause this story">{_play_glyph()}</button>
     <div class="mini__rail" data-role="rail" role="slider" aria-label="Seek in this story"
          aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
       <div class="mini__fill" data-role="fill"></div>

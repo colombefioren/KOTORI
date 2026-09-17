@@ -183,7 +183,7 @@
 
     function reflect(on) {
       var glyph = node.querySelector('[data-role="glyph"]');
-      if (glyph) glyph.textContent = on ? "❚❚" : "▶";
+      if (glyph) glyph.classList.toggle("is-playing", on);
     }
 
     function time() {
