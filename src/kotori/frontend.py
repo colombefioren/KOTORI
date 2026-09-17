@@ -75,7 +75,7 @@ def head_html(settings: Settings | None = None) -> str:
     fonts = "&".join(FONT_REQUESTS)
     default = (settings.theme if settings else "light") or "light"
     return (
-        '<meta name="theme-color" content="#f6eef2" />\n'
+        '<meta name="theme-color" content="#f2e8ee" />\n'
         '<meta name="color-scheme" content="light dark" />\n'
         '<meta property="og:title" content="KOTORI" />\n'
         '<meta property="og:description" content="A pastel paper studio that writes a short '
@@ -83,14 +83,19 @@ def head_html(settings: Settings | None = None) -> str:
         '<link rel="preconnect" href="https://fonts.googleapis.com" />\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n'
         f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?{fonts}&display=swap" />\n'
-        # paint in the right theme before the first frame, so there is no flash
-        "<script>(function(){try{var saved=localStorage.getItem('kotori-theme');"
+        # paint in the right theme (and the right room) before the first frame
+        "<script>(function(){var root=document.documentElement;"
+        "root.setAttribute('data-room','home');"
+        "try{var saved=localStorage.getItem('kotori-theme');"
         f"var theme=saved||'{default}';"
         "if(!saved&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)"
         "{theme='dark';}"
-        "document.documentElement.setAttribute('data-theme',theme);"
-        "if(theme==='dark'){document.documentElement.classList.add('dark');}"
-        "}catch(e){}})();</script>\n"
+        "root.setAttribute('data-theme',theme);"
+        "if(theme==='dark'){root.classList.add('dark');}"
+        "}catch(e){root.setAttribute('data-theme','light');}})();</script>\n"
+        # without scripting, show every room stacked instead of hiding two
+        "<noscript><style>#room-home,#room-playground,#room-history"
+        "{display:block !important}</style></noscript>\n"
     )
 
 
