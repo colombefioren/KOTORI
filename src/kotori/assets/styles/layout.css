@@ -249,9 +249,17 @@
   padding-top: 32px;
 }
 
-:root[data-room="home"] #room-home,
-:root[data-room="playground"] #room-playground,
-:root[data-room="history"] #room-history {
+/* Gradio 6 mirrors our css_paths into a second copy of every rule, scoped
+   under ".gradio-container.gradio-container-<ver> .contain", to sandbox
+   custom CSS. That scoped copy of the rule above outranks a plain
+   ":root[data-room] #id" selector (three classes beat one id + two
+   pseudo/attribute classes), so the room never actually shows once Gradio's
+   duplicate wins the cascade. Repeating the id compound (#room-home#room-home)
+   counts as two id selectors in the specificity calculation, which beats any
+   class-only scoping Gradio adds, however many classes it prefixes. */
+:root[data-room="home"] #room-home#room-home,
+:root[data-room="playground"] #room-playground#room-playground,
+:root[data-room="history"] #room-history#room-history {
   display: flex !important;
   flex-direction: column;
 }

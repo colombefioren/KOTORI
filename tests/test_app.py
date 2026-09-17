@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 import gradio as gr
 
 from kotori.app import build_demo, build_studio, launch_options
@@ -7,6 +8,9 @@ from kotori.config import Settings
 from kotori.ui.frontend import (
     SCRIPT_FILES,
     STYLE_FILES,
+    _TEMPLATE_MARKER,
+    _gradio_template_path,
+    _patch_gradio_template,
     favicon_path,
     head_html,
     missing_assets,
@@ -40,6 +44,28 @@ EXPECTED_IDS = {
     "ast-adopt",
     "ast-footer",
 }
+
+
+def test_gradio_template_is_patched():
+    """The index template must inject css / js / head back into the DOM."""
+    path = _gradio_template_path()
+    if path is None:
+        pytest.skip("Gradio template not available in this environment")
+    text = path.read_text(encoding="utf-8")
+    assert _TEMPLATE_MARKER in text
+    assert "config.get('head') | safe }}" in text
+    assert "config.get('js') | safe }}" in text
+
+
+def test_template_patch_is_idempotent():
+    """Calling the patch twice is a no-op the second time."""
+    first = _patch_gradio_template()
+    second = _patch_gradio_template()
+    assert isinstance(first, bool)
+    assert isinstance(second, bool)
+    # if it was already patched, both calls return False
+    # if it was patched on the first call, first is True and second is False
+    assert not (first and second), "patch applied twice — idempotency broken"
 
 
 def test_asset_bundle_is_complete():
