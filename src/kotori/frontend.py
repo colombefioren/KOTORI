@@ -75,6 +75,9 @@ def head_html(settings: Settings | None = None) -> str:
     """Head tags: webfonts, the theme bootstrap and the social card."""
     fonts = "&".join(FONT_REQUESTS)
     default = (settings.theme if settings else "light") or "light"
+    # a deployment that opens on the night desk stays there: only a light
+    # deployment lets the visitor's OS preference decide
+    follow_os = "false" if default == "dark" else "true"
     return (
         '<meta name="theme-color" content="#f2e8ee" />\n'
         '<meta name="color-scheme" content="light dark" />\n'
@@ -89,7 +92,8 @@ def head_html(settings: Settings | None = None) -> str:
         "root.setAttribute('data-room','home');"
         "try{var saved=localStorage.getItem('kotori-theme');"
         f"var theme=saved||'{default}';"
-        "if(!saved&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)"
+        f"if(!saved&&{follow_os}&&window.matchMedia"
+        "&&window.matchMedia('(prefers-color-scheme: dark)').matches)"
         "{theme='dark';}"
         "root.setAttribute('data-theme',theme);"
         "if(theme==='dark'){root.classList.add('dark');}"

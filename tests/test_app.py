@@ -84,6 +84,17 @@ def test_the_room_is_chosen_before_the_first_paint():
         assert room in head
 
 
+def test_a_light_deployment_follows_the_operating_system():
+    head = head_html(Settings(theme="light"))
+    assert "!saved&&true&&window.matchMedia" in head
+
+
+def test_a_dark_deployment_stays_dark():
+    head = head_html(Settings(theme="dark"))
+    assert "!saved&&false&&window.matchMedia" in head
+    assert "theme=saved||'dark'" in head
+
+
 def test_head_html_loads_the_webfonts():
     head = head_html()
     assert "fonts.googleapis.com" in head
