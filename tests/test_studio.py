@@ -64,8 +64,16 @@ def ignite(studio: Studio):
     return asyncio.run(collect())
 
 
+def frame_with(views, needle: str):
+    """The first view whose deck mentions ``needle``."""
+    for view in views:
+        if needle in view.deck:
+            return view
+    raise AssertionError(f"no frame mentions {needle!r}")
+
+
 def test_idle_view_reports_a_ready_engine(studio: Studio):
-    assert "waiting for a topic" in studio.idle_view().status
+    assert "ready when you are" in studio.idle_view().status
 
 
 def test_idle_view_offers_the_demo_without_credentials(tmp_path: Path):
@@ -83,17 +91,24 @@ def test_ignite_without_credentials_streams_a_demo_reel(tmp_path: Path):
     assert "follow the light" in views[-1].status
 
 
+def test_ignite_answers_immediately_with_a_loading_state(studio: Studio):
+    first = ignite(studio)[0]
+    assert "tp-skeleton" in first.stage
+    assert "getting the story ready" in first.deck
+    assert first.busy is True
+    assert first.draft is None
+
+
 def test_ignite_streams_then_voices_and_archives(studio: Studio):
     views = ignite(studio)
-    assert len(views) == 5
+    assert len(views) == 6
+    assert views[-1].busy is False
 
-    live = views[1]
-    assert "tp-paper--live" in live.stage
-    assert ">The</span>" in live.stage and "tp-caret" in live.stage
-    assert live.draft is None
+    live = [view for view in views if "tp-paper--live" in view.stage]
+    assert live and all(view.draft is None for view in live)
+    assert ">The</span>" in live[0].stage and "tp-caret" in live[0].stage
 
-    assert "tp-paper--live" not in views[2].stage
-    assert "synthesising the voice…" in views[3].deck
+    assert "synthesising the voice…" in frame_with(views, "synthesising").deck
 
     final = views[-1]
     assert "deck__play" in final.deck
@@ -118,10 +133,11 @@ def test_ignite_reports_speech_failure_without_losing_the_story(
     final = ignite(studio)[-1]
     assert "voices are down" in final.deck
     assert final.audio is None
+    assert "voices are down" in final.status
     assert studio.library.load()[0].story == PROSE
 
 
-def test_archive_round_trip_and_preview(studio: Studio):
+def test_the_shelf_gives_every_story_its_own_player(studio: Studio):
     ignite(studio)
     choices, preview, listing = studio.archive_state()
     assert len(choices) == 1
@@ -129,16 +145,98 @@ def test_archive_round_trip_and_preview(studio: Studio):
     assert "ar-item" in listing
 
     story_id = choices[0][1]
+    assert f'data-story-id="{story_id}"' in preview
+    assert "deck__play" in preview
+    assert "data:audio/mpeg;base64," in preview
+
+
+def test_opening_an_archived_story_reuses_its_recording(
+    studio: Studio, monkeypatch: pytest.MonkeyPatch
+):
+    ignite(studio)
+    story_id = studio.library.load()[0].story_id
+
+    def no_network(*args, **kwargs):
+        raise AssertionError("a saved voice must not be re-synthesised")
+
+    monkeypatch.setattr(studio_module, "synthesize", no_network)
     opened = studio.open_draft(story_id)
     assert "from the archive" in opened.stage
-    assert openable_deck_is_idle(opened)
+    assert "data:audio/mpeg;base64," in opened.deck
+    assert opened.audio is not None and Path(opened.audio).exists()
+    assert opened.draft is not None and opened.draft.audio_path
 
+
+def test_a_recording_that_vanished_is_replaced_not_faked(
+    studio: Studio, monkeypatch: pytest.MonkeyPatch
+):
+    ignite(studio)
+    draft = studio.library.load()[0]
+    Path(draft.audio_path).unlink()
+
+    calls: list[str] = []
+
+    def counting_synthesize(text, *, voice_key, out_dir, stem, slow=False):
+        calls.append(stem)
+        target = Path(out_dir) / f"{stem}-{voice_key}.mp3"
+        target.write_bytes(b"\xff\xfb\x90\x00")
+        return target
+
+    monkeypatch.setattr(studio_module, "synthesize", counting_synthesize)
+    opened = studio.open_draft(draft.story_id)
+    assert calls == [draft.slug]
+    assert "data:audio/mpeg;base64," in opened.deck
+
+
+def test_audio_uri_is_none_without_a_file(studio: Studio, tmp_path: Path):
+    missing = StoryDraft(
+        story_id="x", topic="t", story=PROSE, audio_path=str(tmp_path / "gone.mp3")
+    )
+    assert studio._audio_uri(missing) is None
+    # an unknown id falls back to the empty reading pane
+    assert "nothing selected" in studio.preview("x")
+
+
+def test_respeak_reports_a_failed_recording(studio: Studio, monkeypatch: pytest.MonkeyPatch):
+    ignite(studio)
+    story_id = studio.library.load()[0].story_id
+
+    def broken(*args, **kwargs):
+        raise studio_module.SpeechError("the voice is unwell")
+
+    monkeypatch.setattr(studio_module, "synthesize", broken)
+    view = studio.respeak(story_id)
+    assert view.audio is None
+    assert "unvoiced" in view.stage
+    assert "the voice is unwell" in view.status
+
+
+def test_archive_state_falls_back_when_the_selection_is_gone(studio: Studio):
+    ignite(studio)
+    newest = studio.library.load()[0].story_id
+    choices, preview, _listing = studio.archive_state("nobody")
+    assert choices[0][1] == newest
+    assert f'data-story-id="{newest}"' in preview
+
+
+def test_deck_message_survives_a_foreign_string():
+    assert studio_module._deck_message("<div>nope</div>") == ""
+
+
+def test_archive_state_keeps_a_valid_selection(studio: Studio):
+    ignite(studio)
+    keep = studio.library.load()[0].story_id
+    choices, preview, _listing = studio.archive_state(keep)
+    assert choices[0][1] == keep
+    assert "deck__play" in preview
+
+
+def test_respeak_records_a_new_voice(studio: Studio):
+    ignite(studio)
+    story_id = studio.library.load()[0].story_id
     re_voiced = studio.respeak(story_id)
     assert "data:audio/mpeg;base64," in re_voiced.deck
-
-
-def openable_deck_is_idle(view) -> bool:
-    return "speak it again" in view.deck
+    assert "follow the light" in re_voiced.status
 
 
 def test_missing_draft_is_reported(studio: Studio):
@@ -156,7 +254,7 @@ def test_delete_and_clear_report_their_effect(studio: Studio):
 
     ignite(studio)
     _choices, _preview, _hero, status = studio.clear()
-    assert "burned 1 draft" in status
+    assert "cleared 1 story" in status
     assert studio.library.load() == []
 
 

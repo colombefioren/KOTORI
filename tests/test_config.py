@@ -21,7 +21,7 @@ ENV_KEYS = (
     "TEMPERATURE",
     "MAX_TOKENS",
     "AI_STORYTELLER_DATA_DIR",
-    "FORCE_DARK",
+    "FORCE_LIGHT",
 )
 
 
@@ -66,11 +66,11 @@ def test_numeric_env_values_fall_back_when_nonsense(monkeypatch: pytest.MonkeyPa
 def test_numeric_env_values_are_read(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("TEMPERATURE", "0.4")
     monkeypatch.setenv("MAX_TOKENS", "256")
-    monkeypatch.setenv("FORCE_DARK", "0")
+    monkeypatch.setenv("FORCE_LIGHT", "0")
     settings = load_settings()
     assert settings.temperature == 0.4
     assert settings.max_tokens == 256
-    assert settings.force_dark is False
+    assert settings.force_light is False
 
 
 def test_relative_data_dir_anchors_to_the_project(monkeypatch: pytest.MonkeyPatch):

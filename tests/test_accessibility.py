@@ -9,9 +9,10 @@ from ai_storyteller.markup import (
     render_footer,
     render_hero,
     render_idle_stage,
+    render_notes,
     render_stage,
     render_status,
-    render_ticker,
+    render_thinking,
     render_words,
 )
 from ai_storyteller.models import StoryDraft
@@ -51,6 +52,10 @@ def test_only_the_live_paper_announces_itself():
     assert 'aria-busy="true"' in live
 
 
+def test_waiting_is_announced_once():
+    assert render_thinking("a topic").count("aria-live") == 1
+
+
 def test_deck_controls_are_described():
     deck = render_deck(draft(), "data:audio/mpeg;base64,AAAA")
     assert 'role="group"' in deck
@@ -62,16 +67,17 @@ def test_deck_controls_are_described():
 
 def test_buttons_declare_their_type_so_forms_never_submit():
     deck = render_deck(draft(), "data:audio/mpeg;base64,AAAA")
-    assert deck.count('type="button"') == 7
+    assert deck.count('type="button"') == 6
 
 
 def test_decorative_layer_is_hidden_from_assistive_tech():
-    assert 'aria-hidden="true"' in render_ticker()
+    assert 'aria-hidden="true"' in render_notes()
     assert 'aria-hidden="true"' in render_stage(draft())
 
 
 def test_status_line_is_read_out():
     status = render_status("writing…", tone="busy")
+    assert 'role="status"' in status
     assert "writing…" in status
     assert "<b>" in status
 
@@ -81,7 +87,7 @@ def test_words_keep_punctuation_for_readers_and_copiers():
 
 
 def test_empty_states_explain_themselves():
-    assert "the stage is empty" in render_idle_stage()
+    assert "the page is still blank" in render_idle_stage()
     assert "archive is empty" in render_archive_list([])
     assert "nothing selected" in render_archive_preview(None)
     assert "voice arrives" in render_deck_idle()

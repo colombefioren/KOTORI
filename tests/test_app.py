@@ -13,7 +13,7 @@ from ai_storyteller.frontend import (
     script_source,
     stylesheet_paths,
 )
-from ai_storyteller.theme import NeonEditorial
+from ai_storyteller.theme import Scratchbook
 
 EXPECTED_IDS = {
     "ast-header",
@@ -24,10 +24,12 @@ EXPECTED_IDS = {
     "ast-status",
     "ast-stage",
     "ast-deck",
-    "ast-tabs",
     "ast-archive-pick",
     "ast-archive-preview",
     "ast-archive-status",
+    "ast-delete",
+    "ast-record",
+    "ast-clear",
     "ast-incoming",
     "ast-adopt",
     "ast-footer",
@@ -52,7 +54,9 @@ def test_head_html_loads_the_webfonts():
     head = head_html()
     assert "fonts.googleapis.com" in head
     assert "theme-color" in head
-    assert "Instrument+Serif" in head
+    assert "color-scheme" in head
+    assert "Fraunces" in head
+    assert "Caveat" in head
 
 
 def test_favicon_is_shipped():
@@ -62,7 +66,7 @@ def test_favicon_is_shipped():
 
 def test_launch_options_are_wired(settings: Settings):
     options = launch_options(settings)
-    assert isinstance(options["theme"], NeonEditorial)
+    assert isinstance(options["theme"], Scratchbook)
     assert options["js"] and options["head"]
     assert options["css_paths"]
     assert options["favicon_path"]
@@ -94,8 +98,8 @@ def test_app_renders_branding_and_controls(settings: Settings, tmp_path: Path):
         str(component.get("props", {}).get("value", "")) for component in config["components"]
     )
     assert "Stories" in values
-    assert "ignite story" in values
-    assert "the stage is empty" in values
+    assert "write the story" in values
+    assert "the page is still blank" in values
 
 
 def test_archive_tab_starts_empty(settings: Settings):
