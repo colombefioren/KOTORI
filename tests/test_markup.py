@@ -121,8 +121,6 @@ def test_the_masthead_names_the_studio_and_counts_the_shelf():
     assert "KOTO<b>RI</b>" in one
     assert "1 story kept" in one
     assert "a quiet writer" in one
-    assert 'id="ast-theme"' in one
-    assert "night desk" in one
 
 
 def test_the_masthead_never_names_the_model():
@@ -194,7 +192,7 @@ def test_sticky_notes_are_pastel_and_optional():
 
 def test_the_home_page_tapes_up_a_polaroid():
     intro = render_home_intro(Settings(api_key="key"))
-    assert 'class="polaroid"' in intro
+    assert 'class="polaroid paper-light"' in intro
     assert "polaroid__print" in intro
     assert "the little bird" in intro
     assert "tape" in intro

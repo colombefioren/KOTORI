@@ -42,9 +42,7 @@ _TEMPLATE_MARKER = "config.get('css') | safe }}"
 def _gradio_template_path() -> Path | None:
     """Return the path to the installed ``index.html`` template, or ``None``."""
     try:
-        path = importlib.resources.files("gradio").joinpath(
-            "templates/frontend/index.html"
-        )
+        path = importlib.resources.files("gradio").joinpath("templates/frontend/index.html")
         if path.is_file():
             return Path(str(path))
     except Exception:
@@ -82,9 +80,7 @@ def _patch_gradio_template() -> bool:
     anchor = "\t\t<script data-gradio-mode>"
     idx = text.find(anchor)
     if idx == -1:
-        _LOG.warning(
-            "KOTORI could not find the injection point in the Gradio template."
-        )
+        _LOG.warning("KOTORI could not find the injection point in the Gradio template.")
         return False
     patched = text[:idx] + _TEMPLATE_INJECTION + text[idx:]
     try:
@@ -166,32 +162,20 @@ def script_source() -> str:
 
 
 def head_html(settings: Settings | None = None) -> str:
-    """Head tags: webfonts, the theme bootstrap and the social card."""
+    """Head tags: webfonts and the social card. There is one desk: the dark one."""
+    del settings  # kept for call-site compatibility; nothing here varies by settings
     fonts = "&".join(FONT_REQUESTS)
-    default = (settings.theme if settings else "light") or "light"
-    # a deployment that opens on the night desk stays there: only a light
-    # deployment lets the visitor's OS preference decide
-    follow_os = "false" if default == "dark" else "true"
     return (
-        '<meta name="theme-color" content="#f2e8ee" />\n'
-        '<meta name="color-scheme" content="light dark" />\n'
+        '<meta name="theme-color" content="#191725" />\n'
+        '<meta name="color-scheme" content="dark" />\n'
         '<meta property="og:title" content="KOTORI" />\n'
         '<meta property="og:description" content="A pastel paper studio that writes a short '
         'story from one line, then reads it back to you word by word." />\n'
         '<link rel="preconnect" href="https://fonts.googleapis.com" />\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n'
         f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?{fonts}&display=swap" />\n'
-        # paint in the right theme (and the right room) before the first frame
-        "<script>(function(){var root=document.documentElement;"
-        "root.setAttribute('data-room','home');"
-        "try{var saved=localStorage.getItem('kotori-theme');"
-        f"var theme=saved||'{default}';"
-        f"if(!saved&&{follow_os}&&window.matchMedia"
-        "&&window.matchMedia('(prefers-color-scheme: dark)').matches)"
-        "{theme='dark';}"
-        "root.setAttribute('data-theme',theme);"
-        "if(theme==='dark'){root.classList.add('dark');}"
-        "}catch(e){root.setAttribute('data-theme','light');}})();</script>\n"
+        # paint the right room before the first frame
+        "<script>document.documentElement.setAttribute('data-room','home');</script>\n"
         # without scripting, show every room stacked instead of hiding two
         "<noscript><style>#room-home,#room-playground,#room-history"
         "{display:block !important}</style></noscript>\n"

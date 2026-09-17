@@ -121,40 +121,6 @@
   box-shadow: var(--sticker-shadow);
 }
 
-/* the theme switch is a paper switch, not a component */
-.theme-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--type);
-  font-size: 11px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-  background: var(--paper);
-  border: 1.5px solid var(--line-2);
-  border-radius: 999px;
-  padding: 9px 16px;
-  cursor: pointer;
-  box-shadow: var(--shadow-1);
-  transition: transform 0.18s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.theme-switch:hover {
-  transform: rotate(-1.5deg) translateY(-1px);
-  color: var(--ink);
-  border-color: var(--pink-400);
-  background: var(--pink-100);
-}
-
-.theme-switch__dot {
-  width: 13px;
-  height: 13px;
-  border-radius: 999px;
-  background: linear-gradient(120deg, var(--pink-300) 0 50%, var(--blue-300) 50% 100%);
-  border: 1px solid var(--line-2);
-}
-
 /* ── index tabs ────────────────────────────────────────────────────────────── */
 
 .index-tabs {
@@ -368,22 +334,17 @@
 
 /* ── the polaroid ──────────────────────────────────────────────────────────── */
 
+/* a real polaroid: white card stock regardless of the room it's sitting in */
 .polaroid {
   position: relative;
   justify-self: center;
   width: min(300px, 84%);
   margin: 0;
-  background: #fffdfa;
+  background: var(--paper);
   border: 1.5px solid var(--line);
   padding: 13px 13px 46px;
   transform: rotate(-2.4deg);
   box-shadow: var(--shadow-2);
-}
-
-:root[data-theme="dark"] .polaroid,
-:root.dark .polaroid {
-  background: #2f2a3d;
-  border-color: var(--line-2);
 }
 
 .polaroid__print {
@@ -544,8 +505,10 @@
 
 .ast-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
+  /* a clear break from the fields above: this row is actions, not input */
+  margin-top: 10px;
 }
 
 .ast-actions button {

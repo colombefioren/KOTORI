@@ -1,39 +1,55 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    KOTORI · design tokens
 
-   A paper scrapbook in pink and blue pastels. Two desks: the day desk (light)
-   and the night desk (dark). Every colour is cut from the same two pastel
-   families, so tape, highlighter and stamps agree in both rooms.
+   A paper scrapbook in pink and blue pastels, kept on the night desk: one dark
+   room, always. A few things (the reader, the "how it goes" steps) are still
+   drawn as pale paper on purpose, like a real index card left on a dark desk —
+   .paper-light re-scopes the paper/ink tokens locally for exactly those.
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
   /* ── washi: the two pastels everything is cut from ─────────────────────── */
-  --pink-100: #fdeef4;
-  --pink-200: #f9d5e4;
+  --pink-100: #3a2634;
+  --pink-200: #4c2f42;
   --pink-300: #f2b3cd;
   --pink-400: #e288ae;
   --pink-500: #bd5f8b;
-  --blue-100: #edf3fd;
-  --blue-200: #d8e7fa;
+  --blue-100: #1f2740;
+  --blue-200: #283358;
   --blue-300: #b3d0f2;
   --blue-400: #82aae0;
   --blue-500: #5b83b6;
 
   /* ── the desk and the paper on it ──────────────────────────────────────── */
-  --desk: #f2e8ee;
-  --desk-2: #e8dde9;
-  --paper: #fffdfa;
-  --paper-2: #fdf7f8;
-  --paper-3: #f7eef2;
-  --cream: #fdf9f0;
-  --sky: #f4f8fe;
-  --line: #e8dbe2;
-  --line-2: #cdbac5;
-  --ink: #443b48;
-  --ink-2: #6f6573;
-  --ink-3: #9d94a2;
+  --desk: #191725;
+  --desk-2: #221e2f;
+  --paper: #262233;
+  --paper-2: #221f2e;
+  --paper-3: #2d2839;
+  --cream: #2a2636;
+  --sky: #1f2436;
+  --line: #3a3449;
+  --line-2: #514863;
+  --ink: #f4eff8;
+  --ink-2: #c6bdd2;
+  --ink-3: #8f87a3;
+
+  /* the same paper family, always pale — for the few cards (the reader, the
+     "how it goes" steps) drawn as a light index card on the dark desk */
+  --pale-paper: #fffdfa;
+  --pale-paper-2: #fdf7f8;
+  --pale-paper-3: #f7eef2;
+  --pale-line: #e8dbe2;
+  --pale-line-2: #cdbac5;
+  --pale-ink: #443b48;
+  --pale-ink-2: #6f6573;
+  --pale-ink-3: #9d94a2;
+  --pale-pink-100: #fdeef4;
+  --pale-pink-200: #f9d5e4;
+  --pale-blue-100: #edf3fd;
+  --pale-blue-200: #d8e7fa;
 
   /* ── accents ───────────────────────────────────────────────────────────── */
   --accent: var(--pink-400);
@@ -44,9 +60,9 @@
   --danger: var(--pink-500);
 
   /* how tape behaves on this paper */
-  --tape-alpha: 0.9;
+  --tape-alpha: 0.55;
   --tape-blend: multiply;
-  --tape-shine: rgba(255, 255, 255, 0.5);
+  --tape-shine: rgba(255, 255, 255, 0.14);
 
   /* ── paper geometry: soft-rounded, but never machine-straight ───────────── */
   --edge-card: 20px 24px 22px 26px;
@@ -62,10 +78,10 @@
     13% 99.2%, 10% 96.4%, 7% 99.5%, 4% 96%, 2% 99.1%, 0 96.8%
   );
 
-  --shadow-1: 0 1px 1px rgba(68, 59, 72, 0.05), 0 5px 12px -10px rgba(68, 59, 72, 0.55);
-  --shadow-2: 0 2px 3px rgba(68, 59, 72, 0.05), 0 18px 30px -26px rgba(68, 59, 72, 0.6);
-  --drop-sheet: drop-shadow(0 14px 16px rgba(68, 59, 72, 0.16));
-  --sticker-shadow: 2px 3px 0 var(--line-2);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.42);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 34px -28px rgba(0, 0, 0, 0.9);
+  --drop-sheet: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.5));
+  --sticker-shadow: 2px 3px 0 #14121d;
 
   /* ── type: a book face, a Garamond, a friendly sans, a marker, a typewriter */
   --display: "Fraunces", "Iowan Old Style", Georgia, serif;
@@ -84,41 +100,26 @@
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.34'/%3E%3C/svg%3E");
 }
 
-/* ── the night desk ────────────────────────────────────────────────────────── */
-
-:root[data-theme="dark"],
-:root.dark {
-  color-scheme: dark;
-
-  /* the light pastel washes (pink-100/200, blue-100/200) drive hover and chip
-     backgrounds; left at their day-desk values they paint near-white behind
-     --ink's near-white night-desk text, so hovering a button erases its own
-     label. These are the same washes, darkened to work under light text. */
-  --pink-100: #3a2634;
-  --pink-200: #4c2f42;
-  --blue-100: #1f2740;
-  --blue-200: #283358;
-
-  --desk: #191725;
-  --desk-2: #221e2f;
-  --paper: #262233;
-  --paper-2: #221f2e;
-  --paper-3: #2d2839;
-  --cream: #2a2636;
-  --sky: #1f2436;
-  --line: #3a3449;
-  --line-2: #514863;
-  --ink: #f4eff8;
-  --ink-2: #c6bdd2;
-  --ink-3: #8f87a3;
-
-  --tape-alpha: 0.55;
-  --tape-shine: rgba(255, 255, 255, 0.14);
-
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.42);
-  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 34px -28px rgba(0, 0, 0, 0.9);
-  --drop-sheet: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.5));
-  --sticker-shadow: 2px 3px 0 #14121d;
+/* a light index card on the dark desk: re-scopes the paper/line/ink and the
+   two washes to their pale values, purely locally — everything inside still
+   reads var(--paper) / var(--ink) / var(--blue-100) etc, it just resolves to
+   the pale swatch for as long as it stays inside one of these. */
+.paper-light {
+  --paper: var(--pale-paper);
+  --paper-2: var(--pale-paper-2);
+  --paper-3: var(--pale-paper-3);
+  --cream: var(--pale-paper);
+  --line: var(--pale-line);
+  --line-2: var(--pale-line-2);
+  --ink: var(--pale-ink);
+  --ink-2: var(--pale-ink-2);
+  --ink-3: var(--pale-ink-3);
+  --pink-100: var(--pale-pink-100);
+  --pink-200: var(--pale-pink-200);
+  --blue-100: var(--pale-blue-100);
+  --blue-200: var(--pale-blue-200);
+  --tape-alpha: 0.9;
+  --tape-shine: rgba(255, 255, 255, 0.5);
 }
 
 /* ── the desk itself ───────────────────────────────────────────────────────── */
@@ -136,26 +137,14 @@ body,
 .gradio-container {
   background-color: var(--desk) !important;
   background-image:
-    radial-gradient(9% 6% at 7% 9%, rgba(226, 136, 174, 0.16), transparent 70%),
-    radial-gradient(6% 5% at 12% 13%, rgba(226, 136, 174, 0.1), transparent 70%),
-    radial-gradient(11% 7% at 88% 22%, rgba(130, 170, 224, 0.16), transparent 72%),
-    radial-gradient(7% 9% at 72% 88%, rgba(242, 179, 205, 0.14), transparent 72%),
-    repeating-linear-gradient(90deg, rgba(68, 59, 72, 0.038) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(0deg, rgba(68, 59, 72, 0.03) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(90deg, rgba(68, 59, 72, 0.014) 0 1px, transparent 1px 11px);
-  max-width: 100% !important;
-  padding: 0 !important;
-}
-
-:root[data-theme="dark"] .gradio-container,
-:root.dark .gradio-container {
-  background-image:
     radial-gradient(9% 6% at 7% 9%, rgba(231, 156, 190, 0.12), transparent 70%),
     radial-gradient(11% 7% at 88% 22%, rgba(157, 192, 238, 0.12), transparent 72%),
     radial-gradient(7% 9% at 72% 88%, rgba(231, 156, 190, 0.08), transparent 72%),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0 1px, transparent 1px 11px);
+  max-width: 100% !important;
+  padding: 0 !important;
 }
 
 /* paper grain over the whole desk */

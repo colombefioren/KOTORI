@@ -169,7 +169,7 @@
     border-color 0.2s ease, box-shadow 0.16s ease !important;
 }
 
-.gradio-container button:hover:not(.theme-switch):not(.deck__btn):not(.act) {
+.gradio-container button:hover:not(.deck__btn):not(.act) {
   transform: translate(-1px, -1px) rotate(-0.5deg);
   background: var(--accent-soft-2) !important;
   border-color: var(--blue-400) !important;
@@ -701,6 +701,11 @@
 /* ── the ledger: one index card per story ─────────────────────────────────── */
 
 .story-card {
+  /* the washi tape at the top-left sticks up past the card's own border by
+     design (see .tape--left) and the tiny per-card rotation below shifts
+     that corner further still; without headroom reserved *inside* this
+     grid cell, the tape can reach up into the row above it. */
+  margin-top: 22px;
   position: relative;
   display: grid;
   gap: 10px;

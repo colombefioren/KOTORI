@@ -59,7 +59,7 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
     )
 
     with gr.Blocks(
-        title=f"{APP_NAME} · stories that speak",
+        title=APP_NAME,
         fill_width=True,
         delete_cache=(3600, 3600),
     ) as demo:

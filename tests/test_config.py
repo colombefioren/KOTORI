@@ -22,7 +22,6 @@ ENV_KEYS = (
     "MAX_TOKENS",
     "AI_STORYTELLER_DATA_DIR",
     "KOTORI_DATA_DIR",
-    "KOTORI_THEME",
 )
 
 
@@ -67,16 +66,9 @@ def test_numeric_env_values_fall_back_when_nonsense(monkeypatch: pytest.MonkeyPa
 def test_numeric_env_values_are_read(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("TEMPERATURE", "0.4")
     monkeypatch.setenv("MAX_TOKENS", "256")
-    monkeypatch.setenv("KOTORI_THEME", "dark")
     settings = load_settings()
     assert settings.temperature == 0.4
     assert settings.max_tokens == 256
-    assert settings.theme == "dark"
-
-
-def test_an_unknown_theme_falls_back_to_the_night_desk(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setenv("KOTORI_THEME", "holographic")
-    assert load_settings().theme == "dark"
 
 
 def test_the_old_data_dir_name_still_works(monkeypatch: pytest.MonkeyPatch):

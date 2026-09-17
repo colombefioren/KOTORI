@@ -39,7 +39,6 @@ def test_the_masthead_offers_a_skip_link_and_a_landmark():
     masthead = render_masthead(Settings(api_key="x"), ArchiveStats(drafts=1))
     assert 'href="#ast-tabs"' in masthead
     assert 'role="banner"' in masthead
-    assert 'aria-label="Switch between the paper and the night desk"' in masthead
 
 
 def test_the_tab_strip_is_a_real_tablist():

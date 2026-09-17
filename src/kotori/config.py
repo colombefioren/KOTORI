@@ -25,9 +25,6 @@ VERSION = "0.3.0"
 #: The length every story is written to. There is no slider any more.
 STORY_WORDS = 400
 
-#: The two moods the studio knows how to dress itself in.
-THEMES = ("light", "dark")
-
 load_dotenv(PROJECT_ROOT / ".env")
 
 
@@ -81,12 +78,6 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return raw.lower() in {"1", "true", "yes", "on"}
 
 
-def _theme(raw: str | None) -> str:
-    """Only the two themes the studio actually ships."""
-    value = (raw or "").strip().lower()
-    return value if value in THEMES else "dark"
-
-
 @dataclass(frozen=True, slots=True)
 class Settings:
     """Immutable snapshot of the runtime configuration."""
@@ -98,8 +89,6 @@ class Settings:
     max_tokens: int = 900
     request_timeout: float = 60.0
     data_dir: Path = DEFAULT_DATA_DIR
-    #: Which theme to open in; the toggle in the UI overrides it per visitor.
-    theme: str = "dark"
     version: str = VERSION
 
     @property
@@ -154,7 +143,6 @@ def load_settings() -> Settings:
         max_tokens=_env_int("MAX_TOKENS", 900),
         request_timeout=_env_float("REQUEST_TIMEOUT", 60.0),
         data_dir=data_dir,
-        theme=_theme(_first_env("KOTORI_THEME")),
     )
 
 

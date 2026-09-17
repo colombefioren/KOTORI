@@ -182,7 +182,6 @@
     ["Ctrl / ⌘ + Enter", "write the story"],
     ["Space", "play or pause the voice"],
     ["← / →", "skip five seconds"],
-    ["D", "paper or night desk"],
     ["P", "open a shared story"],
     ["T", "toggle the cursor trail"],
     ["?", "this sheet"],
@@ -246,13 +245,6 @@
       hint: ".mp3",
       run: function () {
         deckAction("download-mp3");
-      },
-    },
-    {
-      label: "Switch the paper",
-      hint: "D",
-      run: function () {
-        if (window.ASTTheme) window.ASTTheme.toggle();
       },
     },
     {
@@ -493,8 +485,6 @@
       tab("playground");
     } else if (key === "3") {
       tab("history");
-    } else if (key === "d") {
-      if (window.ASTTheme) window.ASTTheme.toggle();
     } else if (key === "p") {
       restoreFromPrompt();
     } else if (key === "t") {
