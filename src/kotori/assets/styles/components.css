@@ -620,19 +620,25 @@
 .deck__top { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
 
 /* the play button is a pastel sticker */
+/* every declaration here that also appears in the generic
+   ".gradio-container button" reset below needs !important too: that reset
+   forces background/border/border-radius/box-shadow/padding/color on every
+   <button> in the app, and being declared later in the file doesn't help a
+   plain rule beat an !important one. Without it this rendered as a plain
+   near-white circle — indistinguishable from the reader card behind it. */
 .deck__play {
   width: 76px;
   height: 76px;
   flex: 0 0 76px;
   display: grid;
   place-items: center;
-  color: var(--ink);
-  background: linear-gradient(180deg, var(--blue-200), var(--blue-300));
-  border: 2px solid var(--blue-500);
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 2px var(--paper), var(--sticker-shadow);
+  color: var(--ink) !important;
+  background: linear-gradient(180deg, var(--blue-200), var(--blue-300)) !important;
+  border: 2px solid var(--blue-500) !important;
+  border-radius: 999px !important;
+  box-shadow: inset 0 0 0 2px var(--paper), var(--sticker-shadow) !important;
   cursor: pointer;
-  padding: 0;
+  padding: 0 !important;
   transition: transform 0.18s ease, background 0.2s ease;
 }
 
@@ -857,19 +863,20 @@
   min-width: 0;
 }
 
+/* see the comment on .deck__play: same generic !important reset, same fix. */
 .mini__play {
   width: 42px;
   height: 42px;
   flex: 0 0 42px;
   display: grid;
   place-items: center;
-  color: var(--ink);
-  background: linear-gradient(180deg, var(--pink-200), var(--pink-300));
-  border: 1.5px solid var(--pink-500);
-  border-radius: 999px;
+  color: var(--ink) !important;
+  background: linear-gradient(180deg, var(--pink-200), var(--pink-300)) !important;
+  border: 1.5px solid var(--pink-500) !important;
+  border-radius: 999px !important;
   cursor: pointer;
-  padding: 0;
-  box-shadow: inset 0 0 0 1.5px var(--cream), var(--sticker-shadow);
+  padding: 0 !important;
+  box-shadow: inset 0 0 0 1.5px var(--cream), var(--sticker-shadow) !important;
   transition: transform 0.16s ease, background 0.2s ease;
 }
 
