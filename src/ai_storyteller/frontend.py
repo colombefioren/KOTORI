@@ -10,7 +10,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .config import ASSETS_DIR
-from .theme import DISPLAY_FONT, MONO_FONT, SERIF_FONT
+from .theme import DISPLAY_FONT, HAND_FONT, SANS_FONT, SERIF_FONT
 
 STYLE_FILES: tuple[str, ...] = (
     "tokens.css",
@@ -24,6 +24,14 @@ SCRIPT_FILES: tuple[str, ...] = (
     "teleprompter.js",
     "deck.js",
     "shell.js",
+)
+
+#: Google Fonts axes: display serif, prose serif, UI sans, a handwriting.
+FONT_REQUESTS: tuple[str, ...] = (
+    f"family={DISPLAY_FONT}:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700",
+    f"family={SERIF_FONT}:ital,wght@0,400..700;1,400..700",
+    f"family={SANS_FONT}:wght@400..700",
+    f"family={HAND_FONT}:wght@400..700",
 )
 
 STYLE_DIR = ASSETS_DIR / "styles"
@@ -56,18 +64,13 @@ def script_source() -> str:
 
 def head_html() -> str:
     """Head tags: webfonts, theme colour and the favicon."""
-    families = (
-        f"{DISPLAY_FONT.replace(' ', '+')}:wght@400;500;700",
-        f"{MONO_FONT.replace(' ', '+')}:wght@400;600",
-        f"{SERIF_FONT.replace(' ', '+')}:ital@0;1",
-    )
-    fonts = "&".join(f"family={family}" for family in families)
+    fonts = "&".join(FONT_REQUESTS)
     return (
-        '<meta name="theme-color" content="#07070c" />\n'
-        '<meta name="color-scheme" content="dark" />\n'
+        '<meta name="theme-color" content="#f7f1e7" />\n'
+        '<meta name="color-scheme" content="light" />\n'
         '<meta property="og:title" content="AI Storyteller" />\n'
-        '<meta property="og:description" content="Stories that speak: '
-        'streamed prose, synthesised voice, karaoke teleprompter." />\n'
+        '<meta property="og:description" content="A scratchbook that writes a story '
+        'and reads it back to you, word by word." />\n'
         '<link rel="preconnect" href="https://fonts.googleapis.com" />\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n'
         f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?{fonts}&display=swap" />\n'
