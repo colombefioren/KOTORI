@@ -118,10 +118,15 @@ def _bird() -> str:
 # ── chrome ──────────────────────────────────────────────────────────────────
 
 
-def render_label(text: str, meta: str = "") -> str:
-    """A typewriter rule: ``the brief`` · *one line is enough*."""
+def render_label(text: str, meta: str = "", doodle: str = "") -> str:
+    """A typewriter rule: ``the brief`` · *one line is enough*.
+
+    Pass ``doodle`` (``star``, ``arrow``, ``hearts``) to pin a marker-pen
+    drawing to the end of the rule.
+    """
     tail = f" · {escape(meta)}" if meta else ""
-    return f'<p class="ast-label">{escape(text)}{tail}</p>'
+    art = f'<span class="doodle-slot">{_doodle(doodle)}</span>' if doodle else ""
+    return f'<p class="ast-label">{escape(text)}{tail}{art}</p>'
 
 
 def render_tabs(active: str = "home", kept: int = 0) -> str:

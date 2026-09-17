@@ -79,7 +79,7 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
             with gr.Column(elem_id="room-playground", elem_classes=["room"]):
                 with gr.Row(elem_classes=["ast-grid"]):
                     with gr.Column(scale=5, elem_id="ast-composer"):
-                        gr.HTML(render_label("the brief", "one line is enough"))
+                        gr.HTML(render_label("the brief", "one line is enough", doodle="arrow"))
                         with gr.Group(elem_classes=["card", "ast-stack"]):
                             topic = gr.Textbox(
                                 label="what should happen?",
@@ -141,12 +141,12 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
                         )
 
                 with gr.Column(elem_classes=["ast-full"]):
-                    gr.HTML(render_label("the page", "written here, heard here"))
+                    gr.HTML(render_label("the page", "written here, heard here", doodle="hearts"))
                     stage = gr.HTML(render_idle_sheet(), elem_id="ast-stage")
 
             with gr.Column(elem_id="room-history", elem_classes=["room", "ledger"]):
                 with gr.Row(elem_classes=["ledger__bar"]):
-                    gr.HTML(render_label("the ledger", "every story you kept"))
+                    gr.HTML(render_label("the ledger", "every story you kept", doodle="star"))
                     refresh = gr.Button("refresh", elem_id="ast-refresh")
                 history = gr.HTML(initial_ledger, elem_id="ast-history")
                 with gr.Accordion("manage the shelf", open=False):
