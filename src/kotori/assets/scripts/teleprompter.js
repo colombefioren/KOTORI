@@ -82,16 +82,6 @@
     var active = words[index];
     if (!active) return;
 
-    var halo = player.paper && player.paper.querySelector(".tp-halo");
-    if (halo) {
-      halo.style.transform =
-        "translate(" +
-        (active.offsetLeft + active.offsetWidth / 2) +
-        "px," +
-        (active.offsetTop + active.offsetHeight / 2) +
-        "px)";
-    }
-
     if (player.paper && player.paper.scrollHeight > player.paper.clientHeight + 8) {
       player.paper.scrollTop = Math.max(0, active.offsetTop - player.paper.clientHeight * 0.4);
     }

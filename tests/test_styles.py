@@ -33,7 +33,6 @@ CLIENT_ONLY = (
     "is-spoken",
     "is-pending",
     "is-fresh",
-    "sheet--speaking",
     "deck__play--ready",
     "ast-lamp--busy",
 )

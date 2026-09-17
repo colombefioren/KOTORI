@@ -5,10 +5,16 @@
 
 /* ── gradio chrome, flattened to paper ────────────────────────────────────── */
 
+/* :not(.card) matters: a gr.Group that opts into the paper-card look
+   (elem_classes=["card", ...]) is the same DOM node as ".gr-group", and an
+   !important flatten-rule here would beat .card's own background/radius/
+   shadow no matter how specific they were, leaving every "card" invisible:
+   no background, no border, square corners, sitting flush on the desk. */
 .gradio-container .block,
 .gradio-container .form,
 .gradio-container .panel,
-.gradio-container .gr-group {
+.gradio-container .styler,
+.gradio-container .gr-group:not(.card) {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -220,7 +226,7 @@
     var(--line) 28px 29px
   ) !important;
   border: 1.5px solid var(--line-2) !important;
-  border-radius: 8px !important;
+  border-radius: 14px !important;
   box-shadow: none !important;
   padding: 12px 14px !important;
 }
@@ -248,7 +254,7 @@
 .gradio-container .wrap {
   background: var(--paper-2) !important;
   border: 1.5px solid var(--line-2) !important;
-  border-radius: 8px !important;
+  border-radius: 14px !important;
   color: var(--ink) !important;
   box-shadow: none !important;
 }
@@ -326,7 +332,7 @@
   color: var(--ink-3) !important;
   background: var(--paper-3) !important;
   border: 1.5px dashed var(--line-2) !important;
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   padding: 12px 14px !important;
   cursor: pointer;
 }
@@ -386,6 +392,15 @@
   filter: var(--drop-sheet);
 }
 
+/* .sheet clips its own content to a torn-paper silhouette, which would clip
+   the tape too if the tape were its child — the part sticking out past the
+   edge is the whole point of a strip of tape. This frame sits around .sheet,
+   unclipped, so the tape can lie on top of the torn edge instead of being
+   cut off at it. */
+.sheet-frame {
+  position: relative;
+}
+
 .sheet {
   position: relative;
   background: var(--paper);
@@ -431,8 +446,6 @@
   box-shadow: inset 0 1px 2px rgba(68, 59, 72, 0.2);
 }
 
-.sheet__tape { position: absolute; inset: 0; pointer-events: none; }
-
 .sheet__prose {
   position: relative;
   z-index: 1;
@@ -472,28 +485,6 @@
 }
 
 .tp-word.is-pending { color: var(--ink-3); }
-
-/* the soft pastel light that follows the voice down the page */
-.tp-halo {
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  border-radius: 999px;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgba(179, 208, 242, 0.42),
-    rgba(242, 179, 205, 0.2) 56%,
-    transparent 74%
-  );
-  filter: blur(10px);
-  opacity: 0;
-  z-index: 0;
-  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
-}
-
-.sheet--speaking .tp-halo { opacity: 1; }
 
 .tp-caret {
   display: inline-block;
@@ -818,6 +809,11 @@
   align-items: center;
   gap: 10px;
   margin: 2px 0 2px;
+  /* a flex item's default min-width is auto, not 0, so the rail refused to
+     shrink below its content and pushed the row past the card's edge on
+     narrower cards. This is a grid item of .story-card too, which has the
+     same default — both need it zeroed for the row to actually fit. */
+  min-width: 0;
 }
 
 .mini__play {
@@ -842,6 +838,7 @@
 .mini__rail {
   position: relative;
   flex: 1;
+  min-width: 0;
   height: 9px;
   border-radius: 999px;
   background: var(--paper-3);

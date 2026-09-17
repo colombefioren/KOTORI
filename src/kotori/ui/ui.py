@@ -80,7 +80,7 @@ def build_app(studio: Studio | None = None, settings: Settings | None = None) ->
                 with gr.Row(elem_classes=["ast-grid"]):
                     with gr.Column(scale=5, elem_id="ast-composer"):
                         gr.HTML(render_label("the brief", "one line is enough", doodle="arrow"))
-                        with gr.Group(elem_classes=["card", "ast-stack"]):
+                        with gr.Group(elem_classes=["ast-stack"]):
                             topic = gr.Textbox(
                                 label="what should happen?",
                                 placeholder=(
