@@ -190,6 +190,10 @@
   transform: translateY(-2px) rotate(0);
 }
 
+.index-tab__label {
+  white-space: nowrap;
+}
+
 .index-tab__n {
   font-family: var(--type);
   font-size: 9.5px;
@@ -232,6 +236,10 @@
 
 /* ── the three rooms ───────────────────────────────────────────────────────── */
 
+.room {
+  min-width: 0;
+}
+
 #room-home,
 #room-playground,
 #room-history {
@@ -267,6 +275,16 @@
   grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
   gap: clamp(22px, 4vw, 52px);
   align-items: center;
+}
+
+.home__say {
+  min-width: 0;
+}
+
+/* the composer's fields, spaced like items in a notebook */
+.ast-stack {
+  display: grid;
+  gap: 14px;
 }
 
 .home__kicker {
