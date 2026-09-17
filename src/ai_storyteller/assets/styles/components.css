@@ -242,6 +242,9 @@
 
 .tp-stage { position: relative; }
 
+/* the card looks unfinished while the writer is still thinking */
+.tp-stage--waiting { border-style: dashed !important; }
+
 .tp-meta {
   display: flex;
   flex-wrap: wrap;
@@ -552,7 +555,8 @@
   margin: 0;
 }
 
-.deck__audio { display: none; }
+.deck__audio,
+.deck__payload { display: none !important; }
 
 .deck__idle-note {
   font-family: var(--serif);
