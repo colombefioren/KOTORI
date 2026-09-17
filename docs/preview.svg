@@ -1,171 +1,165 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800"
      role="img" aria-labelledby="title desc">
-  <title id="title">AI Storyteller — a pastel scratchbook studio</title>
-  <desc id="desc">A warm paper page holding a composer card, a story being read aloud with the
-  spoken word highlighted, a rounded player with a pastel play button, and a shelf of saved
-  stories. Drawn to match the live stylesheet.</desc>
+  <title id="title">KOTORI — a pastel paper studio that writes a story and reads it aloud</title>
+  <desc id="desc">A scrapbook interface: three index tabs, a brief card with a genre field, a
+    reader with a round play button, and the story written on a torn sheet of ruled paper with the
+    spoken words highlighted in pastel blue.</desc>
 
   <defs>
-    <filter id="wash" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="70" />
-    </filter>
-    <linearGradient id="action" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#d6cbf4" />
-      <stop offset="1" stop-color="#f3c1cc" />
+    <linearGradient id="wash-pink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f9d5e4" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#f9d5e4" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="wash-blue" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8e7fa" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#d8e7fa" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sticker" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f9d5e4"/>
+      <stop offset="1" stop-color="#f2b3cd"/>
+    </linearGradient>
+    <linearGradient id="play" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8e7fa"/>
+      <stop offset="1" stop-color="#b3d0f2"/>
     </linearGradient>
     <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#b7ddc8" />
-      <stop offset="0.55" stop-color="#d6cbf4" />
-      <stop offset="1" stop-color="#f3c1cc" />
+      <stop offset="0" stop-color="#d8e7fa"/>
+      <stop offset="1" stop-color="#f9d5e4"/>
     </linearGradient>
-    <radialGradient id="halo">
-      <stop offset="0" stop-color="#c9bcf2" stop-opacity="0.8" />
-      <stop offset="0.6" stop-color="#f3c1cc" stop-opacity="0.25" />
-      <stop offset="1" stop-color="#f3c1cc" stop-opacity="0" />
-    </radialGradient>
-    <filter id="card" x="-10%" y="-10%" width="120%" height="130%">
-      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#5a4a35" flood-opacity="0.13" />
+    <filter id="paper" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#443b48" flood-opacity="0.16"/>
     </filter>
+    <clipPath id="torn">
+      <path d="M0 0h1188v196l-25 12-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-24 13-25-14-24 12-25-13-24 14-25-12-25 13V0Z"/>
+    </clipPath>
     <style>
-      .serif { font-family: "Lora", Georgia, serif; fill: #4b3f2f; }
-      .display { font-family: "Fraunces", Georgia, serif; fill: #4b3f2f; }
-      .sans { font-family: "Karla", "Helvetica Neue", Arial, sans-serif; fill: #4b3f2f; }
-      .label { font-family: "Karla", Arial, sans-serif; fill: #a79579; font-size: 12px;
-               letter-spacing: 2.4px; text-transform: uppercase; }
-      .hand { font-family: "Caveat", "Segoe Script", cursive; fill: #7c6c57; }
-      .faint { fill: #a79579; }
+      .display { font-family: "Fraunces", "Iowan Old Style", Georgia, serif; }
+      .serif { font-family: "EB Garamond", Garamond, Georgia, serif; }
+      .ui { font-family: "Karla", "Helvetica Neue", Arial, sans-serif; }
+      .hand { font-family: "Kalam", "Bradley Hand", cursive; }
+      .type { font-family: "Special Elite", "Courier New", monospace; }
+      .label { font-family: "Special Elite", "Courier New", monospace; font-size: 11px;
+               letter-spacing: 2.6px; fill: #9d94a2; }
+      .body { font-family: "EB Garamond", Garamond, Georgia, serif; font-size: 19px; fill: #443b48; }
+      .faint { fill: #9d94a2; }
+      .chip { font-family: "Special Elite", "Courier New", monospace; font-size: 10px;
+              letter-spacing: 1.2px; fill: #5b83b6; }
     </style>
   </defs>
 
-  <rect width="1200" height="900" fill="#f7f1e7" />
-  <g filter="url(#wash)" opacity="0.9">
-    <ellipse cx="90" cy="30" rx="260" ry="160" fill="#d6cbf4" opacity="0.7" />
-    <ellipse cx="1120" cy="80" rx="240" ry="150" fill="#b7ddc8" opacity="0.65" />
-    <ellipse cx="620" cy="900" rx="460" ry="190" fill="#f3c1cc" opacity="0.55" />
-  </g>
-  <g opacity="0.5">
-    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
-      <circle cx="1" cy="1" r="1" fill="#7a6850" opacity="0.22" />
-    </pattern>
-    <rect width="1200" height="900" fill="url(#dots)" />
-  </g>
+  <!-- the desk -->
+  <rect width="1200" height="800" fill="#f2e8ee"/>
+  <rect width="1200" height="800" fill="url(#wash-pink)"/>
+  <rect width="1200" height="800" fill="url(#wash-blue)"/>
 
   <!-- masthead -->
+  <text class="display" x="52" y="96" font-size="68" font-weight="600" fill="#443b48"
+        letter-spacing="-2">KOTO<tspan fill="#bd5f8b" font-style="italic">RI</tspan></text>
+  <text class="hand" x="54" y="126" font-size="23" fill="#6f6573">a little bird that tells you stories</text>
+
+  <!-- the shelf note -->
+  <g transform="rotate(-1.2 1050 96)">
+    <rect x="928" y="62" width="216" height="62" rx="9" fill="#fdf9f0" stroke="#e8dbe2" stroke-width="1.5"/>
+    <text class="label" x="948" y="86">3 STORIES KEPT · 1200 WORDS</text>
+    <text class="label" x="948" y="106">A QUIET WRITER</text>
+  </g>
+  <g transform="rotate(-1.4 1010 44)">
+    <rect x="938" y="26" width="146" height="30" rx="15" fill="#fffdfa" stroke="#cdbac5" stroke-width="1.5"/>
+    <circle cx="958" cy="41" r="7.5" fill="url(#rail)" stroke="#cdbac5" stroke-width="1"/>
+    <text class="label" x="974" y="45">NIGHT DESK</text>
+  </g>
+
+  <!-- index tabs -->
   <g>
-    <rect x="60" y="46" width="316" height="34" rx="17" fill="#fffdf8" stroke="#ecdfca" />
-    <circle cx="82" cy="63" r="5" fill="#7cb79b" />
-    <text x="96" y="68" class="label">AI Storyteller</text>
-    <text x="246" y="68" class="label" style="letter-spacing:0;text-transform:none">v0.2.0</text>
-    <text x="60" y="140" class="display" font-size="46" font-weight="500">
-      Stories that <tspan fill="#a795e0" font-style="italic">speak</tspan> for themselves
-    </text>
-    <text x="60" y="172" class="serif" font-size="16" fill="#7c6c57">
-      Write a topic, watch the story arrive word by word, then let it read itself back to you.
-    </text>
-    <text x="60" y="202" class="label" style="font-size:11px">streamed prose ✽ a small voice ✽ karaoke ✽ a shelf you keep</text>
+    <rect x="52" y="158" width="24" height="40" rx="6" fill="#f9d5e4" stroke="#cdbac5" stroke-width="1.5"/>
+    <path d="M86 198v-32a9 11 0 0 1 9-11h108a9 11 0 0 1 9 11v32z" fill="#fdf7f8" stroke="#e8dbe2" stroke-width="1.5"/>
+    <text class="type" x="102" y="172" font-size="10" fill="#9d94a2">01</text>
+    <text class="hand" x="122" y="186" font-size="21" fill="#6f6573">home</text>
+
+    <path d="M226 198v-32a9 11 0 0 1 9-11h172a9 11 0 0 1 9 11v32z" fill="#fffdfa" stroke="#cdbac5" stroke-width="1.5"/>
+    <rect x="272" y="150" width="46" height="14" rx="3" fill="#d8e7fa" opacity="0.85"
+          transform="rotate(-3 295 157)"/>
+    <text class="type" x="242" y="172" font-size="10" fill="#9d94a2">02</text>
+    <text class="hand" x="262" y="187" font-size="21" fill="#443b48">playground</text>
+
+    <path d="M430 198v-32a9 11 0 0 1 9-11h156a9 11 0 0 1 9 11v32z" fill="#fdf7f8" stroke="#e8dbe2" stroke-width="1.5"/>
+    <text class="type" x="446" y="172" font-size="10" fill="#9d94a2">03</text>
+    <text class="hand" x="466" y="187" font-size="21" fill="#6f6573">history</text>
+    <rect x="580" y="166" width="22" height="20" rx="10" fill="#f9d5e4" stroke="#e288ae" stroke-width="1.4"/>
+    <text class="type" x="586" y="181" font-size="10" fill="#443b48">3</text>
+    <line x1="52" y1="199" x2="1148" y2="199" stroke="#cdbac5" stroke-width="1.5" stroke-dasharray="8 8"/>
   </g>
 
-  <!-- composer -->
-  <g filter="url(#card)">
-    <rect x="60" y="238" width="368" height="330" rx="18" fill="#fffdf8" stroke="#ecdfca" />
+  <!-- the brief card -->
+  <g filter="url(#paper)">
+    <rect x="52" y="228" width="430" height="196" rx="10" fill="#fffdfa" stroke="#e8dbe2" stroke-width="1.5"/>
   </g>
-  <text x="88" y="276" class="label">what should happen?</text>
-  <rect x="88" y="290" width="312" height="104" rx="12" fill="#fdf8f0" stroke="#ecdfca" />
-  <text x="106" y="322" class="serif" font-size="15" fill="#a79579" font-style="italic">
-    a lighthouse keeper who receives
-  </text>
-  <text x="106" y="346" class="serif" font-size="15" fill="#a79579" font-style="italic">
-    letters from a ship that sank
-  </text>
-  <text x="106" y="370" class="serif" font-size="15" fill="#a79579" font-style="italic">
-    in 1912
-  </text>
-
-  <rect x="88" y="412" width="196" height="46" rx="23" fill="url(#action)" />
-  <text x="118" y="441" class="sans" font-size="14" font-weight="600">write the story</text>
-  <rect x="296" y="412" width="104" height="46" rx="23" fill="#fffdf8" stroke="#ddc9ac" />
-  <text x="318" y="441" class="sans" font-size="13" fill="#7c6c57">surprise me</text>
-
-  <line x1="88" y1="488" x2="400" y2="488" stroke="#ecdfca" stroke-dasharray="4 5" />
-  <text x="88" y="516" class="sans" font-size="12" fill="#a79579">more settings</text>
-  <text x="88" y="546" class="sans" font-size="12" fill="#7c6c57">genre · mood · voice · length</text>
-  <circle cx="94" cy="576" r="5" fill="#7cb79b" />
-  <text x="108" y="581" class="sans" font-size="12" fill="#7c6c57">warming up the pen…</text>
-
-  <!-- stage -->
-  <g filter="url(#card)">
-    <rect x="458" y="238" width="682" height="330" rx="18" fill="#fffdf8" stroke="#ecdfca" />
+  <rect x="38" y="216" width="110" height="26" fill="#f9d5e4" opacity="0.9"
+        transform="rotate(-8 93 229)"/>
+  <text class="label" x="76" y="262">THE BRIEF · ONE LINE IS ENOUGH</text>
+  <text class="hand" x="76" y="292" font-size="19" fill="#6f6573">what should happen?</text>
+  <g>
+    <rect x="76" y="304" width="382" height="74" rx="8" fill="#fdf7f8" stroke="#cdbac5" stroke-width="1.5"/>
+    <line x1="76" y1="330" x2="458" y2="330" stroke="#e8dbe2"/>
+    <line x1="76" y1="359" x2="458" y2="359" stroke="#e8dbe2"/>
+    <text class="serif" x="90" y="327" font-size="17" fill="#443b48">a lighthouse keeper who receives letters</text>
+    <text class="serif" x="90" y="356" font-size="17" fill="#443b48">from a ship that sank in 1912</text>
   </g>
-  <g class="sans" font-size="11">
-    <rect x="482" y="262" width="104" height="26" rx="13" fill="#e6f3ec" stroke="#b7ddc8" />
-    <text x="498" y="279" fill="#5f9880">187 words</text>
-    <rect x="594" y="262" width="112" height="26" rx="13" fill="#ede8fb" stroke="#d6cbf4" />
-    <text x="610" y="279" fill="#8674c4">1:14 to read</text>
-    <rect x="714" y="262" width="74" height="26" rx="13" fill="#fdf8f0" stroke="#ecdfca" />
-    <text x="732" y="279" fill="#7c6c57">Noir</text>
-    <rect x="796" y="262" width="122" height="26" rx="13" fill="#fdeef2" stroke="#f3c1cc" />
-    <text x="812" y="279" fill="#c07d90">Aurora · US</text>
-    <rect x="926" y="262" width="96" height="26" rx="13" fill="#fdf6e2" stroke="#f8e6b2" />
-    <text x="944" y="279" fill="#b9983f">archived</text>
-  </g>
+  <rect x="76" y="390" width="182" height="26" rx="8" fill="#fdf7f8" stroke="#cdbac5" stroke-width="1.5"/>
+  <text class="type" x="88" y="407" font-size="10" fill="#9d94a2">GENRE · GHOST STORY</text>
+  <text class="hand" x="286" y="410" font-size="17" fill="#bd5f8b">← paste your own</text>
 
-  <rect x="482" y="304" width="634" height="240" rx="12" fill="#fdf8f0" stroke="#ecdfca" />
-  <line x1="515" y1="304" x2="515" y2="544" stroke="#d98ea2" stroke-opacity="0.35" />
-  <circle cx="724" cy="406" r="76" fill="url(#halo)" />
-  <text x="530" y="346" class="serif" font-size="17">
-    The lighthouse keeper had letters again. They arrived
-  </text>
-  <text x="530" y="382" class="serif" font-size="17">
-    with the tide, sealed in wax the colour of old blood,
-  </text>
-  <rect x="684" y="399" width="59" height="27" rx="6" fill="#f8e6b2" />
-  <text x="530" y="419" class="serif" font-size="17">
-    addressed in her <tspan x="688">own</tspan><tspan x="750"> hand, and the wax</tspan>
-  </text>
-  <text x="530" y="455" class="serif" font-size="17" fill="#a79579">
-    was still warm. The first one asked her to keep the lamp
-  </text>
-  <text x="530" y="491" class="serif" font-size="17" fill="#a79579">
-    lit on the sixteenth of March.
-  </text>
-
-  <!-- player -->
-  <g filter="url(#card)">
-    <rect x="458" y="586" width="682" height="152" rx="18" fill="#fffdf8" stroke="#ecdfca" />
+  <!-- the reader card -->
+  <g filter="url(#paper)">
+    <rect x="512" y="228" width="634" height="196" rx="10" fill="#fffdfa" stroke="#e8dbe2" stroke-width="1.5"/>
   </g>
-  <circle cx="524" cy="646" r="31" fill="url(#action)" />
-  <path d="M518 633 l18 13 -18 13 z" fill="#4b3f2f" />
-  <text x="576" y="626" class="label" style="font-size:11px">now speaking: “own”</text>
-  <rect x="576" y="636" width="392" height="12" rx="6" fill="#fdf8f0" stroke="#ecdfca" />
-  <rect x="576" y="636" width="164" height="12" rx="6" fill="url(#rail)" />
-  <text x="982" y="647" class="sans" font-size="12" fill="#a79579">0:31 / 1:14</text>
-  <line x1="482" y1="676" x2="1116" y2="676" stroke="#ecdfca" stroke-dasharray="4 5" />
-  <g class="sans" font-size="12" fill="#7c6c57">
-    <rect x="482" y="694" width="112" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
-    <text x="498" y="713">↺ from the top</text>
-    <rect x="604" y="694" width="120" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
-    <text x="620" y="713">↓ save the mp3</text>
-    <rect x="734" y="694" width="130" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
-    <text x="750" y="713">⧉ copy the words</text>
-    <rect x="874" y="694" width="128" height="30" rx="15" fill="#fdf8f0" stroke="#ecdfca" />
-    <text x="890" y="713">↗ share a link</text>
+  <rect x="500" y="216" width="96" height="24" fill="#d8e7fa" opacity="0.9"
+        transform="rotate(-4 548 228)"/>
+  <text class="label" x="536" y="262">THE READER · PRESS PLAY AND READ ALONG</text>
+  <circle cx="586" cy="330" r="38" fill="url(#play)" stroke="#5b83b6" stroke-width="2"/>
+  <circle cx="586" cy="330" r="34" fill="none" stroke="#fffdfa" stroke-width="2"/>
+  <path d="M576 314l26 16-26 16z" fill="#443b48"/>
+  <text class="label" x="654" y="308">NOW SPEAKING · “HARBOUR”</text>
+  <rect x="654" y="320" width="464" height="15" rx="8" fill="#f7eef2" stroke="#cdbac5" stroke-width="1.5"/>
+  <rect x="654" y="320" width="228" height="15" rx="8" fill="url(#rail)"/>
+  <text class="type" x="654" y="360" font-size="10" fill="#9d94a2">1:42 / 3:12</text>
+  <text class="hand" x="654" y="392" font-size="18" fill="#9d94a2">space plays and pauses · ← → skip five seconds</text>
+  <line x1="536" y1="404" x2="1122" y2="404" stroke="#e8dbe2" stroke-dasharray="6 6"/>
+  <text class="ui" x="536" y="422" font-size="12" fill="#6f6573">↺ from the top</text>
+  <text class="ui" x="654" y="422" font-size="12" fill="#6f6573">↓ save the mp3</text>
+  <text class="ui" x="772" y="422" font-size="12" fill="#6f6573">⧉ copy the words</text>
+  <text class="ui" x="900" y="422" font-size="12" fill="#6f6573">↗ share a link</text>
+
+  <!-- the story sheet, torn out of a notebook -->
+  <g filter="url(#paper)">
+    <rect x="52" y="456" width="1094" height="248" fill="#fffdfa"/>
+  </g>
+  <g clip-path="url(#torn)">
+    <rect x="52" y="640" width="1094" height="70" fill="#fffdfa"/>
+  </g>
+  <rect x="52" y="456" width="1094" height="248" fill="none" stroke="#cdbac5" stroke-width="1.5"/>
+  <line x1="112" y1="472" x2="112" y2="684" stroke="#f2b3cd" stroke-width="1.5"/>
+  <g fill="#f2e8ee" stroke="#e8dbe2" stroke-width="1.5">
+    <circle cx="82" cy="502" r="7.5"/><circle cx="82" cy="566" r="7.5"/><circle cx="82" cy="630" r="7.5"/>
+  </g>
+  <text class="label" x="140" y="486">THE PAGE · WRITTEN HERE, HEARD HERE</text>
+
+  <g class="body">
+    <text x="140" y="524">The <tspan font-weight="600">keeper</tspan> counted the sails twice before she believed them. Every</text>
+    <text x="140" y="553">letter that arrived that winter smelled of salt and engine oil, and none of</text>
+    <text x="140" y="582">them had been written by anyone still living. She kept them in a biscuit</text>
+    <text x="140" y="611">tin, then in the lamp room, where <tspan class="faint">the light could read</tspan></text>
+    <text x="140" y="640"><tspan class="faint">them back to the sea</tspan> night after night after night.</text>
   </g>
 
-  <!-- shelf -->
-  <g filter="url(#card)">
-    <rect x="60" y="586" width="368" height="262" rx="18" fill="#fffdf8" stroke="#ecdfca" />
-  </g>
-  <text x="88" y="622" class="label">your shelf</text>
-  <g font-size="13">
-    <rect x="88" y="640" width="312" height="58" rx="12" fill="#ede8fb" stroke="#d6cbf4" />
-    <text x="104" y="663" class="sans" font-weight="600">⟡ The lighthouse keeper</text>
-    <text x="104" y="683" class="sans" font-size="11" fill="#7c6c57">Noir · 187 words · 17 Sep</text>
+  <!-- the spoken word, on a pastel highlighter mark, with the halo behind it -->
+  <circle cx="330" cy="578" r="46" fill="#d8e7fa" opacity="0.55"/>
+  <rect x="286" y="562" width="92" height="26" rx="4" fill="#d8e7fa"/>
+  <text class="serif" x="290" y="582" font-size="19" fill="#443b48">biscuit</text>
+  <path d="M382 592v22" stroke="#bd5f8b" stroke-width="2"/>
 
-    <rect x="88" y="708" width="312" height="58" rx="12" fill="#fdf8f0" stroke="#ecdfca" />
-    <text x="104" y="731" class="sans" font-weight="600">⟡ The last video rental on the moon</text>
-    <text x="104" y="751" class="sans" font-size="11" fill="#7c6c57">Science Fiction · 240 words · 16 Sep</text>
-  </g>
-  <rect x="88" y="780" width="156" height="42" rx="21" fill="#fffdf8" stroke="#ddc9ac" />
-  <text x="110" y="806" class="sans" font-size="13" fill="#7c6c57">delete this story</text>
-  <text x="264" y="806" class="hand" font-size="19">pick one to hear it again</text>
+  <!-- margin notes -->
+  <text class="hand" x="960" y="700" font-size="20" fill="#9d94a2">every story is four hundred words</text>
+  <path d="M930 676c26-14 52-16 78-6" fill="none" stroke="#5b83b6" stroke-width="2" stroke-linecap="round"/>
+  <path d="M930 676l14-3M930 676l9 11" fill="none" stroke="#5b83b6" stroke-width="2" stroke-linecap="round"/>
 </svg>
