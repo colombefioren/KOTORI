@@ -29,10 +29,10 @@
     host.appendChild(node);
     window.setTimeout(function () {
       node.style.opacity = "0";
-      node.style.transition = "opacity 0.3s ease";
+      node.style.transition = "opacity 0.35s ease";
       window.setTimeout(function () {
         node.remove();
-      }, 320);
+      }, 360);
     }, 2600);
   };
 
@@ -65,19 +65,18 @@
     if (field) {
       field.focus();
       if (field.select) field.select();
+      field.scrollIntoView({ block: "center", behavior: "smooth" });
     }
   }
 
-  function openTab(pattern) {
-    var tabs = Array.prototype.slice.call(document.querySelectorAll("#ast-tabs .tab-nav button"));
-    var match = tabs.find(function (button) {
-      return pattern.test(button.textContent || "");
-    });
-    if (match) match.click();
+  function scrollToShelf() {
+    var shelf = document.getElementById("ast-archive-pick");
+    if (shelf) shelf.scrollIntoView({ block: "center", behavior: "smooth" });
   }
 
   function deckAction(action) {
-    var button = document.querySelector('.deck [data-act="' + action + '"]');
+    var deck = window.ASTPlayer ? window.ASTPlayer.deck() : null;
+    var button = deck && deck.querySelector('[data-act="' + action + '"]');
     if (button) button.click();
   }
 
@@ -85,23 +84,23 @@
 
   var SHORTCUTS = [
     ["Ctrl / ⌘ + K", "command palette"],
-    ["/", "focus the topic field"],
-    ["Ctrl / ⌘ + Enter", "ignite a story"],
+    ["/", "jump to the topic field"],
+    ["Ctrl / ⌘ + Enter", "write the story"],
     ["Space", "play or pause the voice"],
-    ["← / →", "scrub five seconds"],
-    ["A", "open the archive"],
-    ["P", "paste a shared story"],
+    ["← / →", "skip five seconds"],
+    ["S", "scroll to your shelf"],
+    ["P", "open a shared story"],
     ["T", "toggle the cursor trail"],
     ["?", "this sheet"],
-    ["Esc", "close overlays"],
+    ["Esc", "close this"],
   ];
 
   var COMMANDS = [
     {
-      label: "Ignite a story",
+      label: "Write a story",
       hint: "⌘ + ⏎",
       run: function () {
-        if (!click("ast-ignite")) window.ASTToast("composer not ready", "error");
+        if (!click("ast-ignite")) window.ASTToast("the composer is not ready", "error");
       },
     },
     {
@@ -112,16 +111,14 @@
       },
     },
     {
-      label: "Focus the topic field",
+      label: "Jump to the topic field",
       hint: "/",
       run: focusTopic,
     },
     {
-      label: "Open the archive",
-      hint: "A",
-      run: function () {
-        openTab(/archive|shelf/i);
-      },
+      label: "Scroll to your shelf",
+      hint: "S",
+      run: scrollToShelf,
     },
     {
       label: "Play or pause the voice",
@@ -131,17 +128,17 @@
       },
     },
     {
-      label: "Copy the prose",
+      label: "Copy the words",
       hint: "clipboard",
       run: function () {
         deckAction("copy");
       },
     },
     {
-      label: "Download the markdown",
-      hint: ".md",
+      label: "Save the mp3",
+      hint: ".mp3",
       run: function () {
-        deckAction("download-md");
+        deckAction("download-mp3");
       },
     },
     {
@@ -156,13 +153,6 @@
       hint: "T",
       run: function () {
         toggleTrail();
-      },
-    },
-    {
-      label: "Back to the top",
-      hint: "scroll",
-      run: function () {
-        window.scrollTo({ top: 0, behavior: "smooth" });
       },
     },
   ];
@@ -242,33 +232,37 @@
 
   /* ── trail toggle + shared links ──────────────────────────────────────── */
 
+  function trailCanvas() {
+    return document.getElementById("ast-trail");
+  }
+
   function toggleTrail() {
-    var canvas = document.getElementById("ast-trail");
+    var canvas = trailCanvas();
     var off = window.localStorage.getItem(TRAIL_KEY) === "1";
     window.localStorage.setItem(TRAIL_KEY, off ? "0" : "1");
     if (canvas) canvas.style.display = off ? "" : "none";
-    window.ASTToast(off ? "cursor trail on" : "cursor trail off");
+    window.ASTToast(off ? "the trail is back" : "trail hidden");
   }
 
   function applyTrailPreference() {
     if (window.localStorage.getItem(TRAIL_KEY) !== "1") return;
-    var canvas = document.getElementById("ast-trail");
+    var canvas = trailCanvas();
     if (canvas) canvas.style.display = "none";
   }
 
   function adoptStory(text) {
     if (!text) {
-      window.ASTToast("nothing to open", "error");
+      window.ASTToast("there is nothing to open", "error");
       return;
     }
     var field = gradioInput("ast-incoming");
     if (!field) {
-      window.ASTToast("restore is unavailable", "error");
+      window.ASTToast("restoring is unavailable right now", "error");
       return;
     }
     field.value = text;
     field.dispatchEvent(new Event("input", { bubbles: true }));
-    if (!click("ast-adopt")) window.ASTToast("restore is unavailable", "error");
+    if (!click("ast-adopt")) window.ASTToast("restoring is unavailable right now", "error");
   }
 
   function restoreFromPrompt() {
@@ -312,7 +306,7 @@
 
     if (meta && event.key === "Enter") {
       event.preventDefault();
-      click("ast-ignite") || window.ASTToast("composer not ready", "error");
+      if (!click("ast-ignite")) window.ASTToast("the composer is not ready", "error");
       return;
     }
 
@@ -353,8 +347,8 @@
     }
 
     var key = (event.key || "").toLowerCase();
-    if (key === "a") {
-      openTab(/archive|shelf/i);
+    if (key === "s") {
+      scrollToShelf();
     } else if (key === "p") {
       restoreFromPrompt();
     } else if (key === "t") {
@@ -373,8 +367,5 @@
     buildOverlays();
     applyTrailPreference();
     window.setTimeout(restoreFromHash, 600);
-    window.setTimeout(function () {
-      window.ASTToast("press ? for shortcuts", "ok");
-    }, 1200);
   });
 })();

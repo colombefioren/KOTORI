@@ -1,9 +1,14 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   deck.js — client-side exports, share links and the story codec
+   deck.js — client-side exports, share links and the story codec.
+
+   Every button works on the deck it lives in, so exports always describe the
+   story on screen rather than whichever story was written last.
    ───────────────────────────────────────────────────────────────────────────── */
 
 (function () {
   "use strict";
+
+  var bound = [];
 
   function toast(message, tone) {
     if (typeof window.ASTToast === "function") window.ASTToast(message, tone);
@@ -75,86 +80,82 @@
 
   window.ASTCodec = { encode: encode, decode: decode };
 
-  function slugOf(deck, fallback) {
-    var slug = deck.getAttribute("data-slug") || fallback;
-    return slug.replace(/[^a-z0-9-]+/gi, "-") || fallback;
+  function slugOf(deck) {
+    var slug = deck.getAttribute("data-slug") || "story";
+    return slug.replace(/[^a-z0-9-]+/gi, "-") || "story";
+  }
+
+  function audioOf(deck) {
+    return deck.querySelector(".deck__audio");
+  }
+
+  function act(deck, action) {
+    var audio = audioOf(deck);
+    var prose = payload(deck, "text");
+    var slug = slugOf(deck);
+
+    if (action === "restart") {
+      if (!audio) return;
+      audio.currentTime = 0;
+      var promise = audio.play();
+      if (promise && promise.catch) promise.catch(function () {});
+      return;
+    }
+
+    if (action === "copy") {
+      copyText(prose).then(function () {
+        toast("the words are on your clipboard", "ok");
+      });
+      return;
+    }
+
+    if (action === "download-md") {
+      saveBlob(slug + ".md", payload(deck, "markdown"), "text/markdown;charset=utf-8");
+      toast("saved as markdown", "ok");
+      return;
+    }
+
+    if (action === "download-mp3") {
+      if (!audio || !audio.getAttribute("src")) {
+        toast("this story has no voice yet", "error");
+        return;
+      }
+      var link = document.createElement("a");
+      link.href = audio.getAttribute("src");
+      link.download = slug + ".mp3";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast("the mp3 is yours", "ok");
+      return;
+    }
+
+    if (action === "share") {
+      var url = window.location.origin + window.location.pathname + "#s=" + encode(prose);
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, "", "#s=" + encode(prose));
+      }
+      copyText(url).then(function () {
+        toast("share link copied", "ok");
+      });
+    }
   }
 
   function bind(deck) {
-    var audio = deck.querySelector("#ast-audio");
-    var buttons = deck.querySelectorAll("[data-act]");
-    if (!buttons.length || deck.dataset.astTools === "1") return;
+    if (deck.dataset.astTools === "1") return;
     deck.dataset.astTools = "1";
-
-    buttons.forEach(function (button) {
+    bound.push(deck);
+    Array.prototype.forEach.call(deck.querySelectorAll("[data-act]"), function (button) {
       button.addEventListener("click", function () {
-        var action = button.getAttribute("data-act");
-        var prose = payload(deck, "text");
-        var markdown = payload(deck, "markdown");
-        var slug = slugOf(deck, "story");
-
-        if (action === "restart") {
-          if (audio) {
-            audio.currentTime = 0;
-            var promise = audio.play();
-            if (promise && promise.catch) promise.catch(function () {});
-          }
-          return;
-        }
-
-        if (action === "copy") {
-          copyText(prose).then(function () {
-            toast("prose copied", "ok");
-          });
-          return;
-        }
-
-        if (action === "download-md") {
-          saveBlob(slug + ".md", markdown, "text/markdown;charset=utf-8");
-          toast("markdown saved", "ok");
-          return;
-        }
-
-        if (action === "download-txt") {
-          saveBlob(slug + ".txt", prose, "text/plain;charset=utf-8");
-          toast("plain text saved", "ok");
-          return;
-        }
-
-        if (action === "download-mp3") {
-          if (!audio || !audio.getAttribute("src")) {
-            toast("no audio rendered", "error");
-            return;
-          }
-          var link = document.createElement("a");
-          link.href = audio.getAttribute("src");
-          link.download = slug + ".mp3";
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          toast("mp3 saved", "ok");
-          return;
-        }
-
-        if (action === "share") {
-          var url =
-            window.location.origin +
-            window.location.pathname +
-            "#s=" +
-            encode(prose);
-          if (window.history && window.history.replaceState) {
-            window.history.replaceState(null, "", "#s=" + encode(prose));
-          }
-          copyText(url).then(function () {
-            toast("share link copied", "ok");
-          });
-        }
+        act(deck, button.getAttribute("data-act"));
       });
     });
   }
 
   window.ASTBus.onUpdate(function () {
-    var deck = document.querySelector(".deck");
-    if (deck) bind(deck);
+    bound = bound.filter(function (deck) {
+      return document.contains(deck);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".deck"), bind);
   });
 })();

@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   trail.js — a tiny DOM bus plus the neon pastel cursor trail
+   trail.js — a tiny DOM bus plus the pastel cursor trail
    ───────────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -45,34 +45,37 @@
     schedule();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", observe);
-  } else {
-    observe();
+  function onReady(fn) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", fn);
+    } else {
+      fn();
+    }
   }
 
-  /* keep the studio dark whatever the OS thinks */
-  function forceDark() {
+  onReady(observe);
+
+  /* the studio is paper, never midnight: strip anything that says otherwise */
+  function keepLight() {
+    var root = document.documentElement;
     ["dark", "dark-mode"].forEach(function (cls) {
-      document.documentElement.classList.add(cls);
-      if (document.body) document.body.classList.add(cls);
+      root.classList.remove(cls);
+      if (document.body) document.body.classList.remove(cls);
     });
+    root.classList.add("light");
+    if (document.body) document.body.classList.add("light");
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", forceDark);
-  } else {
-    forceDark();
-  }
-  window.ASTBus.onUpdate(forceDark);
+  onReady(keepLight);
+  window.ASTBus.onUpdate(keepLight);
 
   /* ── cursor trail ─────────────────────────────────────────────────────── */
 
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   if (reduced.matches) return;
 
-  var COLOURS = ["#96f7d2", "#cbb8ff", "#ffb2cb", "#ffe8a3", "#a6d8ff"];
-  var MAX_POINTS = 30;
+  var COLOURS = ["#a795e0", "#d98ea2", "#7cb79b", "#d8b96b", "#8ab3d6"];
+  var MAX_POINTS = 26;
 
   var canvas = document.createElement("canvas");
   canvas.id = "ast-trail";
@@ -82,7 +85,7 @@
   var width = 0;
   var height = 0;
   var dpr = 1;
-  var head = { x: 0, y: 0, active: false };
+  var head = { x: 0, y: 0 };
   var colourIndex = 0;
 
   function resize() {
@@ -99,7 +102,6 @@
   function push(x, y) {
     head.x = x;
     head.y = y;
-    head.active = true;
     points.push({ x: x, y: y, colour: COLOURS[colourIndex] });
     colourIndex = (colourIndex + 1) % COLOURS.length;
     if (points.length > MAX_POINTS) points.shift();
@@ -116,19 +118,18 @@
         var previous = points[i - 1];
         var point = points[i];
         var ratio = i / points.length;
-        context.globalAlpha = ratio * 0.6;
+        context.globalAlpha = ratio * 0.45;
         context.strokeStyle = point.colour;
-        context.lineWidth = ratio * 3.2 + 0.35;
+        context.lineWidth = ratio * 2.6 + 0.3;
         context.beginPath();
         context.moveTo(previous.x, previous.y);
         context.lineTo(point.x, point.y);
         context.stroke();
       }
-      /* the glowing head of the trail */
-      context.globalAlpha = 0.85;
+      context.globalAlpha = 0.5;
       context.fillStyle = COLOURS[colourIndex];
       context.beginPath();
-      context.arc(head.x, head.y, 3.2, 0, Math.PI * 2);
+      context.arc(head.x, head.y, 2.6, 0, Math.PI * 2);
       context.fill();
       context.globalAlpha = 1;
     }
@@ -147,7 +148,9 @@
     points = [];
   });
 
-  document.body.appendChild(canvas);
-  resize();
-  window.requestAnimationFrame(frame);
+  onReady(function () {
+    document.body.appendChild(canvas);
+    resize();
+    window.requestAnimationFrame(frame);
+  });
 })();
