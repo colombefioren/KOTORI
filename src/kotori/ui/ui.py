@@ -18,8 +18,10 @@ from functools import partial
 
 import gradio as gr
 
+from ..config import APP_NAME, Settings, get_settings
+from ..core.prompts import GENRE_LABELS, MOOD_LABELS
+from ..core.speech import voice_choices
 from . import callbacks
-from .config import APP_NAME, Settings, get_settings
 from .markup import (
     render_deck_idle,
     render_home_intro,
@@ -32,8 +34,6 @@ from .markup import (
     render_sticky,
     render_tabs,
 )
-from .prompts import GENRE_LABELS, MOOD_LABELS
-from .speech import voice_choices
 from .studio import Studio
 
 DEFAULT_GENRE = "Contemporary"

@@ -8,7 +8,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
-from .config import STORY_WORDS
+from ..config import STORY_WORDS
 
 WORD_RE = re.compile(r"[\w'’-]+", re.UNICODE)
 SLUG_RE = re.compile(r"[^a-z0-9]+")

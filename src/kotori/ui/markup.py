@@ -15,11 +15,11 @@ from __future__ import annotations
 import html
 from collections.abc import Mapping, Sequence
 
-from .config import APP_NAME, APP_TAGLINE, STORY_WORDS, Settings
-from .library import ArchiveStats
-from .models import StoryDraft, format_duration, humanize_ms
-from .speech import Voice, resolve_voice
-from .timing import word_weight
+from ..config import APP_NAME, APP_TAGLINE, STORY_WORDS, Settings
+from ..core.library import ArchiveStats
+from ..core.models import StoryDraft, format_duration, humanize_ms
+from ..core.speech import Voice, resolve_voice
+from ..core.timing import word_weight
 
 escape = html.escape
 
@@ -576,20 +576,12 @@ def archive_choices(drafts: Sequence[StoryDraft]) -> list[tuple[str, str]]:
 
 def render_footer(settings: Settings, data_dir: object | None = None) -> str:
     """Credits, licence note and where the stories are kept."""
-    location = data_dir or settings.data_dir
     return f"""
 <footer class="ast-footer">
-  <span>{escape(APP_NAME)} · {escape(APP_TAGLINE)} · written with gradio {escape(_gradio_version())}</span>
+  <span>{escape(APP_NAME)} · {escape(APP_TAGLINE)}</span>
   <span>
     <a href="https://github.com/colombefioren/kotori" target="_blank" rel="noreferrer">source</a> ·
     <a href="/gradio_api/info" target="_blank" rel="noreferrer">api</a>
   </span>
-  <span>kept in {escape(str(location))}</span>
 </footer>
 """
-
-
-def _gradio_version() -> str:
-    import gradio as gr
-
-    return gr.__version__

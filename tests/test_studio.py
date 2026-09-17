@@ -3,11 +3,11 @@ from pathlib import Path
 
 import pytest
 
-from kotori import studio as studio_module
 from kotori.config import STORY_WORDS, Settings
-from kotori.models import StoryDraft
-from kotori.story import StoryChunk
-from kotori.studio import Studio
+from kotori.core.models import StoryDraft
+from kotori.core.story import StoryChunk
+from kotori.ui import studio as studio_module
+from kotori.ui.studio import Studio
 
 PROSE = (
     "The lamp turned twice and the sea leaned closer, patient as debt. "
@@ -254,9 +254,8 @@ def test_roll_topic_returns_a_seed(studio: Studio):
     assert len(studio.roll_topic()) > 10
 
 
-def test_masthead_and_footer_describe_the_studio(studio: Studio):
+def test_masthead_describes_the_studio(studio: Studio):
     assert "KOTO<b>RI</b>" in studio.masthead()
-    assert str(studio.data_dir) in studio.footer()
 
 
 def test_view_outputs_unpack_in_ui_order(studio: Studio):

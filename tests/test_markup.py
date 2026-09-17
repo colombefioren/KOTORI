@@ -1,6 +1,7 @@
 from kotori.config import Settings
-from kotori.library import ArchiveStats
-from kotori.markup import (
+from kotori.core.library import ArchiveStats
+from kotori.core.models import StoryDraft
+from kotori.ui.markup import (
     ROOMS,
     STAGE_PAPER,
     archive_choices,
@@ -22,7 +23,6 @@ from kotori.markup import (
     render_thinking,
     render_words,
 )
-from kotori.models import StoryDraft
 
 STORY = "The lamp turned twice and the sea leaned closer, patient as debt."
 AUDIO = "/gradio_api/file=/tmp/kotori/audio/the-lamp-abcd-aurora.mp3"
@@ -244,8 +244,7 @@ def test_archive_choices_describe_each_story():
     assert choices[0][0].startswith("The lamp")
 
 
-def test_footer_mentions_the_data_dir_and_the_source():
+def test_footer_mentions_the_source():
     footer = render_footer(Settings(data_dir="/tmp/archive"))
-    assert "gradio" in footer
-    assert "/tmp/archive" in footer
+
     assert "github.com/colombefioren/kotori" in footer

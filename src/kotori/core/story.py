@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from .config import Settings, get_settings
+from ..config import Settings, get_settings
 from .llm import build_chat_model
 from .models import StoryDraft, StoryRequest
 from .prompts import build_messages, clean_story, get_genre, get_mood, random_topic

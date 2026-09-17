@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from kotori.speech import (
+from kotori.core.speech import (
     DEFAULT_VOICE,
     VOICES,
     audio_data_uri,

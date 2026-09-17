@@ -4,7 +4,7 @@ import gradio as gr
 
 from kotori.app import build_demo, build_studio, launch_options
 from kotori.config import Settings
-from kotori.frontend import (
+from kotori.ui.frontend import (
     SCRIPT_FILES,
     STYLE_FILES,
     favicon_path,
@@ -13,7 +13,7 @@ from kotori.frontend import (
     script_source,
     stylesheet_paths,
 )
-from kotori.theme import Washi
+from kotori.ui.theme import Washi
 
 EXPECTED_IDS = {
     "ast-masthead",

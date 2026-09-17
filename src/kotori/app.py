@@ -8,10 +8,10 @@ from typing import Any
 import gradio as gr
 
 from .config import Settings, get_settings
-from .frontend import favicon_path, head_html, script_source, stylesheet_paths
-from .studio import Studio
-from .theme import build_theme
-from .ui import build_app, configure_queue
+from .ui.frontend import favicon_path, head_html, script_source, stylesheet_paths
+from .ui.studio import Studio
+from .ui.theme import build_theme
+from .ui.ui import build_app, configure_queue
 
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 7860

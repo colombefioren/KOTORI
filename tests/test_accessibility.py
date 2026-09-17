@@ -1,8 +1,9 @@
 """The studio should be navigable without a mouse and legible to a screen reader."""
 
 from kotori.config import Settings
-from kotori.library import ArchiveStats
-from kotori.markup import (
+from kotori.core.library import ArchiveStats
+from kotori.core.models import StoryDraft
+from kotori.ui.markup import (
     render_deck,
     render_deck_idle,
     render_footer,
@@ -17,7 +18,6 @@ from kotori.markup import (
     render_thinking,
     render_words,
 )
-from kotori.models import StoryDraft
 
 STORY = "She waited, and the city answered. Was it real?"
 AUDIO = "/gradio_api/file=/tmp/kotori/audio/the-lamp-a11y-aurora.mp3"

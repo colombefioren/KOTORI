@@ -12,9 +12,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import quote
 
-from .config import STORY_WORDS, Settings, ensure_writable_dir, get_settings
-from .demo import DEMO_GENRE, DEMO_MODEL, DEMO_MOOD, demo_stream
-from .library import StoryLibrary
+from ..config import STORY_WORDS, Settings, ensure_writable_dir, get_settings
+from ..core.demo import DEMO_GENRE, DEMO_MODEL, DEMO_MOOD, demo_stream
+from ..core.library import StoryLibrary
+from ..core.models import StoryDraft, StoryRequest
+from ..core.prompts import get_genre, get_mood, random_topic
+from ..core.speech import SpeechError, resolve_voice, synthesize
+from ..core.story import StoryService
+from ..core.timing import estimate_duration
 from .markup import (
     archive_choices,
     render_deck,
@@ -27,11 +32,6 @@ from .markup import (
     render_status,
     render_thinking,
 )
-from .models import StoryDraft, StoryRequest
-from .prompts import get_genre, get_mood, random_topic
-from .speech import SpeechError, resolve_voice, synthesize
-from .story import StoryService
-from .timing import estimate_duration
 
 OPENING_STATUS = "warming up the pen…"
 OPENING_DEMO = "warming up the pen… (demo reel)"

@@ -11,7 +11,9 @@ from collections.abc import AsyncIterator, Iterator
 
 import gradio as gr
 
-from .llm import EngineNotConfiguredError
+from ..core.llm import EngineNotConfiguredError
+from ..core.speech import SpeechError
+from ..core.story import StoryError
 from .markup import (
     render_deck_idle,
     render_room_signal,
@@ -19,8 +21,6 @@ from .markup import (
     render_status,
     render_thinking,
 )
-from .speech import SpeechError
-from .story import StoryError
 from .studio import Studio
 
 #: the page, the reader, the status line, and the composer button's own state

@@ -4,7 +4,7 @@ import pytest
 from langchain_openai import ChatOpenAI
 
 from kotori.config import Settings
-from kotori.llm import EngineNotConfiguredError, build_chat_model, describe_engine
+from kotori.core.llm import EngineNotConfiguredError, build_chat_model, describe_engine
 
 
 def test_missing_credentials_raise_a_readable_error():

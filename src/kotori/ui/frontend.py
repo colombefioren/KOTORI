@@ -9,7 +9,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from .config import ASSETS_DIR, Settings
+from ..config import ASSETS_DIR, Settings
 from .theme import DISPLAY_FONT, HAND_FONT, MONO_FONT, SANS_FONT, SERIF_FONT
 
 STYLE_FILES: tuple[str, ...] = (

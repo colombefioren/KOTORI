@@ -3,7 +3,7 @@
 import pytest
 
 from kotori.config import STORY_WORDS
-from kotori.models import (
+from kotori.core.models import (
     StoryDraft,
     StoryRequest,
     count_words,

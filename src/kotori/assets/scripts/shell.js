@@ -278,7 +278,11 @@
     overlay.dataset.open = "false";
     overlay.innerHTML =
       '<div class="ast-sheet"><i class="tape tape--blue tape--right" aria-hidden="true"></i>' +
+      '<button type="button" class="ast-close" aria-label="close">×</button>' +
       "<h3></h3><ul></ul></div>";
+    overlay.querySelector(".ast-close").addEventListener("click", function () {
+      closeOverlays();
+    });
     overlay.querySelector("h3").textContent = heading;
     overlay.addEventListener("click", function (event) {
       if (event.target === overlay) closeOverlays();

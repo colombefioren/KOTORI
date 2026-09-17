@@ -1,6 +1,6 @@
 import itertools
 
-from kotori.timing import (
+from kotori.core.timing import (
     cumulative_fractions,
     estimate_duration,
     split_words,

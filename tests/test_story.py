@@ -2,10 +2,10 @@ import asyncio
 
 import pytest
 
-from kotori import story as story_module
 from kotori.config import STORY_WORDS, Settings
-from kotori.models import StoryRequest
-from kotori.story import StoryError, StoryService
+from kotori.core import story as story_module
+from kotori.core.models import StoryRequest
+from kotori.core.story import StoryError, StoryService
 
 
 @pytest.fixture

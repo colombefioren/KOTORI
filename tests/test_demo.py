@@ -3,14 +3,14 @@ import random
 
 import pytest
 
-from kotori import demo as demo_module
-from kotori.demo import (
+from kotori.core import demo as demo_module
+from kotori.core.demo import (
     DEMO_CHUNK_WORDS,
     DEMO_STORIES,
     demo_stream,
     pick_demo_story,
 )
-from kotori.models import StoryRequest
+from kotori.core.models import StoryRequest
 
 
 @pytest.fixture(autouse=True)

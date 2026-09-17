@@ -50,7 +50,7 @@ class FakeModel:
 @pytest.fixture
 def fake_model_factory(monkeypatch: pytest.MonkeyPatch, story_text: str):
     """Patch the writer so `StoryService` streams `story_text` in pieces."""
-    from kotori import story as story_module
+    from kotori.core import story as story_module
 
     pieces = [story_text[:40], story_text[40:120], story_text[120:]]
     monkeypatch.setattr(story_module, "build_chat_model", lambda *a, **k: FakeModel(pieces))
@@ -71,7 +71,7 @@ def story_text() -> str:
 @pytest.fixture
 def story_service(settings: Settings, fake_model_factory):
     """A writer wired to the fake model."""
-    from kotori.story import StoryService
+    from kotori.core.story import StoryService
 
     return StoryService(settings)
 
@@ -83,7 +83,7 @@ class FakeStoryService:
         return request.normalised("a quiet town")
 
     async def stream(self, request):
-        from kotori.story import StoryChunk
+        from kotori.core.story import StoryChunk
 
         yield StoryChunk(text=STORY[:40], delta=STORY[:40], note="writing…")
         yield StoryChunk(text=STORY, delta=STORY[40:], note="writing…")
@@ -95,7 +95,7 @@ def fake_speech(monkeypatch: pytest.MonkeyPatch) -> None:
     """Write a stand-in mp3 instead of talking to Google."""
     from pathlib import Path
 
-    from kotori import studio as studio_module
+    from kotori.ui import studio as studio_module
 
     def fake_synthesize(text, *, voice_key, out_dir, stem, slow=False):
         out_dir = Path(out_dir)
@@ -110,7 +110,7 @@ def fake_speech(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture
 def studio(settings: Settings, fake_speech: None):
     """A studio with a fake writer and fake speech, on a throwaway archive."""
-    from kotori.studio import Studio
+    from kotori.ui.studio import Studio
 
     return Studio(settings, service=FakeStoryService())
 
@@ -118,6 +118,6 @@ def studio(settings: Settings, fake_speech: None):
 @pytest.fixture
 def offline_studio(offline_settings: Settings, fake_speech: None):
     """No credentials: the studio must reach for the demo reels."""
-    from kotori.studio import Studio
+    from kotori.ui.studio import Studio
 
     return Studio(offline_settings, service=FakeStoryService())

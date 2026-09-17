@@ -163,7 +163,7 @@
     border-color 0.2s ease, box-shadow 0.16s ease !important;
 }
 
-.gradio-container button:hover {
+.gradio-container button:hover:not(.theme-switch):not(.deck__btn):not(.act) {
   transform: translate(-1px, -1px) rotate(-0.5deg);
   background: var(--accent-soft-2) !important;
   border-color: var(--blue-400) !important;
@@ -921,6 +921,34 @@
   border-radius: var(--edge-card);
   box-shadow: var(--shadow-2);
   padding: 30px;
+}
+
+/* close button on overlays */
+.ast-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  font-family: var(--ui);
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1.5px solid var(--line-2);
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.ast-close:hover {
+  color: var(--ink);
+  border-color: var(--pink-400);
 }
 
 .ast-sheet h3 {

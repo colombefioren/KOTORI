@@ -12,8 +12,8 @@ import re
 
 from kotori.config import ASSETS_DIR, PROJECT_ROOT
 
-MARKUP = PROJECT_ROOT / "src" / "kotori" / "markup.py"
-UI = PROJECT_ROOT / "src" / "kotori" / "ui.py"
+MARKUP = PROJECT_ROOT / "src" / "kotori" / "ui" / "markup.py"
+UI = PROJECT_ROOT / "src" / "kotori" / "ui" / "ui.py"
 SCRIPTS = ASSETS_DIR / "scripts"
 STYLES = ASSETS_DIR / "styles"
 

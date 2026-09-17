@@ -1,7 +1,7 @@
 import random
 
-from kotori.models import StoryRequest
-from kotori.prompts import (
+from kotori.core.models import StoryRequest
+from kotori.core.prompts import (
     GENRES,
     MOODS,
     TOPIC_SEEDS,

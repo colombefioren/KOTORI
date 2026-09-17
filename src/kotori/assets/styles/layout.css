@@ -129,7 +129,8 @@
 .theme-switch:hover {
   transform: rotate(-1.5deg) translateY(-1px);
   color: var(--ink);
-  border-color: var(--pink-300);
+  border-color: var(--pink-400);
+  background: var(--pink-100);
 }
 
 .theme-switch__dot {
@@ -240,17 +241,19 @@
   min-width: 0;
 }
 
+/* Gradio Columns apply display:flex; we must override with !important */
 #room-home,
 #room-playground,
 #room-history {
-  display: none;
+  display: none !important;
   padding-top: 32px;
 }
 
 :root[data-room="home"] #room-home,
 :root[data-room="playground"] #room-playground,
 :root[data-room="history"] #room-history {
-  display: block;
+  display: flex !important;
+  flex-direction: column;
 }
 
 /* the hidden note the server writes to move the reader between rooms */
