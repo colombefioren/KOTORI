@@ -20,6 +20,7 @@ from ..core.library import ArchiveStats
 from ..core.models import StoryDraft, format_duration, humanize_ms
 from ..core.speech import Voice, resolve_voice
 from ..core.timing import word_weight
+from .frontend import kotori_mark_data_uri
 
 escape = html.escape
 
@@ -87,32 +88,35 @@ def _doodle(kind: str) -> str:
     return ""
 
 
+def _mark(*, size: int = 40, css_class: str = "kotori-mark") -> str:
+    """The KOTORI mark on its own: a bird carrying a star.
+
+    The real drawn logo, inlined as a data URI so the masthead never depends
+    on a static file route. Used next to the wordmark, and again (bigger) on
+    the home polaroid, so the brand reads as one thing everywhere.
+    """
+    src = kotori_mark_data_uri()
+    if not src:
+        return ""
+    return (
+        f'<img class="{css_class}" width="{size}" height="{size}" src="{src}" '
+        f'alt="the KOTORI mark: a bird carrying a star">'
+    )
+
+
 def _bird() -> str:
-    """The mascot: a flat little bird on a branch, riso-printed."""
-    return """
-<svg class="polaroid__print" viewBox="0 0 240 176" role="img"
-     aria-label="a little bird on a branch">
-  <rect width="240" height="176" fill="var(--blue-100)"/>
-  <circle cx="192" cy="36" r="17" fill="var(--pink-200)"/>
-  <path d="M-6 134C58 120 120 146 246 120" fill="none" stroke="var(--blue-500)"
-        stroke-width="3" stroke-linecap="round"/>
-  <path d="M96 122C96 104 108 92 124 86" fill="none" stroke="var(--blue-500)"
-        stroke-width="2" stroke-linecap="round"/>
-  <ellipse cx="108" cy="92" rx="35" ry="29" fill="var(--pink-300)"/>
-  <path d="M78 96C56 92 44 78 40 60" fill="none" stroke="var(--pink-400)"
-        stroke-width="3" stroke-linecap="round"/>
-  <circle cx="136" cy="66" r="19" fill="var(--pink-200)"/>
-  <circle cx="143" cy="62" r="2.8" fill="var(--ink)"/>
-  <path d="M152 64 168 69 152 75Z" fill="var(--pink-500)"/>
-  <path d="M100 92c12-7 25-4 31 4-10 10-24 8-31-4Z" fill="var(--blue-300)"
-        stroke="var(--blue-500)" stroke-width="1.2"/>
-  <path d="M118 118v10M104 128l14-10 14 10" fill="none" stroke="var(--ink-2)"
-        stroke-width="2" stroke-linecap="round"/>
-  <g fill="var(--pink-400)">
-    <circle cx="30" cy="30" r="3"/><circle cx="46" cy="22" r="2"/>
-    <circle cx="20" cy="50" r="2"/><circle cx="212" cy="150" r="3"/>
-  </g>
-</svg>"""
+    """The mascot on a little riso-printed card, for the home polaroid."""
+    dots = (
+        '<svg class="polaroid__dots" viewBox="0 0 240 176" aria-hidden="true">'
+        '<g fill="var(--pink-400)">'
+        '<circle cx="30" cy="30" r="3"/><circle cx="46" cy="22" r="2"/>'
+        '<circle cx="20" cy="50" r="2"/><circle cx="212" cy="150" r="3"/>'
+        "</g>"
+        '<path d="M-6 150C58 138 120 158 246 138" fill="none" stroke="var(--blue-500)" '
+        'stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>'
+        "</svg>"
+    )
+    return f'<span class="polaroid__print">{dots}{_mark(size=200, css_class="polaroid__mark")}</span>'
 
 
 # ── chrome ──────────────────────────────────────────────────────────────────
@@ -177,9 +181,11 @@ def render_masthead(settings: Settings, stats: ArchiveStats) -> str:
 <a class="ast-skip" href="#ast-tabs">skip to the studio</a>
 <header class="masthead" role="banner">
   <div class="masthead__brand">
-    <p class="masthead__mark">KOTO<b>RI</b></p>
-    <p class="masthead__tag">{escape(APP_TAGLINE)}</p>
-    {_doodle("star")}
+    {_mark(size=46)}
+    <div class="masthead__word">
+      <p class="masthead__title">KOTO<b>RI</b></p>
+      <p class="masthead__tag">{escape(APP_TAGLINE)}</p>
+    </div>
   </div>
   <div class="masthead__side">
     <p class="masthead__note">
@@ -202,7 +208,7 @@ def render_masthead(settings: Settings, stats: ArchiveStats) -> str:
 def render_home_intro(settings: Settings) -> str:
     """What KOTORI is, in a couple of sentences and a polaroid."""
     engine = (
-        "The key on this server is a real writer — everything it makes is yours."
+        "The key on this server is a real writer: everything it makes is yours."
         if settings.is_configured
         else "No key is set, so the shelves hold demo reels. Add one and the same "
         "button writes something nobody has read before."
@@ -213,7 +219,7 @@ def render_home_intro(settings: Settings) -> str:
     <p class="home__kicker">what is this?</p>
     <h2 class="home__title">a little bird that writes you a story, then reads it aloud</h2>
     <p class="home__lede">
-      {escape(APP_NAME)} takes one line from you — a place, a person, a problem — and
+      {escape(APP_NAME)} takes one line from you, a place, a person, a problem, and
       writes a <b>{STORY_WORDS}-word story</b> onto the page. While it writes, the words
       land one by one, as if someone were typing. Then a small voice reads the whole
       thing back and every word warms as it is spoken, so you can read along.
@@ -223,7 +229,7 @@ def render_home_intro(settings: Settings) -> str:
   <figure class="polaroid">
     {_tape("blue", "mid")}
     {_bird()}
-    <figcaption>kotori — <i>“the little bird”</i></figcaption>
+    <figcaption>kotori, <i>“the little bird”</i></figcaption>
   </figure>
 </div>
 """
@@ -233,7 +239,7 @@ STEPS: tuple[tuple[str, str], ...] = (
     (
         "give it a line",
         "A half-sentence is plenty. “A lighthouse keeper who receives letters from a "
-        "ship that sank in 1912” — that is a whole story waiting to happen.",
+        "ship that sank in 1912” is already a whole story waiting to happen.",
     ),
     (
         "pick a genre and a voice",
@@ -270,9 +276,9 @@ def render_home_steps() -> str:
 def render_home_notes(settings: Settings) -> str:
     """The small print: what is kept, what is sent, what it costs."""
     engine = (
-        "Your own model — the key you set on the server writes every story."
+        "Your own model: the key you set on the server writes every story."
         if settings.is_configured
-        else "Demo reels — add an API key on the server and the same button writes "
+        else "Demo reels: add an API key on the server and the same button writes "
         "stories nobody has read before."
     )
     notes = (
@@ -346,7 +352,7 @@ def render_idle_sheet() -> str:
     <div class="tp-empty">
       <h3>the page is still blank</h3>
       <ol>
-        <li>Write a line in the brief — or press <b>surprise me</b>.</li>
+        <li>Write a line in the brief, or press <b>surprise me</b>.</li>
         <li>Press <b>write the story</b> and watch it arrive, word by word.</li>
         <li>Press play, then read along as the story is spoken.</li>
       </ol>
@@ -513,7 +519,7 @@ def render_history(
   {_tape("", "left")}
   <h3>nothing here yet</h3>
   <p>Write your first story in the playground and it will be filed here, voice and all.</p>
-  <p class="handnote">every card keeps its own recording — nothing is re-recorded.</p>
+  <p class="handnote">every card keeps its own recording; nothing is re-recorded.</p>
 </div>
 """
     sources = audio_srcs or {}
@@ -567,7 +573,7 @@ def archive_choices(drafts: Sequence[StoryDraft]) -> list[tuple[str, str]]:
     """``(label, id)`` pairs for the drawer's picker."""
     return [
         (
-            f"{draft.title} — {draft.genre} · {draft.words} words · {draft.created_label}",
+            f"{draft.title} · {draft.genre} · {draft.words} words · {draft.created_label}",
             draft.story_id,
         )
         for draft in drafts

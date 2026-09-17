@@ -14,6 +14,7 @@ survives ``uv sync`` re-installs.
 
 from __future__ import annotations
 
+import base64
 import importlib.resources
 import logging
 from functools import lru_cache
@@ -137,7 +138,8 @@ FONT_REQUESTS: tuple[str, ...] = (
 
 STYLE_DIR = ASSETS_DIR / "styles"
 SCRIPT_DIR = ASSETS_DIR / "scripts"
-FAVICON = ASSETS_DIR / "favicon.svg"
+FAVICON = ASSETS_DIR / "favicon.png"
+KOTORI_MARK = ASSETS_DIR / "images" / "kotori-mark.png"
 
 
 def _resolve(base: Path, names: tuple[str, ...]) -> list[Path]:
@@ -200,8 +202,23 @@ def favicon_path() -> str | None:
     return str(FAVICON) if FAVICON.exists() else None
 
 
+@lru_cache(maxsize=1)
+def kotori_mark_data_uri() -> str:
+    """The KOTORI mark (a bird carrying a star) as a data URI.
+
+    Inlined rather than served from a path so the masthead logo and the home
+    polaroid never depend on ``allowed_paths`` or a static route.
+    """
+    if not KOTORI_MARK.exists():
+        return ""
+    encoded = base64.b64encode(KOTORI_MARK.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
 def missing_assets() -> list[str]:
     """Names of any expected asset that is not on disk (used by the tests)."""
     missing = [path.name for path in _resolve(STYLE_DIR, STYLE_FILES) if not path.exists()]
     missing += [path.name for path in script_paths() if not path.exists()]
+    if not KOTORI_MARK.exists():
+        missing.append(KOTORI_MARK.name)
     return missing
