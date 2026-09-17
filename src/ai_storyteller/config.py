@@ -86,7 +86,8 @@ class Settings:
     max_tokens: int = 900
     request_timeout: float = 60.0
     data_dir: Path = DEFAULT_DATA_DIR
-    force_dark: bool = True
+    #: The studio is a scratchbook: paper, pastel ink, always light.
+    force_light: bool = True
     version: str = VERSION
 
     @property
@@ -139,7 +140,7 @@ def load_settings() -> Settings:
         max_tokens=_env_int("MAX_TOKENS", 900),
         request_timeout=_env_float("REQUEST_TIMEOUT", 60.0),
         data_dir=data_dir,
-        force_dark=_env_bool("FORCE_DARK", True),
+        force_light=_env_bool("FORCE_LIGHT", True),
     )
 
 

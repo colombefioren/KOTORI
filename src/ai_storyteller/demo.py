@@ -96,7 +96,3 @@ async def demo_stream(request: StoryRequest) -> AsyncIterator[StoryChunk]:
 
     yield StoryChunk(text=story, delta="", note=_WRITING)
     yield StoryChunk(text=story, delta="", finished=True, note="closing the loop…")
-
-
-def demo_note() -> str:
-    return _WRITING
