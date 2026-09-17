@@ -1,10 +1,13 @@
 """Server-side HTML rendering.
 
-Everything the browser needs is rendered here: word spans carry their timing
-weight in ``data-w`` so the client can drive the karaoke, every player carries
-its own ``<audio>`` element (so a shelf full of stories can never leak one
-story's voice into another), and hidden payloads give the export buttons
-something to copy.
+Everything the browser needs is rendered here: the index tabs across the top,
+the three rooms they switch between, word spans carrying their spoken weight in
+``data-w`` so the client can drive the karaoke, and every player carrying its
+own ``<audio>`` element — so a shelf full of stories can never leak one story's
+voice into another.
+
+The look is a scrapbook: paper, washi tape, torn edges, ruled lines, a polaroid
+and handwriting in the margins. Nothing here is neon, nothing glows.
 """
 
 from __future__ import annotations
@@ -20,8 +23,28 @@ from .timing import word_weight
 
 escape = html.escape
 
+#: The rooms behind the index tabs, in the order they are tabbed.
+ROOMS: tuple[tuple[str, str], ...] = (
+    ("home", "home"),
+    ("playground", "playground"),
+    ("history", "history"),
+)
+
 #: The page the playground player narrates.
 STAGE_PAPER = "paper-stage"
+
+
+# ── small paper helpers ─────────────────────────────────────────────────────
+
+
+def _tape(colour: str = "", side: str = "left") -> str:
+    """A strip of washi tape, stuck over an edge."""
+    cls = "tape"
+    if colour:
+        cls += f" tape--{colour}"
+    if side:
+        cls += f" tape--{side}"
+    return f'<i class="{cls}" aria-hidden="true"></i>'
 
 
 def _chips(items: Sequence[tuple[str, str]]) -> str:
@@ -35,26 +58,131 @@ def _chips(items: Sequence[tuple[str, str]]) -> str:
     return f'<div class="tp-meta">{spans}</div>'
 
 
+def _doodle(kind: str) -> str:
+    """A marker-pen doodle, drawn inline so it inherits the palette."""
+    if kind == "star":
+        return (
+            '<svg class="doodle doodle--star" viewBox="0 0 24 24" aria-hidden="true">'
+            '<path d="M12 1.6 14.9 8.4 22 9 16.5 13.7 18.2 21 12 17.1 5.8 21 '
+            '7.5 13.7 2 9 9.1 8.4Z" fill="var(--pink-200)" stroke="var(--pink-500)" '
+            'stroke-width="1.1" stroke-linejoin="round"/></svg>'
+        )
+    if kind == "arrow":
+        return (
+            '<svg class="doodle doodle--arrow" viewBox="0 0 96 54" aria-hidden="true">'
+            '<path d="M4 6C26 46 58 48 86 24" fill="none" stroke="var(--blue-500)" '
+            'stroke-width="2" stroke-linecap="round"/>'
+            '<path d="M86 24 72 25M86 24 79 36" fill="none" stroke="var(--blue-500)" '
+            'stroke-width="2" stroke-linecap="round"/></svg>'
+        )
+    if kind == "hearts":
+        return (
+            '<svg class="doodle doodle--hearts" viewBox="0 0 40 24" aria-hidden="true">'
+            '<path d="M8 6c2.4-3.6 7.2-1 6 3-.9 3-6 6.4-6 6.4S2.9 12 2 9c-1.2-4 3.6-6.6 6-3Z" '
+            'fill="var(--pink-300)" stroke="var(--pink-500)" stroke-width="1"/>'
+            '<path d="M27 3c1.8-2.7 5.4-.8 4.5 2.2-.7 2.2-4.5 4.8-4.5 4.8S22.7 7.4 22 5.2 '
+            'c-.9-3 2.7-4.9 4.5-2.2Z" fill="var(--blue-200)" stroke="var(--blue-500)" '
+            'stroke-width="1"/></svg>'
+        )
+    return ""
+
+
+def _bird() -> str:
+    """The mascot: a flat little bird on a branch, riso-printed."""
+    return """
+<svg class="polaroid__print" viewBox="0 0 240 176" role="img"
+     aria-label="a little bird on a branch">
+  <rect width="240" height="176" fill="var(--blue-100)"/>
+  <circle cx="192" cy="36" r="17" fill="var(--pink-200)"/>
+  <path d="M-6 134C58 120 120 146 246 120" fill="none" stroke="var(--blue-500)"
+        stroke-width="3" stroke-linecap="round"/>
+  <path d="M96 122C96 104 108 92 124 86" fill="none" stroke="var(--blue-500)"
+        stroke-width="2" stroke-linecap="round"/>
+  <ellipse cx="108" cy="92" rx="35" ry="29" fill="var(--pink-300)"/>
+  <path d="M78 96C56 92 44 78 40 60" fill="none" stroke="var(--pink-400)"
+        stroke-width="3" stroke-linecap="round"/>
+  <circle cx="136" cy="66" r="19" fill="var(--pink-200)"/>
+  <circle cx="143" cy="62" r="2.8" fill="var(--ink)"/>
+  <path d="M152 64 168 69 152 75Z" fill="var(--pink-500)"/>
+  <path d="M100 92c12-7 25-4 31 4-10 10-24 8-31-4Z" fill="var(--blue-300)"
+        stroke="var(--blue-500)" stroke-width="1.2"/>
+  <path d="M118 118v10M104 128l14-10 14 10" fill="none" stroke="var(--ink-2)"
+        stroke-width="2" stroke-linecap="round"/>
+  <g fill="var(--pink-400)">
+    <circle cx="30" cy="30" r="3"/><circle cx="46" cy="22" r="2"/>
+    <circle cx="20" cy="50" r="2"/><circle cx="212" cy="150" r="3"/>
+  </g>
+</svg>"""
+
+
+# ── chrome ──────────────────────────────────────────────────────────────────
+
+
 def render_label(text: str, meta: str = "") -> str:
     """A typewriter rule: ``the brief`` · *one line is enough*."""
     tail = f" · {escape(meta)}" if meta else ""
     return f'<p class="ast-label">{escape(text)}{tail}</p>'
 
 
+def render_tabs(active: str = "home", kept: int = 0) -> str:
+    """The index tabs across the top of the page.
+
+    Three paper tabs: the client flips between them without asking the server,
+    and the server can send the reader to one of them by rendering a signal
+    (see :func:`render_room_signal`). The little count on the history tab is
+    kept fresh by the client, which can count the index cards itself.
+    """
+    buttons: list[str] = []
+    for index, (room, label) in enumerate(ROOMS, start=1):
+        on = room == active
+        badge = ""
+        if room == "history":
+            shown = "" if kept else " hidden"
+            badge = (
+                f'<span class="index-tab__count"{shown} data-role="count">{kept}</span>'
+            )
+        aria = ' aria-selected="true"' if on else ' aria-selected="false"'
+        tabindex = "0" if on else "-1"
+        buttons.append(
+            f'<button type="button" role="tab" class="index-tab" data-room="{room}" '
+            f'id="tab-{room}" aria-controls="room-{room}"{aria} tabindex="{tabindex}">'
+            f'<span class="index-tab__n">{index:02d}</span>'
+            f'<span class="index-tab__label">{escape(label)}</span>{badge}</button>'
+        )
+    flap = '<span class="index-tabs__flap" aria-hidden="true"></span>'
+    return (
+        f'<nav class="index-tabs" role="tablist" '
+        f'aria-label="{escape(APP_NAME)} rooms">{flap}{"".join(buttons)}</nav>'
+    )
+
+
+def render_room_signal(active: str = "home") -> str:
+    """A hidden note telling the client which room to show.
+
+    The rooms are all in the DOM at once (so the browser never re-mounts a
+    player), and this is how the server asks the client to flip the page.
+    """
+    room = active if active in {name for name, _ in ROOMS} else "home"
+    return f'<span class="room-signal" data-room="{room}">{room}</span>'
+
+
 def render_masthead(settings: Settings, stats: ArchiveStats) -> str:
     """The brand, the shelf count and the theme switch."""
     kept = stats.drafts
+    words = f"{stats.words} words" if stats.words else "no words yet"
     return f"""
 <a class="ast-skip" href="#ast-tabs">skip to the studio</a>
 <header class="masthead" role="banner">
-  <p class="masthead__brand">
-    <span class="masthead__mark">KOTO<b>RI</b></span>
-    <span class="masthead__tag">{escape(APP_TAGLINE)}</span>
-  </p>
+  <div class="masthead__brand">
+    <p class="masthead__mark">KOTO<b>RI</b></p>
+    <p class="masthead__tag">{escape(APP_TAGLINE)}</p>
+    {_doodle("star")}
+  </div>
   <div class="masthead__side">
-    <span class="masthead__note">
-      {kept} stor{'y' if kept == 1 else 'ies'} kept · {escape(settings.engine_label)}
-    </span>
+    <p class="masthead__note">
+      {kept} stor{'y' if kept == 1 else 'ies'} kept · {words}<br>
+      {escape(settings.engine_label)}
+    </p>
     <button type="button" class="theme-switch" id="ast-theme"
             aria-label="Switch between the paper and the night desk">
       <span class="theme-switch__dot" aria-hidden="true"></span>
@@ -65,28 +193,35 @@ def render_masthead(settings: Settings, stats: ArchiveStats) -> str:
 """
 
 
+# ── home ────────────────────────────────────────────────────────────────────
+
+
 def render_home_intro(settings: Settings) -> str:
-    """What KOTORI is, in a couple of sentences."""
+    """What KOTORI is, in a couple of sentences and a polaroid."""
+    engine = (
+        "The key on this server is a real writer — everything it makes is yours."
+        if settings.is_configured
+        else "No key is set, so the shelves hold demo reels. Add one and the same "
+        "button writes something nobody has read before."
+    )
     return f"""
 <div class="home__topic">
-  <div>
+  <div class="home__say">
+    <p class="home__kicker">what is this?</p>
     <h2 class="home__title">a little bird that writes you a story, then reads it aloud</h2>
     <p class="home__lede">
-      {escape(APP_NAME)} takes one line from you — a place, a person, a problem —
-      and writes a <b>{STORY_WORDS}-word story</b> into the playground. While it writes,
-      the words land on the page one by one. When it is done, a small voice reads the
-      whole thing back and every word warms up as it is spoken, so you can read along.
+      {escape(APP_NAME)} takes one line from you — a place, a person, a problem — and
+      writes a <b>{STORY_WORDS}-word story</b> onto the page. While it writes, the words
+      land one by one, as if someone were typing. Then a small voice reads the whole
+      thing back and every word warms as it is spoken, so you can read along.
     </p>
+    <p class="home__lede home__lede--soft">{escape(engine)}</p>
   </div>
-  <div class="card card--plain">
-    <i class="tape tape--blue tape--right" aria-hidden="true"></i>
-    <p class="stamp stamp--mint">how it works</p>
-    <p class="handnote">
-      one line in, one story out. it keeps everything you write on this machine,
-      and it never asks you for an account.
-    </p>
-    <p class="handnote handnote--pink">start with a seed — “surprise me” is right there.</p>
-  </div>
+  <figure class="polaroid">
+    {_tape("blue", "mid")}
+    {_bird()}
+    <figcaption>kotori — <i>“the little bird”</i></figcaption>
+  </figure>
 </div>
 """
 
@@ -98,9 +233,9 @@ STEPS: tuple[tuple[str, str], ...] = (
         "ship that sank in 1912” — that is a whole story waiting to happen.",
     ),
     (
-        "pick a voice",
-        "Twelve narrators, from Aurora in the US to Nori in Japan. Choose a genre and "
-        "a mood if you like, or leave them alone and let the studio choose.",
+        "pick a genre and a voice",
+        "Type a genre, or paste one of your own. Twelve narrators, from Aurora in the "
+        "US to Nori in Japan. Mood and pace are yours to leave alone.",
     ),
     (
         "read along",
@@ -121,7 +256,12 @@ def render_home_steps() -> str:
     </li>"""
         for index, (title, body) in enumerate(STEPS, start=1)
     )
-    return f'<ol class="steps">{items}</ol>'
+    return f"""
+<div class="home__start">
+  <p class="ast-label">how it goes</p>
+  <ol class="steps">{items}</ol>
+</div>
+"""
 
 
 def render_home_notes(settings: Settings) -> str:
@@ -133,10 +273,16 @@ def render_home_notes(settings: Settings) -> str:
         "stories nobody has read before."
     )
     notes = (
-        ("Every story stays here.", "Stories and their recordings live in the studio's "
-         "own data folder as readable files. Nothing is sent anywhere else."),
-        ("Voices come from Google Translate's speech service.", "That is the only "
-         "outbound call at playback time, and only for a new recording."),
+        (
+            "Every story stays here.",
+            "Stories and their recordings live in the studio's own data folder as "
+            "readable files. Nothing is sent anywhere else.",
+        ),
+        (
+            "Voices come from Google Translate's speech service.",
+            "That is the only outbound call at playback time, and only for a "
+            "new recording.",
+        ),
         (engine, "The studio never shows or asks for your credentials."),
     )
     items = "".join(
@@ -145,12 +291,12 @@ def render_home_notes(settings: Settings) -> str:
     return f"""
 <div class="home__notes">
   <div class="card card--plain">
-    <i class="tape tape--left" aria-hidden="true"></i>
+    {_tape("", "left")}
     {render_label("field notes")}
     <ul class="fieldnotes">{items}</ul>
   </div>
   <div class="card card--plain">
-    <i class="tape tape--blue tape--mid" aria-hidden="true"></i>
+    {_tape("blue", "mid")}
     {render_label("keyboard")}
     <ul class="fieldnotes">
       <li>Press <b>?</b> any time for the whole shortcut sheet.</li>
@@ -163,9 +309,17 @@ def render_home_notes(settings: Settings) -> str:
 """
 
 
+def render_sticky(text: str, *, tone: str = "") -> str:
+    """A sticky note, for a tip that would otherwise be a tooltip."""
+    cls = f"sticky{f' sticky--{tone}' if tone else ''}"
+    return f'<p class="{cls}">{escape(text)}</p>'
+
+
+# ── the status line ─────────────────────────────────────────────────────────
+
 STATUS_LAMPS: dict[str, str] = {
     "idle": "ast-lamp",
-    "busy": "ast-lamp",
+    "busy": "ast-lamp ast-lamp--busy",
     "demo": "ast-lamp ast-lamp--demo",
     "error": "ast-lamp ast-lamp--off",
 }
@@ -180,11 +334,14 @@ def render_status(note: str = "ready when you are", tone: str = "idle") -> str:
     )
 
 
+# ── the story page ──────────────────────────────────────────────────────────
+
+
 def render_idle_sheet() -> str:
     """An empty page with instructions, not a void."""
     return f"""
 <div class="sheet-wrap">
-  <div class="sheet">
+  <div class="sheet sheet--empty">
     <div class="sheet__holes" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="tp-empty">
       <h3>the page is still blank</h3>
@@ -194,6 +351,7 @@ def render_idle_sheet() -> str:
         <li>Press play, then read along as the story is spoken.</li>
       </ol>
     </div>
+    {_tape("blue", "right")}
   </div>
 </div>
 """
@@ -201,7 +359,7 @@ def render_idle_sheet() -> str:
 
 def render_thinking(topic: str = "", note: str = "shaping the first line…") -> str:
     """The waiting page: ruled lines appearing while the writer thinks."""
-    chip = _chips([(topic, "lilac")]) if topic else ""
+    chip = _chips([(topic, "blue")]) if topic else ""
     return f"""
 <div class="sheet-wrap">
   {chip}
@@ -248,11 +406,11 @@ def render_sheet(
 
     voice: Voice = resolve_voice(draft.voice)
     chips = [
-        (f"{draft.words} words", "mint"),
-        (f"{format_duration(draft.reading_seconds)} to read", "lilac"),
+        (f"{draft.words} words", "blue"),
+        (f"{format_duration(draft.reading_seconds)} to read", "pink"),
         (draft.genre, ""),
         (draft.mood.lower(), ""),
-        (voice.choice, "blush"),
+        (voice.choice, "pink"),
     ]
     if draft.elapsed_ms:
         chips.append((f"written in {humanize_ms(draft.elapsed_ms)}", "butter"))
@@ -267,11 +425,15 @@ def render_sheet(
   {_chips(chips)}
   <div class="sheet{live_cls}" id="{STAGE_PAPER}"{aria}>
     <div class="sheet__holes" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="sheet__tape" aria-hidden="true">{_tape("blue", "right")}</div>
     <div class="tp-halo" aria-hidden="true"></div>
     {render_words(draft.story, live=live)}
   </div>
 </div>
 """
+
+
+# ── the reader ──────────────────────────────────────────────────────────────
 
 
 def render_deck(
@@ -288,10 +450,12 @@ def render_deck(
      data-slug="{escape(draft.slug)}" data-duration-hint="{duration_hint:.2f}"
      data-autoplay="{'1' if autoplay else '0'}"
      role="group" aria-label="story player and extras">
-  <i class="tape tape--blue tape--left" aria-hidden="true"></i>
+  {_tape("blue", "left")}
   <audio class="deck__audio" preload="metadata" src="{escape(audio_src, quote=True)}"></audio>
   <textarea hidden class="deck__payload" data-kind="text">{escape(draft.story)}</textarea>
   <textarea hidden class="deck__payload" data-kind="markdown">{escape(draft.markdown())}</textarea>
+
+  <p class="deck__head">{escape(draft.title)}</p>
 
   <div class="deck__top">
     <button type="button" class="deck__play" data-role="toggle"
@@ -325,35 +489,39 @@ def render_deck_idle(message: str = "the voice arrives once a story exists") -> 
     """The reader while there is nothing to play yet."""
     return f"""
 <div class="deck deck--idle" role="status" aria-live="polite">
-  <i class="tape tape--blue tape--left" aria-hidden="true"></i>
+  {_tape("blue", "left")}
   <div class="deck__top">
     <span class="ast-dots" aria-hidden="true"><i></i><i></i><i></i></span>
     <p class="deck__idle-note">{escape(message)}</p>
   </div>
+  <p class="deck__hint">a story has to exist before it can be read aloud</p>
 </div>
 """
+
+
+# ── the history ─────────────────────────────────────────────────────────────
 
 
 def render_history(
     drafts: Sequence[StoryDraft],
     audio_srcs: Mapping[str, str] | None = None,
 ) -> str:
-    """Every story ever written, as index cards taped to the ledger."""
+    """Every story ever written, as index cards in the ledger."""
     if not drafts:
-        return """
+        return f"""
 <div class="ledger__empty">
+  {_tape("", "left")}
   <h3>nothing here yet</h3>
   <p>Write your first story in the playground and it will be filed here, voice and all.</p>
+  <p class="handnote">every card keeps its own recording — nothing is re-recorded.</p>
 </div>
 """
     sources = audio_srcs or {}
-    cards = "".join(
-        _history_card(draft, sources.get(draft.story_id)) for draft in drafts
-    )
+    cards = "".join(_index_card(draft, sources.get(draft.story_id)) for draft in drafts)
     return f'<div class="ledger__grid">{cards}</div>'
 
 
-def _history_card(draft: StoryDraft, audio_src: str | None) -> str:
+def _index_card(draft: StoryDraft, audio_src: str | None) -> str:
     """One index card: title, stamp, excerpt, its own player, its actions."""
     player = (
         f"""
@@ -369,12 +537,13 @@ def _history_card(draft: StoryDraft, audio_src: str | None) -> str:
     <span class="mini__time" data-role="time">0:00 / --:--</span>
   </div>"""
         if audio_src
-        else '<p class="handnote">no voice recorded yet</p>'
+        else '<p class="handnote handnote--quiet">no voice recorded yet</p>'
     )
     return f"""
 <article class="story-card" data-story-id="{escape(draft.story_id)}"
          data-slug="{escape(draft.slug)}">
-  <i class="tape tape--left" aria-hidden="true"></i>
+  {_tape("", "left")}
+  <p class="story-card__index" aria-hidden="true">{escape(draft.story_id[:4].upper())}</p>
   <header class="story-card__head">
     <h3 class="story-card__title">{escape(draft.title)}</h3>
     <span class="stamp">{escape(draft.created_label)}</span>
@@ -397,7 +566,10 @@ def _history_card(draft: StoryDraft, audio_src: str | None) -> str:
 def archive_choices(drafts: Sequence[StoryDraft]) -> list[tuple[str, str]]:
     """``(label, id)`` pairs for the drawer's picker."""
     return [
-        (f"{draft.title} — {draft.genre} · {draft.words} words · {draft.created_label}", draft.story_id)
+        (
+            f"{draft.title} — {draft.genre} · {draft.words} words · {draft.created_label}",
+            draft.story_id,
+        )
         for draft in drafts
     ]
 
