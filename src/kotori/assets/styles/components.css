@@ -708,6 +708,12 @@
   margin-top: 22px;
   position: relative;
   display: grid;
+  /* without this, the implicit single column sizes to fit its widest
+     unshrinkable child (the nowrap date stamp in .story-card__head) rather
+     than to the card's own fixed width, and everything in that column
+     (title, meta, excerpt, the mini player) spills out past the border
+     with it, since a card this width can't grow to accommodate it. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   align-content: start;
   background: var(--cream);
