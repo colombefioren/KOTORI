@@ -12,7 +12,13 @@ from collections.abc import AsyncIterator, Iterator
 import gradio as gr
 
 from .llm import EngineNotConfiguredError
-from .markup import render_deck_idle, render_sheet, render_status, render_thinking
+from .markup import (
+    render_deck_idle,
+    render_room_signal,
+    render_sheet,
+    render_status,
+    render_thinking,
+)
 from .speech import SpeechError
 from .story import StoryError
 from .studio import Studio
@@ -21,8 +27,8 @@ from .studio import Studio
 StageOutputs = tuple[str, str, str, object]
 #: the hidden picker, the visible picker, the ledger, the masthead, the status
 HistoryOutputs = tuple[object, object, str, str, str]
-#: the page, the reader, the status line, and which tab should be showing
-PlayOutputs = tuple[str, str, str, object]
+#: the page, the reader, the status line, and which room should be showing
+PlayOutputs = tuple[str, str, str, str]
 
 EXPECTED_ERRORS = (StoryError, SpeechError, EngineNotConfiguredError)
 
@@ -44,8 +50,9 @@ def _picks(choices: list[tuple[str, str]], value: str | None = None) -> tuple[ob
     return update, gr.update(choices=choices, value=value)
 
 
-def _show_playground() -> object:
-    return gr.update(selected=PLAYGROUND)
+def _show_playground() -> str:
+    """A room signal: the client reads it and flips the page."""
+    return render_room_signal(PLAYGROUND)
 
 
 def _plural(count: int, singular: str, plural: str | None = None) -> str:
@@ -84,7 +91,7 @@ async def stream_story(
         raise gr.Error(str(error)) from error
 
 
-async def demo_story(studio: Studio) -> AsyncIterator[tuple[str, str, str, object, object]]:
+async def demo_story(studio: Studio) -> AsyncIterator[tuple[str, str, str, object, str]]:
     """A demo reel, written into the playground from the home page."""
     topic = studio.roll_topic()
     async for stage, deck, status, composer in stream_story(
@@ -98,7 +105,7 @@ def rearm(studio: Studio) -> object:
     return _composer(False)
 
 
-def show_playground(studio: Studio) -> object:
+def show_playground(studio: Studio) -> str:
     """Send the reader from the home page to the playground."""
     return _show_playground()
 
