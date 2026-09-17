@@ -30,10 +30,16 @@ jobs:
         run: uv sync --frozen
 
       - name: lint
-        run: uv run ruff check src tests
+        run: uv run ruff check src tests scripts
 
       - name: format check
-        run: uv run ruff format --check src tests
+        run: uv run ruff format --check src tests scripts
+
+      - name: parse the client scripts
+        run: |
+          for script in src/kotori/assets/scripts/*.js; do
+            node --check "$script"
+          done
 
       - name: test
         run: |
@@ -46,5 +52,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+
+      - name: validate the compose and blueprint files
+        run: |
+          python - <<'PY'
+          import pathlib, yaml
+          for name in ("docker-compose.yml", "render.yaml"):
+              yaml.safe_load(pathlib.Path(name).read_text())
+              print(f"{name} parses")
+          PY
+
       - name: build the image
         run: docker build -t kotori:ci .
+
+      - name: boot the image and wait for a healthy container
+        run: |
+          docker run -d --name kotori-ci -p 7860:7860 \
+            -e KOTORI_DATA_DIR=/tmp/kotori kotori:ci
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:7860/ >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          docker logs kotori-ci
+          exit 1
