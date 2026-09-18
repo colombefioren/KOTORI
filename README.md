@@ -66,14 +66,22 @@ Every story is four hundred words: long enough to have weather, short enough for
 docker compose up --build        # reads .env, mounts ./data
 ```
 
-**Free:** push this repo to a [Hugging Face Space](https://huggingface.co/new-space) — the
-front matter at the top of this file (`sdk: docker`, `app_port: 7860`) is all a Space needs
-to build and run the Dockerfile as-is, on its free CPU tier, no card required. Add
-`MODEL_NAME` / `API_KEY` / `BASE_URL` as Space secrets and it writes real stories instead of
-demo reels.
+**Free:** [Render](https://render.com) → *New → Web Service* (not *Blueprint* — that flow
+needs a paid plan) → point it at this repo. Render detects the `Dockerfile` and offers a
+**Free** compute plan; pick it. Add `MODEL_NAME` / `API_KEY` / `BASE_URL` under the service's
+*Environment* tab and it writes real stories instead of demo reels. No card required.
+
+The catches, both inherent to a free tier rather than anything about this app: it sleeps
+after 15 minutes idle (30–60s to wake back up on the next visit), and there is no free
+persistent disk, so the story archive resets whenever the service sleeps, redeploys, or
+restarts — everything still works, it just doesn't remember past sessions. Neither Vercel
+nor Hugging Face's Docker/Gradio Spaces work here at all: Vercel's serverless functions
+can't hold the WebSocket connection this app's streaming needs, and Hugging Face now
+requires a paid plan to run anything but a static Space.
 
 Also ships `deploy.yml`, which publishes a released tag to `ghcr.io/colombefioren/kotori`,
-so the same image runs on anywhere else that hosts a container and gives it a port.
+so the same image runs on any host that gives a container a port and lets it stay running
+(with a persistent disk, if that history matters to you).
 
 ## tests
 
