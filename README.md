@@ -2,7 +2,7 @@
 
 <img src="src/kotori/assets/images/kotori-mark.png" alt="kotori: a bird carrying a star" width="160" />
 
-# Kotori
+# KOTORI
 
 **a pastel paper studio that writes you a story and reads it aloud.**
 
@@ -18,38 +18,27 @@
 
 ---
 
-## what kotori is
+## What KOTORI is
 
 give it one line, a place, a person, a problem, and kotori writes a full story around
-it: four hundred words, typed onto the page one word at a time, as if someone were
-writing it live in front of you. pick a genre and a mood first if you want to steer it,
-or leave both alone and let the studio choose.
+it: four hundred words, typed onto the page one word at a time. a voice then reads it
+back, and every word lights up on the page in time with the voice, like a karaoke
+lyric you can pause, skip, or scrub.
 
-once the story lands, a voice reads it back. every word it speaks lights up on the page
-in time with the voice, so you can follow along the way you'd follow a karaoke lyric,
-and pause, skip, or scrub the recording like any other player.
+no signup or key required: the studio ships demo reels, so writing, streaming and
+narration all work immediately. add a model endpoint later and the same button writes
+something new, in any of ten genres and eight moods, read by one of twelve voices
+across nine languages.
 
-there's no signup and no key required to try it: the studio ships a set of demo reels,
-so writing, streaming and narration all work the moment you open it. add a model
-endpoint and a key later and the same button writes something nobody has read before,
-in any of ten genres and eight moods, read by one of twelve voices across nine
-languages.
+the interface looks like a scrapbook left open on a desk, not a software dashboard:
+torn paper, washi tape, index cards, a polaroid, and margin doodles, where pink marks
+what you gave it and blue marks what it wrote back. kotori is the japanese word for a
+small bird, the one taped above, carrying a star.
 
-the interface is drawn to look like a scrapbook left open on a desk rather than a
-software dashboard: torn paper edges, washi tape, index cards, a polaroid, and margin
-doodles, all built as real shapes and gradients rather than a texture pasted over a
-grid. pink marks what you gave it, blue marks what it wrote back, and the two colours
-never swap meaning anywhere in the app. more on the paper-craft and the type system
-lives in [`docs/design.md`](docs/design.md).
+every story you keep is filed away with its own recording, ready to reopen, replay, or
+export as text or mp3.
 
-kotori is the japanese word for a small bird; the one taped above, carrying a star, is
-who the studio is named after and who keeps an eye on the page while you write.
-
-every story you keep gets filed away with its own recording, so a shelf full of past
-work never leaks one voice into another, and anything on it can be reopened, replayed,
-or exported as text or mp3 whenever you like.
-
-## quickstart
+## Quickstart
 
 ```bash
 git clone https://github.com/colombefioren/kotori && cd kotori
@@ -67,7 +56,7 @@ API_KEY=sk-…
 BASE_URL=https://api.your-endpoint.com/v1
 ```
 
-## the three rooms
+## The three rooms
 
 | tab | what lives there |
 |:--|:--|
@@ -75,7 +64,7 @@ BASE_URL=https://api.your-endpoint.com/v1
 | **playground** | the brief, the reader and the written story |
 | **history** | every story ever kept, each with its own player |
 
-## tests
+## Tests
 
 ```bash
 uv run pytest                                   # fully offline
