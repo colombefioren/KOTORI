@@ -31,35 +31,9 @@ def build_studio(settings: Settings | None = None) -> Studio:
 
 
 def build_demo(settings: Settings | None = None, studio: Studio | None = None) -> gr.Blocks:
-    """Fully wired Blocks instance: theme and assets applied, queue included.
-
-    The theme, stylesheet, script and head markup are stamped onto the demo and
-    its config regenerated so the ASGI app it builds renders correctly even when
-    served directly (Vercel) instead of only through ``launch()``.
-    """
+    """Fully wired Blocks instance, queue included."""
     settings = settings or get_settings()
-    demo = build_app(studio or Studio(settings), settings)
-    _apply_frontend_options(demo, settings)
-    return configure_queue(demo)
-
-
-def _apply_frontend_options(demo: gr.Blocks, settings: Settings) -> None:
-    """Stamp the theme/assets that ``launch()`` normally sets onto the demo.
-
-    Gradio reads these when it generates the page config, so they must be
-    present before the ASGI app is built — otherwise the index page renders
-    with no theme (``body_css`` is ``None``) and the template 500s.
-    """
-    options = launch_options(settings)
-    demo.theme = options["theme"]
-    demo.css_paths = options["css_paths"]
-    demo.js = options["js"]
-    demo.head = options["head"]
-    demo.favicon_path = options["favicon_path"]
-    demo.pwa = options["pwa"]
-    demo.show_error = options["show_error"]
-    demo._set_html_css_theme_variables()
-    demo.config = demo.get_config_file()
+    return configure_queue(build_app(studio or Studio(settings), settings))
 
 
 def launch_options(
