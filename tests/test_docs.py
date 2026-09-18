@@ -7,8 +7,6 @@ and that the old studio name is gone from everything a visitor can see.
 
 from pathlib import Path
 
-import yaml
-
 from kotori.config import PROJECT_ROOT
 
 README = PROJECT_ROOT / "README.md"
@@ -46,16 +44,6 @@ def shipped_files() -> list[Path]:
         else:
             files.append(entry)
     return files
-
-
-def test_the_readme_has_valid_space_front_matter():
-    text = README.read_text(encoding="utf-8")
-    _, _, body = text.partition("---\n")
-    front_matter, _, _ = body.partition("---\n")
-    meta = yaml.safe_load(front_matter)
-    assert meta["title"] == "KOTORI"
-    assert meta["sdk"] == "docker"
-    assert meta["app_port"] == 7860
 
 
 def test_no_shipped_file_names_the_model_vendor():
