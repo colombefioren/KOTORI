@@ -585,6 +585,34 @@
   gap: clamp(20px, 2.6vw, 32px);
 }
 
+/* the pager (shell.js) hides every card outside the current page this way,
+   rather than by matching the page number in CSS, since the number of pages
+   is unbounded */
+.story-card.is-off-page {
+  display: none;
+}
+
+.ledger__pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: clamp(28px, 3vw, 40px);
+}
+
+.ledger__pager-page {
+  font-family: var(--type);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* otherwise a plain paper button, the same as "refresh" above the ledger */
+.ledger__pager-btn {
+  min-width: 108px;
+}
+
 /* ── footer ────────────────────────────────────────────────────────────────── */
 
 .ast-footer {

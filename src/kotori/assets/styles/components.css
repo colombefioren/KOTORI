@@ -693,6 +693,22 @@
   margin: 0;
 }
 
+/* the one wait that actually takes a while gets a quiet hourglass instead
+   of leaving the pause to read as the app doing nothing */
+.deck__hint--patient {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+}
+
+.deck__hint--patient .doodle--hourglass {
+  position: static;
+  flex: none;
+  width: 16px;
+  animation: breath 2.4s ease-in-out infinite;
+}
+
 .deck__tools {
   display: flex;
   flex-wrap: wrap;
