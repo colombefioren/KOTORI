@@ -66,9 +66,14 @@ Every story is four hundred words: long enough to have weather, short enough for
 docker compose up --build        # reads .env, mounts ./data
 ```
 
-Also ships a Render blueprint (`render.yaml`), Hugging Face Spaces front matter, and a
-`deploy.yml` that publishes a released tag to `ghcr.io/colombefioren/kotori`, so it runs
-anywhere that hosts a container, gives it a port, and lets it stay running.
+**Free:** push this repo to a [Hugging Face Space](https://huggingface.co/new-space) — the
+front matter at the top of this file (`sdk: docker`, `app_port: 7860`) is all a Space needs
+to build and run the Dockerfile as-is, on its free CPU tier, no card required. Add
+`MODEL_NAME` / `API_KEY` / `BASE_URL` as Space secrets and it writes real stories instead of
+demo reels.
+
+Also ships `deploy.yml`, which publishes a released tag to `ghcr.io/colombefioren/kotori`,
+so the same image runs on anywhere else that hosts a container and gives it a port.
 
 ## tests
 

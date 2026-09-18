@@ -53,11 +53,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: validate the compose and blueprint files
+      - name: validate the compose file
         run: |
           python - <<'PY'
           import pathlib, yaml
-          for name in ("docker-compose.yml", "render.yaml"):
+          for name in ("docker-compose.yml",):
               yaml.safe_load(pathlib.Path(name).read_text())
               print(f"{name} parses")
           PY
