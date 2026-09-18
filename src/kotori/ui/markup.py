@@ -105,6 +105,15 @@ def _doodle(kind: str) -> str:
             'c-.9-3 2.7-4.9 4.5-2.2Z" fill="var(--blue-200)" stroke="var(--blue-500)" '
             'stroke-width="1"/></svg>'
         )
+    if kind == "hourglass":
+        return (
+            '<svg class="doodle doodle--hourglass" viewBox="0 0 24 24" aria-hidden="true">'
+            '<path d="M6 3h12M6 21h12M7 3c0 5 4 6 5 8-1 2-5 3-5 8M17 3c0 5-4 6-5 8'
+            'c1 2 5 3 5 8" fill="none" stroke="var(--blue-500)" stroke-width="1.6" '
+            'stroke-linecap="round" stroke-linejoin="round"/>'
+            '<path d="M9 6.3c.7 1.6 2 2.3 3 2.3s2.3-.7 3-2.3" fill="var(--pink-200)" '
+            'stroke="none"/></svg>'
+        )
     return ""
 
 
@@ -509,8 +518,24 @@ def render_deck(
 """
 
 
-def render_deck_idle(message: str = "the voice arrives once a story exists") -> str:
-    """The reader while there is nothing to play yet."""
+def render_deck_idle(
+    message: str = "the voice arrives once a story exists",
+    hint: str = "a story has to exist before it can be read aloud",
+    *,
+    patient: bool = False,
+) -> str:
+    """The reader while there is nothing to play yet.
+
+    ``patient=True`` is for the one wait that actually takes a while (a
+    fresh voice recording): a small hourglass breathes next to the hint
+    instead of the hint sitting there as plain text, so the pause reads as
+    an expected, timed thing rather than the app looking stuck.
+    """
+    hint_html = (
+        f'<p class="deck__hint deck__hint--patient">{_doodle("hourglass")}{escape(hint)}</p>'
+        if patient
+        else f'<p class="deck__hint">{escape(hint)}</p>'
+    )
     return f"""
 <div class="deck deck--idle paper-light" role="status" aria-live="polite">
   {_tape("blue", "left")}
@@ -518,7 +543,7 @@ def render_deck_idle(message: str = "the voice arrives once a story exists") -> 
     <span class="ast-dots" aria-hidden="true"><i></i><i></i><i></i></span>
     <p class="deck__idle-note">{escape(message)}</p>
   </div>
-  <p class="deck__hint">a story has to exist before it can be read aloud</p>
+  {hint_html}
 </div>
 """
 
@@ -526,11 +551,17 @@ def render_deck_idle(message: str = "the voice arrives once a story exists") -> 
 # ── the history ─────────────────────────────────────────────────────────────
 
 
+#: Cards per page in the ledger. The client pages a fully-rendered grid
+#: rather than asking the server for a slice, so this only has to agree
+#: with the client-side pager in shell.js, not with any callback.
+LEDGER_PAGE_SIZE = 6
+
+
 def render_history(
     drafts: Sequence[StoryDraft],
     audio_srcs: Mapping[str, str] | None = None,
 ) -> str:
-    """Every story ever written, as index cards in the ledger."""
+    """Every story ever written, as index cards in the ledger, paged client-side."""
     if not drafts:
         return f"""
 <div class="ledger__empty">
@@ -541,11 +572,26 @@ def render_history(
 </div>
 """
     sources = audio_srcs or {}
-    cards = "".join(_index_card(draft, sources.get(draft.story_id)) for draft in drafts)
-    return f'<div class="ledger__grid">{cards}</div>'
+    cards = "".join(
+        _index_card(draft, sources.get(draft.story_id), page=index // LEDGER_PAGE_SIZE + 1)
+        for index, draft in enumerate(drafts)
+    )
+    pages = (len(drafts) - 1) // LEDGER_PAGE_SIZE + 1
+    pager = f"""
+<div class="ledger__pager" data-role="pager"{" hidden" if pages <= 1 else ""}>
+  <button type="button" class="ledger__pager-btn" data-role="prev" aria-label="Previous page">
+    ← prev
+  </button>
+  <span class="ledger__pager-page" data-role="page-label">page 1 of {pages}</span>
+  <button type="button" class="ledger__pager-btn" data-role="next" aria-label="Next page">
+    next →
+  </button>
+</div>
+"""
+    return f'<div class="ledger__grid">{cards}</div>{pager}'
 
 
-def _index_card(draft: StoryDraft, audio_src: str | None) -> str:
+def _index_card(draft: StoryDraft, audio_src: str | None, *, page: int = 1) -> str:
     """One index card: title, stamp, excerpt, its own player, its actions."""
     player = (
         f"""
@@ -565,7 +611,7 @@ def _index_card(draft: StoryDraft, audio_src: str | None) -> str:
     )
     return f"""
 <article class="story-card" data-story-id="{escape(draft.story_id)}"
-         data-slug="{escape(draft.slug)}">
+         data-slug="{escape(draft.slug)}" data-page="{page}">
   {_tape("", "left")}
   <p class="story-card__index" aria-hidden="true">{escape(draft.story_id[:4].upper())}</p>
   <header class="story-card__head">

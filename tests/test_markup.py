@@ -235,6 +235,24 @@ def test_a_story_without_a_recording_says_so():
     assert "mini__audio" not in html
 
 
+def test_the_ledger_pager_stays_hidden_under_one_page():
+    html = render_history([draft()])
+    assert 'data-page="1"' in html
+    assert 'data-role="pager" hidden' in html
+
+
+def test_the_ledger_pages_past_a_full_page():
+    drafts = [
+        StoryDraft(story_id=f"story{i:04d}", topic=f"topic {i}", story=STORY) for i in range(7)
+    ]
+    html = render_history(drafts)
+    # six cards to a page: the seventh spills onto page 2
+    assert html.count('data-page="1"') == 6
+    assert html.count('data-page="2"') == 1
+    assert "page 1 of 2" in html
+    assert 'data-role="pager" hidden' not in html
+
+
 def test_archive_choices_describe_each_story():
     drafts = [draft(), StoryDraft(story_id="efgh234567", topic="other", story=STORY)]
     choices = archive_choices(drafts)

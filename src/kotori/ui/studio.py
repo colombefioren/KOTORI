@@ -37,6 +37,7 @@ OPENING_STATUS = "warming up the pen…"
 OPENING_DEMO = "warming up the pen… (demo reel)"
 WRITING_DECK = "the voice arrives as soon as the story is finished…"
 VOICE_WAIT_NOTE = "recording the voice…"
+VOICE_WAIT_HINT = "good things take a moment: a fresh recording can take up to thirty seconds"
 READY_NOTE = "all yours · press play and read along"
 SAVED_NOTE = "filed in the history"
 DEMO_STATUS = "demo mode · add credentials for your own stories"
@@ -214,7 +215,7 @@ class Studio:
 
         yield View(
             stage=render_sheet(draft, note=SAVED_NOTE),
-            deck=render_deck_idle(VOICE_WAIT_NOTE),
+            deck=render_deck_idle(VOICE_WAIT_NOTE, hint=VOICE_WAIT_HINT, patient=True),
             status=render_status(VOICE_WAIT_NOTE, tone="busy"),
             draft=draft,
             busy=True,

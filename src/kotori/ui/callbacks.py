@@ -21,7 +21,7 @@ from .markup import (
     render_status,
     render_thinking,
 )
-from .studio import Studio
+from .studio import VOICE_WAIT_HINT, Studio
 
 #: the page, the reader, the status line, and the composer button's own state
 StageOutputs = tuple[str, str, str, object]
@@ -138,7 +138,9 @@ def record_voice(studio: Studio, story_id: str | None) -> Iterator[tuple[str, st
 
     yield (
         render_sheet(draft, note="recording…"),
-        render_deck_idle("recording a fresh voice for this story…"),
+        render_deck_idle(
+            "recording a fresh voice for this story…", hint=VOICE_WAIT_HINT, patient=True
+        ),
         render_status("recording a fresh voice…", tone="busy"),
     )
 

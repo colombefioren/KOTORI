@@ -55,14 +55,71 @@
     return room;
   }
 
-  /* the little number on the history tab, counted from the cards themselves */
+  /* the little number on the history tab, counted from the cards themselves.
+     Writing .textContent replaces a text node, which is a childList
+     mutation — and ASTBus's own MutationObserver watches childList on the
+     whole body. Writing it unconditionally on every tick, whether the
+     number changed or not, re-triggers that observer forever: schedule a
+     frame, flush, write the same text, get observed, schedule the next
+     frame, indefinitely. Only writing when the value actually changes
+     breaks that loop. */
   function syncCount() {
     var badge = document.querySelector('#ast-tabs [data-role="count"]');
     if (!badge) return;
-    var total = document.querySelectorAll(".story-card").length;
-    badge.textContent = String(total);
-    if (total) badge.removeAttribute("hidden");
+    var total = String(document.querySelectorAll(".story-card").length);
+    if (badge.textContent !== total) badge.textContent = total;
+    if (total !== "0") badge.removeAttribute("hidden");
     else badge.setAttribute("hidden", "");
+  }
+
+  /* the ledger: every card is already in the DOM (markup.py stamps each one
+     with the page it belongs to), so paging is just hiding the cards that
+     aren't on the current page — no server round trip to turn a page. */
+  var ledgerPage = 1;
+  var lastLedgerIds = "";
+
+  function pageLedger() {
+    var grid = document.querySelector(".ledger__grid");
+    var pager = document.querySelector('.ledger__pager[data-role="pager"]');
+    if (!grid || !pager) return;
+    var cards = Array.prototype.slice.call(grid.querySelectorAll(".story-card"));
+    if (!cards.length) return;
+
+    /* a genuinely different set of cards (a story written or deleted) starts
+       back on page 1; paging within the same set must not reset itself */
+    var ids = cards
+      .map(function (card) {
+        return card.getAttribute("data-story-id");
+      })
+      .join(",");
+    if (ids !== lastLedgerIds) {
+      lastLedgerIds = ids;
+      ledgerPage = 1;
+    }
+
+    var pages = cards.reduce(function (max, card) {
+      return Math.max(max, parseInt(card.getAttribute("data-page"), 10) || 1);
+    }, 1);
+    if (ledgerPage > pages) ledgerPage = pages;
+    if (ledgerPage < 1) ledgerPage = 1;
+
+    cards.forEach(function (card) {
+      var page = parseInt(card.getAttribute("data-page"), 10) || 1;
+      card.classList.toggle("is-off-page", page !== ledgerPage);
+    });
+
+    if (pages <= 1) {
+      pager.setAttribute("hidden", "");
+    } else {
+      pager.removeAttribute("hidden");
+    }
+    var label = pager.querySelector('[data-role="page-label"]');
+    var labelText = "page " + ledgerPage + " of " + pages;
+    if (label && label.textContent !== labelText) label.textContent = labelText;
+    var prev = pager.querySelector('[data-role="prev"]');
+    var next = pager.querySelector('[data-role="next"]');
+    if (prev) prev.disabled = ledgerPage <= 1;
+    if (next) next.disabled = ledgerPage >= pages;
   }
 
   /* the server moves the reader by re-rendering a hidden note, but Gradio
@@ -98,7 +155,21 @@
       return;
     }
     var jump = node.closest("[data-room-jump]");
-    if (jump) show(jump.getAttribute("data-room-jump"), { focus: true });
+    if (jump) {
+      show(jump.getAttribute("data-room-jump"), { focus: true });
+      return;
+    }
+    var prevPage = node.closest('.ledger__pager [data-role="prev"]');
+    if (prevPage) {
+      ledgerPage -= 1;
+      pageLedger();
+      return;
+    }
+    var nextPage = node.closest('.ledger__pager [data-role="next"]');
+    if (nextPage) {
+      ledgerPage += 1;
+      pageLedger();
+    }
   });
 
   /* ── toasts ───────────────────────────────────────────────────────────── */
@@ -498,6 +569,7 @@
     applyTrailPreference();
     roomPanels();
     syncCount();
+    pageLedger();
     watchRoom();
   });
 
@@ -512,6 +584,7 @@
     applyTrailPreference();
     roomPanels();
     syncCount();
+    pageLedger();
     watchRoom();
     show(currentRoom || "home");
   }
