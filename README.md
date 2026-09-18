@@ -66,24 +66,14 @@ Every story is four hundred words: long enough to have weather, short enough for
 docker compose up --build        # reads .env, mounts ./data
 ```
 
-Also ships a Render blueprint (`render.yaml`), Hugging Face Spaces front matter, and a
-`deploy.yml` that publishes a released tag to `ghcr.io/colombefioren/kotori`, so it runs
-anywhere that hosts a container, gives it a port, and lets it stay running.
+**Free:** push this repo to a [Hugging Face Space](https://huggingface.co/new-space) — the
+front matter at the top of this file (`sdk: docker`, `app_port: 7860`) is all a Space needs
+to build and run the Dockerfile as-is, on its free CPU tier, no card required. Add
+`MODEL_NAME` / `API_KEY` / `BASE_URL` as Space secrets and it writes real stories instead of
+demo reels.
 
-### Vercel (and other serverless/edge platforms)
-
-`app.py` also exposes `app`, the ASGI callable Vercel's Python runtime looks for, and
-`requirements.txt` / `vercel.json` (60s `maxDuration`, which needs at least a Pro plan) are
-there so the build actually installs gradio/langchain and doesn't time out mid-story. That
-gets the page itself loading.
-
-What it does not fix, because no config can: this is one long-running process with a
-WebSocket connection per visitor and a writable disk for the archive and rendered mp3s, and
-a serverless platform hands you a fresh, stateless, time-boxed invocation per request
-instead. Expect the page to load and short interactions to mostly work; expect streaming,
-playback continuing across requests, and the story archive to be unreliable, since none of
-those survive the function's invocation ending. Docker (above), Render, or the published
-GHCR image are the platforms this app is actually built for.
+Also ships `deploy.yml`, which publishes a released tag to `ghcr.io/colombefioren/kotori`,
+so the same image runs on anywhere else that hosts a container and gives it a port.
 
 ## tests
 

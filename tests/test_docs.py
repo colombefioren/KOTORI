@@ -29,7 +29,6 @@ SHIPPED = (
     PROJECT_ROOT / "src" / "kotori",
     PROJECT_ROOT / "Dockerfile",
     PROJECT_ROOT / "docker-compose.yml",
-    PROJECT_ROOT / "render.yaml",
     PROJECT_ROOT / ".github" / "workflows",
 )
 
