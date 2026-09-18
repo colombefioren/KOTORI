@@ -2,7 +2,7 @@
 
 <img src="src/kotori/assets/images/kotori-mark.png" alt="kotori: a bird carrying a star" width="160" />
 
-# Kotori
+# KOTORI
 
 **a pastel paper studio that writes you a story and reads it aloud.**
 
