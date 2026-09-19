@@ -6,6 +6,8 @@ import os
 from typing import Any
 
 import gradio as gr
+from fastapi import FastAPI, Request
+from fastapi.responses import PlainTextResponse
 
 from .config import Settings, get_settings
 from .ui.frontend import favicon_path, head_html, script_source, stylesheet_paths
@@ -30,10 +32,29 @@ def build_studio(settings: Settings | None = None) -> Studio:
     return Studio(settings or get_settings())
 
 
+def health(request: Request) -> PlainTextResponse:
+    """Liveness/readiness probe — answers with a plain ``hi``."""
+    return PlainTextResponse("hi", status_code=200)
+
+
+def register_health(app: FastAPI) -> None:
+    """Attach the ``/health`` probe to Gradio's underlying ASGI app.
+
+    ``Blocks.launch`` rebuilds its FastAPI app, which would drop any route
+    registered before launch. The route is therefore attached to the app
+    object and that same object is reused at launch via the ``_app`` kwarg —
+    the same mechanism ``gradio.Server`` relies on — so the probe survives.
+    """
+    if not any(getattr(route, "path", None) == "/health" for route in app.routes):
+        app.add_route("/health", health, methods=["GET"])
+
+
 def build_demo(settings: Settings | None = None, studio: Studio | None = None) -> gr.Blocks:
     """Fully wired Blocks instance, queue included."""
     settings = settings or get_settings()
-    return configure_queue(build_app(studio or Studio(settings), settings))
+    demo = configure_queue(build_app(studio or Studio(settings), settings))
+    register_health(demo.app)
+    return demo
 
 
 def launch_options(
@@ -63,9 +84,10 @@ def launch(settings: Settings | None = None, **overrides: Any) -> gr.Blocks:
     """Build and launch the studio; extra kwargs win over the defaults."""
     settings = settings or get_settings()
     studio = build_studio(settings)
-    demo = configure_queue(build_app(studio, settings))
+    demo = build_demo(settings, studio)
     options = launch_options(settings, allowed_paths=[str(studio.data_dir)])
     options.update(overrides)
+    options["_app"] = demo.app
     demo.launch(**options)
     return demo
 
