@@ -2,6 +2,7 @@ from pathlib import Path
 
 import gradio as gr
 import pytest
+from starlette.testclient import TestClient
 
 from kotori.app import build_demo, build_studio, launch_options
 from kotori.config import Settings
@@ -155,6 +156,16 @@ def test_app_assembles_every_anchor(settings: Settings):
     ids = {component.get("props", {}).get("elem_id") for component in config["components"]}
     assert ids >= EXPECTED_IDS
     assert len(config["dependencies"]) >= 10
+
+
+def test_health_endpoint_is_live(settings: Settings):
+    demo = build_demo(settings)
+    assert any(getattr(r, "path", None) == "/health" for r in demo.app.routes)
+    with TestClient(demo.app) as client:
+        resp = client.get("/health")
+    assert resp.status_code == 200
+    assert resp.text == "hi"
+    assert resp.headers["content-type"].startswith("text/plain")
 
 
 def test_app_renders_branding_and_controls(settings: Settings, tmp_path: Path):
