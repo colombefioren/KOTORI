@@ -22,6 +22,9 @@ APP_NAME = "KOTORI"
 APP_TAGLINE = "a little bird that tells you stories"
 VERSION = "0.4.0"
 
+#: The gate in front of ``/admin`` when ``KOTORI_ADMIN_PASSWORD`` is unset.
+DEFAULT_ADMIN_PASSWORD = "cocoyourlittleboo"
+
 #: The length every story is written to. There is no slider any more.
 STORY_WORDS = 400
 
@@ -90,6 +93,10 @@ class Settings:
     request_timeout: float = 60.0
     data_dir: Path = DEFAULT_DATA_DIR
     version: str = VERSION
+    #: Postgres DSN. When unset nothing is captured and the studio runs as before.
+    database_url: str | None = None
+    #: Gate for the ``/admin`` page; falls back to :data:`DEFAULT_ADMIN_PASSWORD`.
+    admin_password: str | None = None
 
     @property
     def is_configured(self) -> bool:
@@ -108,6 +115,11 @@ class Settings:
     @property
     def audio_dir(self) -> Path:
         return self.data_dir / "audio"
+
+    @property
+    def has_database(self) -> bool:
+        """True when a Postgres DSN was configured for the submission archive."""
+        return bool(self.database_url)
 
     def ensure_dirs(self) -> None:
         """Create the writable directories the studio needs."""
@@ -143,6 +155,8 @@ def load_settings() -> Settings:
         max_tokens=_env_int("MAX_TOKENS", 900),
         request_timeout=_env_float("REQUEST_TIMEOUT", 60.0),
         data_dir=data_dir,
+        database_url=_first_env("DATABASE_URL"),
+        admin_password=_first_env("KOTORI_ADMIN_PASSWORD"),
     )
 
 

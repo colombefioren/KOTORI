@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from ..config import STORY_WORDS, Settings, ensure_writable_dir, get_settings
+from ..core.db import SubmissionStore
 from ..core.demo import DEMO_GENRE, DEMO_MODEL, DEMO_MOOD, demo_stream
 from ..core.library import StoryLibrary
 from ..core.models import StoryDraft, StoryRequest
@@ -70,6 +71,7 @@ class Studio:
         settings: Settings | None = None,
         library: StoryLibrary | None = None,
         service: StoryService | None = None,
+        store: SubmissionStore | None = None,
     ) -> None:
         self.settings = settings or get_settings()
         self.data_dir = ensure_writable_dir(self.settings.data_dir)
@@ -77,6 +79,8 @@ class Studio:
         self.audio_dir.mkdir(parents=True, exist_ok=True)
         self.library = library or StoryLibrary(self.data_dir / "library.jsonl")
         self.service = service or StoryService(self.settings)
+        #: Best-effort archive of every submission; a no-op without a DSN.
+        self.store = store if store is not None else SubmissionStore(self.settings)
 
     # ── chrome ───────────────────────────────────────────────────────────────
     def masthead(self) -> str:
@@ -212,6 +216,7 @@ class Studio:
 
         draft.elapsed_ms = int((time.perf_counter() - started) * 1000)
         self.library.save(draft)
+        self.store.record(draft)
 
         yield View(
             stage=render_sheet(draft, note=SAVED_NOTE),
@@ -323,6 +328,7 @@ class Studio:
             model="shared link",
         )
         self.library.save(draft)
+        self.store.record(draft, source="shared link")
         return View(
             stage=render_sheet(draft, note="restored from a link"),
             deck=render_deck_idle("press play below once this story has a voice"),

@@ -9,6 +9,7 @@ import gradio as gr
 from fastapi import FastAPI, Request
 from fastapi.responses import PlainTextResponse
 
+from .admin import register_admin
 from .config import Settings, get_settings
 from .ui.frontend import favicon_path, head_html, script_source, stylesheet_paths
 from .ui.studio import Studio
@@ -52,8 +53,11 @@ def register_health(app: FastAPI) -> None:
 def build_demo(settings: Settings | None = None, studio: Studio | None = None) -> gr.Blocks:
     """Fully wired Blocks instance, queue included."""
     settings = settings or get_settings()
-    demo = configure_queue(build_app(studio or Studio(settings), settings))
+    studio = studio or build_studio(settings)
+    demo = configure_queue(build_app(studio, settings))
     register_health(demo.app)
+    # the desk shares the studio's archive, so it sees every submission
+    register_admin(demo.app, settings, studio.store)
     return demo
 
 
